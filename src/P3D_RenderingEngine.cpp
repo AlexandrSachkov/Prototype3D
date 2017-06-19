@@ -1,5 +1,5 @@
 #include "P3D_RenderingEngine.h"
-#include "NL_D3D11Utility.h"
+#include "internal/NL_D3D11Utility.h"
 
 #include <imgui.h>
 

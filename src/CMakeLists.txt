@@ -76,17 +76,20 @@ SET(HEADERS
 	#NL_Thread.h
 	#NL_IWindowManager.h
     
-    p3d_RenderingResources.h
-    NL_D3D11Utility.h
-    NL_D3D11Utility.inl 
-    p3d_CharBuffer.h
-    p3d_CircularBuffer.h
-    p3d_ConsoleQueue.h
-    p3d_GlfwWindowManager.h
-    p3d_ImguiRenderer.h
-    p3d_ImguiUiManager.h
+    internal/p3d_RenderingResources.h
+    internal/NL_D3D11Utility.h
+    internal/NL_D3D11Utility.inl 
+    
+    util/internal/p3d_CharBuffer.h
+    util/internal/p3d_CircularBuffer.h
+    
+    util/p3d_ConsoleQueue.h
+    util/p3d_GlfwWindowManager.h
+    util/p3d_ImguiRenderer.h
+    util/p3d_ImguiUiManager.h
+    util/p3d_Timer.h	
+    
     p3d_RenderingEngine.h
-    p3d_Timer.h	
 	)
 
 SET(SOURCES 
@@ -118,18 +121,20 @@ SET(SOURCES
 	#NL_TextureLoader.cpp
 	#NL_UiComponent.cpp
     
-    NL_D3D11Utility.cpp
-    p3d_ConsoleQueue.cpp
-    p3d_GlfwWindowManager.cpp
-    p3d_ImguiRenderer.cpp
-    p3d_ImguiUiManager.cpp
+    internal/NL_D3D11Utility.cpp
+    
+    util/p3d_ConsoleQueue.cpp
+    util/p3d_GlfwWindowManager.cpp
+    util/p3d_ImguiRenderer.cpp
+    util/p3d_ImguiUiManager.cpp
+    
     p3d_RenderingEngine.cpp
     p3dTest.cpp
 	)
 
 SET (SHADERS
-    D3D11Shaders/Forward_VS.hlsl
-	D3D11Shaders/Forward_PS.hlsl
+    internal/shaders/Forward_VS.hlsl
+	internal/shaders/Forward_PS.hlsl
 )
 
 # TBB

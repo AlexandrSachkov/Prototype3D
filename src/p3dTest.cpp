@@ -1,9 +1,10 @@
-#include "p3d_ConsoleQueue.h"
-#include "p3d_GlfwWindowManager.h"
-#include "p3d_ImguiUiManager.h"
-#include "p3d_ImguiRenderer.h"
+#include "util/p3d_ConsoleQueue.h"
+#include "util/p3d_GlfwWindowManager.h"
+#include "util/p3d_ImguiUiManager.h"
+#include "util/p3d_ImguiRenderer.h"
+#include "util/p3d_Timer.h"
+
 #include "P3D_RenderingEngine.h"
-#include "p3d_Timer.h"
 
 #include <memory>
 #include <assert.h>

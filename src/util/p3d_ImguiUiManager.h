@@ -1,7 +1,7 @@
 #pragma once
 
-#include "p3d_CircularBuffer.h"
-#include "p3d_CharBuffer.h"
+#include "internal/p3d_CircularBuffer.h"
+#include "internal/p3d_CharBuffer.h"
 
 #include <imgui.h>
 #include <functional>
