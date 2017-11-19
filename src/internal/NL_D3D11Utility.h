@@ -1,8 +1,8 @@
 #ifndef NL_D3D11_UTILITY_H_
 #define NL_D3D11_UTILITY_H_
 
-#include "p3d_RenderingResources.h"
-
+#include <Windows.h>
+#include <d3d11.h>
 
 #include <string>
 #include <cstdint>
@@ -37,7 +37,7 @@ namespace p3d
 				ID3D11BlendState*& blendState
 				);
 
-			template<class T>
+			/*template<class T>
 			static bool createBuffer(
 				ID3D11Device* device,
 				D3D11_BIND_FLAG bindFlag,
@@ -45,7 +45,7 @@ namespace p3d
 				T data[],
 				size_t dataLength,
 				RESOURCES::Buffer& buffer
-				);
+				);*/
 
 			static bool createRenderTargetViews(
 				ID3D11Device* device,
@@ -81,13 +81,13 @@ namespace p3d
 				ID3D11Texture2D*& texture
 				);
 
-			static bool createInputLayout(
+			/*static bool createInputLayout(
 				ID3D11Device* device, 
 				D3D11_INPUT_ELEMENT_DESC ilDesc[],
 				uint_fast32_t size,
 				RESOURCES::VertexShader& vShader, 
 				ID3D11InputLayout*& inputLayout
-				);
+				);*/
 
 			static bool createTextureSamplerState(ID3D11Device* device, ID3D11SamplerState*& samplerState);
 
@@ -98,9 +98,9 @@ namespace p3d
 				ID3D11RasterizerState*& rasterizerState
 				);
 				
-			static bool loadVertexShader(ID3D11Device* device, std::wstring path, RESOURCES::VertexShader& vertexShader);
+			/*static bool loadVertexShader(ID3D11Device* device, std::wstring path, RESOURCES::VertexShader& vertexShader);
 			static bool loadPixelShader(ID3D11Device* device, std::wstring path, RESOURCES::PixelShader& pixelShader);
-			
+			*/
 			static void setFullscreen(IDXGISwapChain*& swapChain, bool fullScreen);
 
 			static void setViewPort(
@@ -120,12 +120,12 @@ namespace p3d
 				float screenHeight
 				);
 
-			static void updateBuffer(
+			/*static void updateBuffer(
 				ID3D11DeviceContext*& deviceContext, 
 				RESOURCES::Buffer& buffer, 
 				void* data, 
 				size_t dataSize
-				);
+				);*/
 
 			private:
 				static bool compileBlobFromFile(

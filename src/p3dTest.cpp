@@ -3,8 +3,15 @@
 #include "util/p3d_ImguiUiManager.h"
 #include "util/p3d_ImguiRenderer.h"
 #include "util/p3d_Timer.h"
+#include "util/p3d_SceneImporter.h"
 
+#include "p3d_ResourceModel.h"
 #include "P3D_RenderingEngine.h"
+#include "p3d_Camera.h"
+
+#include "glm/glm.hpp"
+#include <glm/gtc/type_ptr.hpp>
+#include "glm/gtc/matrix_transform.hpp"
 
 #include <memory>
 #include <assert.h>
@@ -24,16 +31,16 @@ int main()
 	p3d::util::ConsoleQueue consoleQueue;
 
 	auto windowManager = p3d::util::GlfwWindowManager();
-	if (!windowManager.initialize(winWidth, winHeight, fullscreen, true, false, true, winTitle,
+	if (!windowManager.initialize(winWidth, winHeight, fullscreen, true, false, false, winTitle,
 		[&](unsigned int level, std::string data) {
 		consoleQueue.push((p3d::util::CONSOLE_OUT_TYPE)level, data);
 	}))
 		return 0;
-	
+
 	int clientWidth, clientHeight;
 	windowManager.getClientSize(clientWidth, clientHeight);
 
-	auto renderingEngine = p3d::RenderingEngine();
+	p3d::d3d11::RenderingEngine renderingEngine;
 	if (!renderingEngine.initialize(windowManager.getWindowHandle(), clientWidth, clientHeight, fullscreen))
 		return 0;
 
@@ -44,10 +51,24 @@ int main()
 	auto uiRenderer = p3d::util::ImguiRenderer();
 	if (!uiRenderer.initialize(renderingEngine.getDevice(), renderingEngine.getDeviceContext()))
 		return 0;
-	
+
 	renderingEngine.attachUiRenderingCallback([&](void* device, void* devCon) {
 		uiRenderer.render(device, devCon, uiManager.getDrawData());
 	});
+
+	// =================== SCENE =============================================
+	p3d::util::SceneImporter importer;
+	p3d::model::Scene scene;
+	//importer.import("resources/landlord/landlord.dae", scene);
+	if (!importer.import("resources/crytek-sponza/sponzaLit.dae", scene))
+		return false;
+	//scene.materials[0].wireframe = true;
+
+	if (!renderingEngine.load(scene))
+		return false;
+	//========================================================================
+
+	p3d::Camera camera({ 0, 0, 3 });
 
 	//SCRIPT::ScriptExecutor masterExecutor;
 	//SCRIPT::Bindings::attachMaster(masterExecutor.getState());
@@ -63,8 +84,43 @@ int main()
 		running = false;
 	});
 	windowManager.addKeyEvCbk([&](int key, int scancode, int action, int mod) {
-		if(key == GLFW_KEY_ESCAPE)
+		if (key == GLFW_KEY_ESCAPE)
 			running = false;
+	});
+
+	float movementSensitivity = 0.1f;
+	windowManager.addKeyEvCbk([&](int key, int scancode, int action, int mod) {
+		if (key == GLFW_KEY_W)
+			camera.move(movementSensitivity, 0);
+	});
+	windowManager.addKeyEvCbk([&](int key, int scancode, int action, int mod) {
+		if (key == GLFW_KEY_S)
+			camera.move(-movementSensitivity, 0);
+	});
+	windowManager.addKeyEvCbk([&](int key, int scancode, int action, int mod) {
+		if (key == GLFW_KEY_A)
+			camera.move(0, -movementSensitivity);
+	});
+	windowManager.addKeyEvCbk([&](int key, int scancode, int action, int mod) {
+		if (key == GLFW_KEY_D)
+			camera.move(0, movementSensitivity);
+	});
+
+	float rotationSensitivity = 0.005f;
+	double lastXPos = 0, lastYPos = 0;
+	bool firstCamUpdate = true;
+	windowManager.addCursorPosEvCbk([&](double xPos, double yPos) {
+		if (firstCamUpdate) {
+			lastXPos = xPos;
+			lastYPos = yPos;
+			firstCamUpdate = false;
+		}
+
+		double yaw = (xPos - lastXPos) * rotationSensitivity;
+		double pitch = (yPos - lastYPos) * rotationSensitivity;
+		lastXPos = xPos;
+		lastYPos = yPos;
+		camera.rotate((float)pitch, (float)yaw);
 	});
 
 	do
@@ -75,7 +131,7 @@ int main()
 		int width, height;
 		windowManager.getClientSize(width, height);
 		uiManager.update(deltaT, width, height);
-		renderingEngine.update(deltaT);
+		renderingEngine.render(deltaT, camera);
 
 	} while (running);
 

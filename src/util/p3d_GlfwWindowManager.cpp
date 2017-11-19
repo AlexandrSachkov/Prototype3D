@@ -2,16 +2,13 @@
 
 #include <assert.h>
 
-namespace p3d
-{
-	namespace util
-	{
+namespace p3d {
+	namespace util {
 		GlfwWindowManager::GlfwWindowManager() :
-			_window(nullptr)
-		{}
+			_window(nullptr) {
+		}
 
-		GlfwWindowManager::~GlfwWindowManager()
-		{
+		GlfwWindowManager::~GlfwWindowManager() {
 			if (_window)
 				glfwDestroyWindow(_window);
 			glfwTerminate();
@@ -27,11 +24,9 @@ namespace p3d
 			bool enableCurs,
 			std::string title,
 			std::function<void(unsigned int level, std::string)> consoleOutCallback
-			)
-		{
+		) {
 			glfwSetErrorCallback(glfwErrorCallback);
-			if (!glfwInit())
-			{
+			if (!glfwInit()) {
 				consoleOutCallback(3, "GLFW failed to initialize");
 				return false;
 			}
@@ -39,19 +34,15 @@ namespace p3d
 			glfwWindowHint(GLFW_RESIZABLE, resizable);
 			glfwWindowHint(GLFW_DECORATED, decorated);
 
-			if (fullscreen)
-			{
+			if (fullscreen) {
 				const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 				_window = glfwCreateWindow(mode->width, mode->height, title.c_str(), glfwGetPrimaryMonitor(), NULL);
-			}
-			else
-			{
+			} else {
 				_window = glfwCreateWindow(screenWidth, screenHeight, title.c_str(), NULL, NULL);
 			}
 
 
-			if (!_window)
-			{
+			if (!_window) {
 				glfwTerminate();
 				consoleOutCallback(3, "GLFW Window failed to initialize");
 				return false;
@@ -63,8 +54,7 @@ namespace p3d
 			return true;
 		}
 
-		void GlfwWindowManager::setWindowCallbacks(GLFWwindow* window)
-		{
+		void GlfwWindowManager::setWindowCallbacks(GLFWwindow* window) {
 			glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
 				auto& windowMngr = *static_cast<GlfwWindowManager*>(glfwGetWindowUserPointer(window));
 				windowMngr.fireKeyEv(key, scancode, action, mods);
@@ -95,21 +85,17 @@ namespace p3d
 			});
 		}
 
-		void GlfwWindowManager::getClientSize(int& width, int& height)
-		{
+		void GlfwWindowManager::getClientSize(int& width, int& height) {
 			glfwGetWindowSize(_window, &width, &height);
 		}
 
-		HWND GlfwWindowManager::getWindowHandle()
-		{
+		HWND GlfwWindowManager::getWindowHandle() {
 			return glfwGetWin32Window(_window);
 		}
 
-		void GlfwWindowManager::glfwErrorCallback(int error, const char* description)
-		{
+		void GlfwWindowManager::glfwErrorCallback(int error, const char* description) {
 			printf("%s\n", description);
-			switch (error)
-			{
+			switch (error) {
 			case GLFW_NO_CURRENT_CONTEXT:
 				assert(false && "GLFW_NO_CURRENT_CONTEXT");
 			case GLFW_OUT_OF_MEMORY:
@@ -125,98 +111,76 @@ namespace p3d
 			}
 		}
 
-		void GlfwWindowManager::pollEvents()
-		{
+		void GlfwWindowManager::pollEvents() {
 			glfwPollEvents();
 		}
 
-		void GlfwWindowManager::addKeyEvCbk(std::function<void(int key, int scancode, int action, int mods)> callback)
-		{
+		void GlfwWindowManager::addKeyEvCbk(std::function<void(int key, int scancode, int action, int mods)> callback) {
 			_keyEvCallbacks.push_back(callback);
 		}
 
-		void GlfwWindowManager::addCharEvCbk(std::function<void(unsigned int codepoint)> callback)
-		{
+		void GlfwWindowManager::addCharEvCbk(std::function<void(unsigned int codepoint)> callback) {
 			_charEvCallbacks.push_back(callback);
 		}
 
-		void GlfwWindowManager::addMouseBtnEvCbk(std::function<void(int button, int action, int mods)> callback)
-		{
+		void GlfwWindowManager::addMouseBtnEvCbk(std::function<void(int button, int action, int mods)> callback) {
 			_mouseBtnEvCallbacks.push_back(callback);
 		}
 
-		void GlfwWindowManager::addCursorPosEvCbk(std::function<void(double xPos, double yPos)> callback)
-		{
+		void GlfwWindowManager::addCursorPosEvCbk(std::function<void(double xPos, double yPos)> callback) {
 			_cursorPosEvCallbacks.push_back(callback);
 		}
 
-		void GlfwWindowManager::addScrollEvCbk(std::function<void(double xOffset, double yOffset)> callback)
-		{
+		void GlfwWindowManager::addScrollEvCbk(std::function<void(double xOffset, double yOffset)> callback) {
 			_scrollEvCallbacks.push_back(callback);
 		}
 
-		void GlfwWindowManager::addWindowSizeEvCbk(std::function<void(int width, int height)> callback)
-		{
+		void GlfwWindowManager::addWindowSizeEvCbk(std::function<void(int width, int height)> callback) {
 			_windowSizeEvCallbacks.push_back(callback);
 		}
 
-		void GlfwWindowManager::addWindowCloseEvCbk(std::function<void()> callback)
-		{
+		void GlfwWindowManager::addWindowCloseEvCbk(std::function<void()> callback) {
 			_windowCloseEvCallbacks.push_back(callback);
 		}
 
-		void GlfwWindowManager::fireKeyEv(int key, int scancode, int action, int mods)
-		{
-			for (auto& callback : _keyEvCallbacks)
-			{
+		void GlfwWindowManager::fireKeyEv(int key, int scancode, int action, int mods) {
+			for (auto& callback : _keyEvCallbacks) {
 				callback(key, scancode, action, mods);
 			}
 		}
 
-		void GlfwWindowManager::fireCharEv(unsigned int codepoint)
-		{
-			for (auto& callback : _charEvCallbacks)
-			{
+		void GlfwWindowManager::fireCharEv(unsigned int codepoint) {
+			for (auto& callback : _charEvCallbacks) {
 				callback(codepoint);
 			}
 		}
 
-		void GlfwWindowManager::fireMouseBtnEv(int button, int action, int mods)
-		{
-			for (auto& callback : _mouseBtnEvCallbacks)
-			{
+		void GlfwWindowManager::fireMouseBtnEv(int button, int action, int mods) {
+			for (auto& callback : _mouseBtnEvCallbacks) {
 				callback(button, action, mods);
 			}
 		}
 
-		void GlfwWindowManager::fireCursorPosEv(double xPos, double yPos)
-		{
-			for (auto& callback : _cursorPosEvCallbacks)
-			{
+		void GlfwWindowManager::fireCursorPosEv(double xPos, double yPos) {
+			for (auto& callback : _cursorPosEvCallbacks) {
 				callback(xPos, yPos);
 			}
 		}
 
-		void GlfwWindowManager::fireScrollEv(double xOffset, double yOffset)
-		{
-			for (auto& callback : _scrollEvCallbacks)
-			{
+		void GlfwWindowManager::fireScrollEv(double xOffset, double yOffset) {
+			for (auto& callback : _scrollEvCallbacks) {
 				callback(xOffset, yOffset);
 			}
 		}
 
-		void GlfwWindowManager::fireWindowSizeEv(int width, int height)
-		{
-			for (auto& callback : _windowSizeEvCallbacks)
-			{
+		void GlfwWindowManager::fireWindowSizeEv(int width, int height) {
+			for (auto& callback : _windowSizeEvCallbacks) {
 				callback(width, height);
 			}
 		}
 
-		void GlfwWindowManager::fireWindowCloseEv()
-		{
-			for (auto& callback : _windowCloseEvCallbacks)
-			{
+		void GlfwWindowManager::fireWindowCloseEv() {
+			for (auto& callback : _windowCloseEvCallbacks) {
 				callback();
 			}
 		}

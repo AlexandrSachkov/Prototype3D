@@ -3,7 +3,7 @@
 
 namespace p3d
 {
-	template<class T>
+	/*template<class T>
 	bool D3D11Utility::createBuffer(
 		ID3D11Device* device,
 		D3D11_BIND_FLAG bindFlag,
@@ -45,7 +45,7 @@ namespace p3d
 		buffer.numberElements = (uint_fast32_t)dataLength;
 
 		return true;
-	}
+	}*/
 
 	inline void D3D11Utility::setViewPort(
 		ID3D11DeviceContext*& deviceContext,
@@ -92,7 +92,7 @@ namespace p3d
 		deviceContext->RSSetViewports(1, &viewport);
 	}
 
-	inline void D3D11Utility::updateBuffer(
+	/*inline void D3D11Utility::updateBuffer(
 		ID3D11DeviceContext*& deviceContext,
 		RESOURCES::Buffer& buffer,
 		void* data,
@@ -105,7 +105,7 @@ namespace p3d
 		deviceContext->Map(buffer.apiBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		memcpy(mappedResource.pData, data, dataSize);
 		deviceContext->Unmap(buffer.apiBuffer, 0);
-	}
+	}*/
 }
 
 #endif

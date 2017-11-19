@@ -48,7 +48,7 @@ namespace p3d
 
 		UINT creationFlags = 0;
 #if defined(_DEBUG) || defined(DEBUG)
-		//creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
+		creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
 			//Create our SwapChain
@@ -320,7 +320,7 @@ namespace p3d
 		return true;
 	}
 
-	bool D3D11Utility::createInputLayout(
+	/*bool D3D11Utility::createInputLayout(
 		ID3D11Device* device,
 		D3D11_INPUT_ELEMENT_DESC ilDesc[],
 		uint_fast32_t size,
@@ -337,7 +337,7 @@ namespace p3d
 			return false;
 		}
 		return true;
-	}
+	}*/
 
 	bool D3D11Utility::createTextureSamplerState(ID3D11Device* device, ID3D11SamplerState*& samplerState)
 	{
@@ -380,6 +380,7 @@ namespace p3d
 
 		cmdesc.CullMode = cullMode;
 		cmdesc.FillMode = fillMode;
+		cmdesc.FrontCounterClockwise = true;
 
 		hr = device->CreateRasterizerState(&cmdesc, &rasterizerState);
 		if (FAILED(hr))
@@ -430,7 +431,7 @@ namespace p3d
 	}
 
 
-	bool D3D11Utility::loadVertexShader(ID3D11Device* device, std::wstring path, RESOURCES::VertexShader& vertexShader)
+	/*bool D3D11Utility::loadVertexShader(ID3D11Device* device, std::wstring path, RESOURCES::VertexShader& vertexShader)
 	{
 		HRESULT hr;
 		//Load vertex shader from file
@@ -467,9 +468,9 @@ namespace p3d
 		}
 
 		return true;
-	}
+	}*/
 
-	bool D3D11Utility::loadPixelShader(ID3D11Device* device, std::wstring path, RESOURCES::PixelShader& pixelShader)
+	/*bool D3D11Utility::loadPixelShader(ID3D11Device* device, std::wstring path, RESOURCES::PixelShader& pixelShader)
 	{
 		HRESULT hr;
 
@@ -508,7 +509,7 @@ namespace p3d
 		}
 
 		return true;
-	}
+	}*/
 
 	void D3D11Utility::setFullscreen(IDXGISwapChain*& swapChain, bool fullScreen)
 	{

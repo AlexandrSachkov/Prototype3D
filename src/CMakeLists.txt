@@ -23,7 +23,7 @@ ENDIF(MSVC)
 
 SET(HEADERS 
 	#NL_Allocator.h
-	#NL_AssetImporter.h
+	
 	#NL_CerealSerializer.h
 	#NL_IEditorUiManager.h
 	#NL_FileIOManager.h
@@ -76,9 +76,12 @@ SET(HEADERS
 	#NL_Thread.h
 	#NL_IWindowManager.h
     
-    internal/p3d_RenderingResources.h
+    internal/p3d_d3d11_RuntimeModel.h
+	internal/p3d_d3d11_Utility.h
+	internal/p3d_Math.h
     internal/NL_D3D11Utility.h
-    internal/NL_D3D11Utility.inl 
+    internal/NL_D3D11Utility.inl  
+    
     
     util/internal/p3d_CharBuffer.h
     util/internal/p3d_CircularBuffer.h
@@ -88,12 +91,16 @@ SET(HEADERS
     util/p3d_ImguiRenderer.h
     util/p3d_ImguiUiManager.h
     util/p3d_Timer.h	
+	util/p3d_SceneImporter.h
     
     p3d_RenderingEngine.h
+	p3d_ResourceModel.h
+	p3d_Camera.h
+   
 	)
 
 SET(SOURCES 
-	#NL_AssetImporter.cpp
+	
 	#NL_FileIOManager.cpp
 	#NL_Game.cpp
 	#NL_GameManager.cpp
@@ -122,19 +129,25 @@ SET(SOURCES
 	#NL_UiComponent.cpp
     
     internal/NL_D3D11Utility.cpp
-    
+       
     util/p3d_ConsoleQueue.cpp
     util/p3d_GlfwWindowManager.cpp
     util/p3d_ImguiRenderer.cpp
     util/p3d_ImguiUiManager.cpp
+	util/p3d_SceneImporter.cpp
     
     p3d_RenderingEngine.cpp
+	p3d_Camera.cpp
     p3dTest.cpp
 	)
 
 SET (SHADERS
     internal/shaders/Forward_VS.hlsl
 	internal/shaders/Forward_PS.hlsl
+	internal/shaders/untextured_VS.hlsl
+	internal/shaders/untextured_PS.hlsl
+	internal/shaders/textured_VS.hlsl
+	internal/shaders/textured_PS.hlsl
 )
 
 # TBB
@@ -280,6 +293,25 @@ IF(NLE_IMGUI_INCLUDE_PATH STREQUAL "")
 	MESSAGE(SEND_ERROR "NLE IMGUI include path must be specified")
 ENDIF(NLE_IMGUI_INCLUDE_PATH STREQUAL "")
 
+
+# DirectXTex
+SET(P3D_DIRECT_X_TEX_INCLUDE_PATH
+"" CACHE PATH "P3D DirectXTex include path")
+
+IF(P3D_DIRECT_X_TEX_INCLUDE_PATH STREQUAL "")
+    MESSAGE(SEND_ERROR "P3D DirectXTex include path must be specified")
+ENDIF(P3D_DIRECT_X_TEX_INCLUDE_PATH STREQUAL "")
+
+# GLM
+SET(P3D_GLM_INCLUDE_PATH
+	"" CACHE PATH "P3D GLM include path")
+
+IF(P3D_GLM_INCLUDE_PATH STREQUAL "")
+	MESSAGE(SEND_ERROR "P3D GLM include path must be specified")
+ENDIF(P3D_GLM_INCLUDE_PATH STREQUAL "")
+
+
+
 SET(HEADERS
 		${HEADERS}
 		${NLE_IMGUI_INCLUDE_PATH}/imgui.h
@@ -288,6 +320,8 @@ SET(HEADERS
 		${NLE_IMGUI_INCLUDE_PATH}/stb_rect_pack.h
 		${NLE_IMGUI_INCLUDE_PATH}/stb_textedit.h
 		${NLE_IMGUI_INCLUDE_PATH}/stb_truetype.h
+		${P3D_DIRECT_X_TEX_INCLUDE_PATH}/DDSTextureLoader/DDSTextureLoader.h
+		${P3D_DIRECT_X_TEX_INCLUDE_PATH}/WICTextureLoader/WICTextureLoader.h
 	)
 
 	SET(SOURCES 
@@ -295,6 +329,8 @@ SET(HEADERS
 		${NLE_IMGUI_INCLUDE_PATH}/imgui.cpp
 		${NLE_IMGUI_INCLUDE_PATH}/imgui_demo.cpp
 		${NLE_IMGUI_INCLUDE_PATH}/imgui_draw.cpp
+		${P3D_DIRECT_X_TEX_INCLUDE_PATH}/DDSTextureLoader/DDSTextureLoader.cpp
+		${P3D_DIRECT_X_TEX_INCLUDE_PATH}/WICTextureLoader/WICTextureLoader.cpp
 	)
 
 
@@ -307,6 +343,8 @@ INCLUDE_DIRECTORIES(
 	${NLE_LUA_INTF_INCLUDE_PATH}
 	${NLE_IMGUI_INCLUDE_PATH}
     ${NLE_D3D11_INCLUDE_PATH}
+    ${P3D_DIRECT_X_TEX_INCLUDE_PATH}
+	${P3D_GLM_INCLUDE_PATH}
 	)
 
 ADD_DEFINITIONS(
@@ -327,6 +365,8 @@ LINK_DIRECTORIES(
 	${NLE_ASSIMP_LIBRARY_RELEASE_PATH}
     ${NLE_D3D11_LIBRARY_DEBUG_PATH}
 	${NLE_D3D11_LIBRARY_RELEASE_PATH}
+    ${P3D_DIRECT_X_TEX_LIBRARY_DEBUG_PATH}
+    ${P3D_DIRECT_X_TEX_LIBRARY_RELEASE_PATH}
 	)
 
 add_executable (P3D
@@ -353,8 +393,8 @@ TARGET_LINK_LIBRARIES(P3D
 	debug glfw3
 	optimized glfw3
 
-	debug assimpd
-	optimized assimp
+	debug assimp-vc140-mt
+	optimized assimp-vc140-mt
     
     debug d3d11.lib
 	optimized d3d11.lib
