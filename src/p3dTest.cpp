@@ -59,9 +59,10 @@ int main()
 	// =================== SCENE =============================================
 	p3d::util::SceneImporter importer;
 	p3d::model::Scene scene;
-	//importer.import("resources/landlord/landlord.dae", scene);
-	if (!importer.import("resources/crytek-sponza/sponzaLit.dae", scene))
+	if(!importer.import("resources/landlord/landlord.dae", scene))
 		return false;
+	//if (!importer.import("resources/crytek-sponza/sponzaLit.dae", scene))
+	//	return false;
 	//scene.materials[0].wireframe = true;
 
 	if (!renderingEngine.load(scene))
@@ -84,36 +85,47 @@ int main()
 		running = false;
 	});
 	windowManager.addKeyEvCbk([&](int key, int scancode, int action, int mod) {
-		if (key == GLFW_KEY_ESCAPE)
+		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 			running = false;
 	});
-
+	
+	bool cursorEnabled = false, initCamPos = true;
 	float movementSensitivity = 0.1f;
 	windowManager.addKeyEvCbk([&](int key, int scancode, int action, int mod) {
-		if (key == GLFW_KEY_W)
+		if (!cursorEnabled && key == GLFW_KEY_W && (action == GLFW_PRESS || action == GLFW_REPEAT))
 			camera.move(movementSensitivity, 0);
 	});
 	windowManager.addKeyEvCbk([&](int key, int scancode, int action, int mod) {
-		if (key == GLFW_KEY_S)
+		if (!cursorEnabled && key == GLFW_KEY_S && (action == GLFW_PRESS || action == GLFW_REPEAT))
 			camera.move(-movementSensitivity, 0);
 	});
 	windowManager.addKeyEvCbk([&](int key, int scancode, int action, int mod) {
-		if (key == GLFW_KEY_A)
+		if (!cursorEnabled && key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT))
 			camera.move(0, -movementSensitivity);
 	});
 	windowManager.addKeyEvCbk([&](int key, int scancode, int action, int mod) {
-		if (key == GLFW_KEY_D)
+		if (!cursorEnabled && key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT))
 			camera.move(0, movementSensitivity);
+	});	
+	windowManager.addKeyEvCbk([&](int key, int scancode, int action, int mod) {
+		if (key == GLFW_KEY_F1 && action == GLFW_PRESS) {
+			cursorEnabled = cursorEnabled ? false : true;
+			windowManager.enableCursor(cursorEnabled);
+			if (!cursorEnabled)
+				initCamPos = true;
+		}			
 	});
 
 	float rotationSensitivity = 0.005f;
 	double lastXPos = 0, lastYPos = 0;
-	bool firstCamUpdate = true;
 	windowManager.addCursorPosEvCbk([&](double xPos, double yPos) {
-		if (firstCamUpdate) {
+		if (cursorEnabled)
+			return;
+
+		if (initCamPos) {
 			lastXPos = xPos;
 			lastYPos = yPos;
-			firstCamUpdate = false;
+			initCamPos = false;
 		}
 
 		double yaw = (xPos - lastXPos) * rotationSensitivity;
