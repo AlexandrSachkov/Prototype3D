@@ -264,7 +264,10 @@ namespace p3d {
 				if (mapMode[0] != mapMode[1])
 					return false;
 
-				std::experimental::filesystem::path fullTexP = std::experimental::filesystem::path(scenePathStr).append(texPathStr.data);
+				std::experimental::filesystem::path texP(texPathStr.data);
+				std::experimental::filesystem::path fullTexP = texP.is_absolute() ?
+					texP : std::experimental::filesystem::path(scenePathStr).append(texP);
+				
 				if (!std::experimental::filesystem::exists(fullTexP))
 					return false;
 
