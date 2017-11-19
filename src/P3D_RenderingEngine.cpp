@@ -93,7 +93,7 @@ namespace p3d {
 			_deviceContext->OMSetRenderTargets(1, &_backBufferRenderTargetView, _depthStencilView);
 
 			util::setViewPort(_deviceContext, 1, { 0,0 }, { width, height }, { 0.0f, 1.0f });
-			_projection = math::perspectiveDX(glm::radians(45.0f), (float)width / (float)height, 1.0f, 1000.f);
+			_projection = math::perspectiveDX(glm::radians(45.0f), (float)width / (float)height, 0.05f, 1000.f);
 
 			return true;
 		}
