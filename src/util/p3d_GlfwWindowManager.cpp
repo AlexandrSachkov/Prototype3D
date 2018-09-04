@@ -49,9 +49,13 @@ namespace p3d {
 			}
 			glfwSetWindowUserPointer(_window, this);
 			setWindowCallbacks(_window);
-			glfwSetInputMode(_window, GLFW_CURSOR, enableCurs ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+			enableCursor(false);
 
 			return true;
+		}
+
+		void GlfwWindowManager::enableCursor(bool enable) {
+			glfwSetInputMode(_window, GLFW_CURSOR, enable ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
 		}
 
 		void GlfwWindowManager::setWindowCallbacks(GLFWwindow* window) {

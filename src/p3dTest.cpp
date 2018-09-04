@@ -59,10 +59,10 @@ int main()
 	// =================== SCENE =============================================
 	p3d::util::SceneImporter importer;
 	p3d::model::Scene scene;
-	if(!importer.import("resources/landlord/landlord.dae", scene))
-		return false;
-	//if (!importer.import("resources/crytek-sponza/sponzaLit.dae", scene))
+	//if(!importer.import("resources/landlord/landlord.dae", scene))
 	//	return false;
+	if (!importer.import("resources/crytek-sponza/sponzaLit.dae", scene))
+		return false;
 	//scene.materials[0].wireframe = true;
 
 	if (!renderingEngine.load(scene))

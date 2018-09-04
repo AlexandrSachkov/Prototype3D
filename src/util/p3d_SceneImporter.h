@@ -12,6 +12,7 @@ struct aiScene;
 struct aiMaterial;
 struct aiMesh;
 struct aiNode;
+struct aiLight;
 
 namespace p3d {
 	namespace model {
@@ -35,6 +36,8 @@ namespace p3d {
 			bool loadMaterial(aiMaterial* material, std::string scenePath, model::Material& out);
 			bool loadTexture2D(aiMaterial* material, aiTextureType type, std::string scenePath, bool& enabled, model::Texture2D& out);
 			bool loadTextureMapMode(aiTextureMapMode in, TEXTURE_MAP_MODE& out);
+			bool loadLights(aiLight** lights, unsigned int numLights, std::vector<model::Light>& out);
+			bool loadLight(aiLight* in, model::Light& out);
 		};
 	}
 }

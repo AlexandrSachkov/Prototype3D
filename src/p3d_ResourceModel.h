@@ -65,26 +65,17 @@ namespace p3d
 
 		struct DirectionalLight
 		{
-			glm::vec3 ambient;
-			glm::vec3 diffuse;
-			glm::vec3 specular;
 			glm::vec3 direction;
 		};
 
 		struct PointLight
 		{
-			glm::vec3 ambient;
-			glm::vec3 diffuse;
-			glm::vec3 specular;
 			glm::vec3 attenuation;
 			float range;
 		};
 
 		struct SpotLight
 		{
-			glm::vec3 ambient;
-			glm::vec3 diffuse;
-			glm::vec3 specular;
 			glm::vec3 direction;
 			glm::vec3 attenuation;
 			float range;
@@ -94,7 +85,11 @@ namespace p3d
 		struct Light
 		{
 			LIGHT_TYPE type;
-			union {
+			glm::vec3 position;
+			glm::vec3 diffuse;
+			glm::vec3 specular;
+			union Data{
+				Data() {}
 				DirectionalLight direct;
 				PointLight point;
 				SpotLight spot;

@@ -43,11 +43,11 @@ namespace p3d {
 			aiMatrix4x4 identity;
 			if (!loadModels(scene->mRootNode, identity, scene->mMeshes, out.models))
 				return false;
-
 			if (!scene->HasMeshes() || !loadMeshes(scene->mMeshes, scene->mNumMeshes, out.meshs))
 				return false;
-
 			if (!scene->HasMaterials() || !loadMaterials(scene->mMaterials, scene->mNumMaterials, scenePath.string(), out.materials))
+				return false;
+			if (scene->HasLights() && !loadLights(scene->mLights, scene->mNumLights, out.lights))
 				return false;
 
 			return true;
@@ -293,6 +293,40 @@ namespace p3d {
 			case aiTextureMapMode_Mirror:
 				out = TEXTURE_MAP_MODE::MIRROR;
 				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
+		bool SceneImporter::loadLights(aiLight** lights, unsigned int numLights, std::vector<model::Light>& out) {
+			for (unsigned int i = 0; i < numLights; i++) {
+				model::Light newLight = {};
+				if (!loadLight(lights[i], newLight))
+					return false;
+				out.push_back(newLight);
+			}
+			return true;
+		}
+
+		bool SceneImporter::loadLight(aiLight* in, model::Light& out) {
+			out.diffuse = glm::make_vec3(&in->mColorDiffuse[0]);
+			out.specular = glm::make_vec3(&in->mColorSpecular[0]);
+			out.position = glm::make_vec3(&in->mPosition[0]);
+
+			switch (in->mType) {
+			case aiLightSource_POINT: {
+				out.type = LIGHT_TYPE::POINT;
+				out.data.point.attenuation = { in->mAttenuationConstant, in->mAttenuationLinear, in->mAttenuationQuadratic };
+				out.data.point.range = 10.0f;
+
+			}break;
+			case aiLightSource_DIRECTIONAL: {
+				return false;
+			}break;
+			case aiLightSource_SPOT: {
+				return false;
+			}break;
 			default:
 				return false;
 			}

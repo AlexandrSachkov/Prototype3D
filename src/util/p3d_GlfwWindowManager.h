@@ -37,6 +37,7 @@ namespace p3d
 			void getClientSize(int& width, int& height);
 			HWND getWindowHandle();
 
+			void enableCursor(bool enable);
 			void pollEvents();
 
 			void addKeyEvCbk(std::function<void(int key, int scancode, int action, int mods)> callback);
