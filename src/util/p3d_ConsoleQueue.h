@@ -1,7 +1,6 @@
 #pragma once
 
-#include "tbb\concurrent_queue.h"
-
+#include <queue>
 namespace p3d
 {
 	namespace util
@@ -32,7 +31,7 @@ namespace p3d
 			bool pop(std::pair<CONSOLE_OUT_TYPE, std::string>& data);
 			void clear();
 		private:
-			tbb::concurrent_queue <std::pair<CONSOLE_OUT_TYPE, std::string>> _data;
+			std::queue <std::pair<CONSOLE_OUT_TYPE, std::string>> _data;
 		};
 	}
 
