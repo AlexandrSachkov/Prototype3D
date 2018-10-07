@@ -11,7 +11,7 @@ int main()
 	std::string winTitle = "Prototype3D test";
 
 	auto windowManager = p3d::util::GlfwWindowManager();
-	if (!windowManager.initialize(winWidth, winHeight, fullscreen, true, false, false, winTitle,
+	if (!windowManager.initialize(winWidth, winHeight, fullscreen, true, false, true, winTitle,
 		[&](unsigned int level, std::string data) {
 		//consoleQueue.push((p3d::util::CONSOLE_OUT_TYPE)level, data);
 	}))

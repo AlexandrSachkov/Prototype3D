@@ -49,7 +49,7 @@ namespace p3d {
 			}
 			glfwSetWindowUserPointer(_window, this);
 			setWindowCallbacks(_window);
-			enableCursor(false);
+			enableCursor(enableCurs);
 
 			return true;
 		}
