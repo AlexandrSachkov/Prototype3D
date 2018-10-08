@@ -1,6 +1,10 @@
 #include "util/p3d_GlfwWindowManager.h"
 #include "util/p3d_Timer.h"
 
+#include "assert.h"
+#include "device/RenderingDeviceI.h"
+#include "device/GPUMemoryManagerI.h"
+
 #include <memory>
 #include <assert.h>
 
@@ -17,8 +21,12 @@ int main()
 	}))
 		return 0;
 
-	int clientWidth, clientHeight;
-	windowManager.getClientSize(clientWidth, clientHeight);
+#ifdef P3D_API_D3D11
+	p3d::d3d11::RenderingDevice& d3d11_device = p3d::d3d11::RenderingDevice::instance();
+	if (!d3d11_device.initialize()) {
+		return 1;
+	}
+#endif
 
 	p3d::util::Timer timer;
 	//end the program when the window is closed or an ESC key is pressed
@@ -30,61 +38,10 @@ int main()
 		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 			running = false;
 	});
-	
-	bool cursorEnabled = false, initCamPos = true;
-	float movementSensitivity = 0.1f;
-	windowManager.addKeyEvCbk([&](int key, int scancode, int action, int mod) {
-		//if (!cursorEnabled && key == GLFW_KEY_W && (action == GLFW_PRESS || action == GLFW_REPEAT))
-		//	camera.move(movementSensitivity, 0);
-	});
-	windowManager.addKeyEvCbk([&](int key, int scancode, int action, int mod) {
-		//if (!cursorEnabled && key == GLFW_KEY_S && (action == GLFW_PRESS || action == GLFW_REPEAT))
-		//	camera.move(-movementSensitivity, 0);
-	});
-	windowManager.addKeyEvCbk([&](int key, int scancode, int action, int mod) {
-		//if (!cursorEnabled && key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT))
-		//	camera.move(0, -movementSensitivity);
-	});
-	windowManager.addKeyEvCbk([&](int key, int scancode, int action, int mod) {
-		//if (!cursorEnabled && key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT))
-		//	camera.move(0, movementSensitivity);
-	});	
-	windowManager.addKeyEvCbk([&](int key, int scancode, int action, int mod) {
-		/*if (key == GLFW_KEY_F1 && action == GLFW_PRESS) {
-			cursorEnabled = cursorEnabled ? false : true;
-			windowManager.enableCursor(cursorEnabled);
-			if (!cursorEnabled)
-				initCamPos = true;
-		}	*/		
-	});
-
-	float rotationSensitivity = 0.005f;
-	double lastXPos = 0, lastYPos = 0;
-	windowManager.addCursorPosEvCbk([&](double xPos, double yPos) {
-		if (cursorEnabled)
-			return;
-
-		if (initCamPos) {
-			lastXPos = xPos;
-			lastYPos = yPos;
-			initCamPos = false;
-		}
-
-		double yaw = (xPos - lastXPos) * rotationSensitivity;
-		double pitch = (yPos - lastYPos) * rotationSensitivity;
-		lastXPos = xPos;
-		lastYPos = yPos;
-		//camera.rotate((float)pitch, (float)yaw);
-	});
 
 	do
 	{
-		double deltaT = timer.deltaT();
-
 		windowManager.pollEvents();
-		int width, height;
-		windowManager.getClientSize(width, height);
-		
 
 	} while (running);
 

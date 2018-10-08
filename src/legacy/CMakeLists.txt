@@ -10,7 +10,11 @@ set (P3D_VERSION_PATCH 1)
 IF(MSVC)
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD /WX /arch:AVX /Ox /Ob2 /Ot /Gt /Zc:implicitNoexcept-")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd /WX /arch:AVX /Od /Ob0 /Zc:implicitNoexcept-")
+    
+#TODO: support for other IDEs
 ENDIF(MSVC)
+
+
 
 # Configuration GUI goes here
 
