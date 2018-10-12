@@ -2,10 +2,12 @@
 #define NL_D3D11_UTILITY_H_
 
 #include "../../assert.h"
+#include "../../math/Vec2.h"
 
 #include <Windows.h>
 #include <d3d11.h>
 #include "comdef.h"
+#include "../dx/ComPtr.h"
 
 #include <string>
 #include <cstdint>
@@ -13,35 +15,54 @@
 #define P3D_ASSERT_R_DX11(hresult)  \
 	P3D_ASSERT_R(!FAILED(hresult), _com_error(hresult).ErrorMessage());
 
-namespace p3d
-{
-		class D3D11Utility
-		{
+namespace p3d {
+	namespace d3d11 {
+
+		class Utility {
 		public:
-			static bool createDeviceAndSwapChain(
-				HWND windowHandle, 
-				uint_fast32_t screenWidth, 
-				uint_fast32_t screenHeight,
+
+			static bool Utility::createDevice(
+				ComPtr<ID3D11Device>& device,
+				ComPtr<ID3D11DeviceContext>& deviceContext
+			);
+
+			static bool Utility::getMSAAQualityLevel(
+				ComPtr<ID3D11Device> device,
+				unsigned int msaaLvl,
+				unsigned int& qualityLvl
+			);
+
+			static bool setFullScreen(
+				ComPtr<IDXGISwapChain> swapChain,
+				bool fullscreen
+			);
+
+			static bool createSwapChain(
+				HWND windowHandle,
+				unsigned int screenRefreshRate,
+				Vec2_uint screenDim,
+				unsigned int msaaLevel, //1 or below considered off
+				unsigned int msaaQualityLevel,
+				unsigned int numBackBuffers,
 				bool fullScreen,
-				ID3D11Device*& device,
-				IDXGISwapChain*& swapChain,
-				ID3D11DeviceContext*& deviceContext
-				);
-			
+				ComPtr<ID3D11Device> device,
+				ComPtr<IDXGISwapChain>& swapChain
+			);
+
 			static bool createBackBufferRenderTargetView(
-				ID3D11Device* device, 
-				IDXGISwapChain* swapChain, 
+				ID3D11Device* device,
+				IDXGISwapChain* swapChain,
 				ID3D11RenderTargetView*& renderTargetView
-				);
+			);
 
 			static bool createBlendStates(
 				ID3D11Device* device,
-				bool enableBlend, 
-				bool enableIndependentBlending, 
+				bool enableBlend,
+				bool enableIndependentBlending,
 				uint_fast32_t numRenderTargets,
-				bool enableAlphaToCoverage, 
+				bool enableAlphaToCoverage,
 				ID3D11BlendState*& blendState
-				);
+			);
 
 			/*template<class T>
 			static bool createBuffer(
@@ -59,21 +80,21 @@ namespace p3d
 				uint_fast32_t width,
 				uint_fast32_t height,
 				ID3D11RenderTargetView*& renderTargetViews
-				);
+			);
 
 			static bool createDepthStencilView(
 				ID3D11Device* device,
 				uint_fast32_t width,
 				uint_fast32_t height,
 				ID3D11DepthStencilView*& depthStencilView
-				);
-			
+			);
+
 			static bool createShaderResourceViewFromTexture2D(
-				ID3D11Device* device, 
-				ID3D11Texture2D* texture, 
+				ID3D11Device* device,
+				ID3D11Texture2D* texture,
 				ID3D11ShaderResourceView*& resourceView
-				);
-			
+			);
+
 			static bool createTexture2D(
 				ID3D11Device* device,
 				uint_fast32_t width,
@@ -85,64 +106,64 @@ namespace p3d
 				void* data,
 				uint_fast32_t memPitch,
 				ID3D11Texture2D*& texture
-				);
+			);
 
 			/*static bool createInputLayout(
-				ID3D11Device* device, 
+				ID3D11Device* device,
 				D3D11_INPUT_ELEMENT_DESC ilDesc[],
 				uint_fast32_t size,
-				RESOURCES::VertexShader& vShader, 
+				RESOURCES::VertexShader& vShader,
 				ID3D11InputLayout*& inputLayout
 				);*/
 
 			static bool createTextureSamplerState(ID3D11Device* device, ID3D11SamplerState*& samplerState);
 
 			static bool createRasterizerState(
-				ID3D11Device* device, 
-				D3D11_CULL_MODE cullMode, 
-				D3D11_FILL_MODE fillMode, 
+				ID3D11Device* device,
+				D3D11_CULL_MODE cullMode,
+				D3D11_FILL_MODE fillMode,
 				ID3D11RasterizerState*& rasterizerState
-				);
-				
+			);
+
 			/*static bool loadVertexShader(ID3D11Device* device, std::wstring path, RESOURCES::VertexShader& vertexShader);
 			static bool loadPixelShader(ID3D11Device* device, std::wstring path, RESOURCES::PixelShader& pixelShader);
 			*/
-			static void setFullscreen(IDXGISwapChain*& swapChain, bool fullScreen);
 
 			static void setViewPort(
-				ID3D11DeviceContext*& deviceContext, 
-				uint_fast32_t numViewports, 
-				float x, 
-				float y, 
-				float width, 
-				float height, 
-				float minDepth, 
+				ID3D11DeviceContext*& deviceContext,
+				uint_fast32_t numViewports,
+				float x,
+				float y,
+				float width,
+				float height,
+				float minDepth,
 				float maxDepth
-				);
+			);
 
 			static void setViewPort(
-				ID3D11DeviceContext*& deviceContext, 
+				ID3D11DeviceContext*& deviceContext,
 				float screenWidth,
 				float screenHeight
-				);
+			);
 
 			/*static void updateBuffer(
-				ID3D11DeviceContext*& deviceContext, 
-				RESOURCES::Buffer& buffer, 
-				void* data, 
+				ID3D11DeviceContext*& deviceContext,
+				RESOURCES::Buffer& buffer,
+				void* data,
 				size_t dataSize
 				);*/
 
-			private:
-				static bool compileBlobFromFile(
-					std::wstring path,
-					LPCSTR entryPoint,
-					LPCSTR profile,
-					ID3DBlob*& blob
-					);
+		private:
+			static bool compileBlobFromFile(
+				std::wstring path,
+				LPCSTR entryPoint,
+				LPCSTR profile,
+				ID3DBlob*& blob
+			);
 
-				static bool loadBlobFromFile(std::wstring path, ID3DBlob*& blob);
+			static bool loadBlobFromFile(std::wstring path, ID3DBlob*& blob);
 		};
+	}
 }
 
 #endif

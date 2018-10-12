@@ -25,8 +25,13 @@ SET(HEADERS
     util/p3d_GlfwWindowManager.h
     util/p3d_Timer.h
     
+    math/Vec2.h
+    
     device/d3d11/d3d11_RenderingDevice.h
     device/d3d11/d3d11_Utility.h
+    
+    device/dx/ComPtr.h
+    
     device/GPUMemoryManager.h
     device/GPUMemoryManagerI.h
     device/RenderingDevice.h

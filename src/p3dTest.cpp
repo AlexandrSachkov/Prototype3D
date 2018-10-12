@@ -23,8 +23,15 @@ int main()
 
 #ifdef P3D_API_D3D11
 	p3d::d3d11::RenderingDevice& d3d11_device = p3d::d3d11::RenderingDevice::instance();
-	if (!d3d11_device.initialize()) {
-		return 1;
+	if (!d3d11_device.initialize(
+		windowManager.getWindowHandle(),
+		60,
+		{ (unsigned int)winWidth, (unsigned int)winHeight },
+		8,
+		1,
+		false
+	)) {
+		return 0;
 	}
 #endif
 
