@@ -98,6 +98,13 @@ namespace p3d {
 
 			P3D_ASSERT_R_DX11(dxgiFactory->CreateSwapChain(device.Get(), &swapChainDesc, &swapChain));
 
+			//Microsoft suggests not creating a full-screen swap chain
+			//"This can reduce presentation performance if the swap chain size and the output window size do not match"
+			//https://docs.microsoft.com/en-gb/windows/desktop/api/dxgi/nf-dxgi-idxgifactory-createswapchain
+			if (fullScreen) { 
+				P3D_ASSERT_R(setFullScreen(swapChain, true), "Unable to set swapchain to full screen");
+			}
+
 			return true;
 		}
 

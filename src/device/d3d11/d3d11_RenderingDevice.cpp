@@ -13,7 +13,7 @@ namespace p3d {
 		}
 
 		RenderingDevice::~RenderingDevice() {
-			if (_swapChain) Utility::setFullScreen(_swapChain, false);
+			release();
 		}
 
 		bool RenderingDevice::initialize(
@@ -49,7 +49,11 @@ namespace p3d {
 		}
 
 		void RenderingDevice::release() {
+			if (_swapChain) Utility::setFullScreen(_swapChain, false);
 
+			_swapChain		= nullptr;
+			_deviceContext	= nullptr;
+			_device = nullptr;
 		}
 	}
 }

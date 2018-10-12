@@ -27,7 +27,7 @@ int main()
 		windowManager.getWindowHandle(),
 		60,
 		{ (unsigned int)winWidth, (unsigned int)winHeight },
-		8,
+		4,
 		1,
 		false
 	)) {
