@@ -36,11 +36,9 @@ namespace p3d {
 			unsigned int msaaLvl,
 			unsigned int& qualityLvl
 		) {
-			UINT lvl;
-			P3D_ASSERT_R_DX11(device->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, msaaLvl, &lvl));
-			P3D_ASSERT_R(lvl > 0, "MSAA " << msaaLvl << " is not supported");
+			P3D_ASSERT_R_DX11(device->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, msaaLvl, &qualityLvl));
+			P3D_ASSERT_R(qualityLvl > 0, "MSAA " << msaaLvl << " is not supported");
 
-			qualityLvl = lvl;
 			return true;
 		}
 
