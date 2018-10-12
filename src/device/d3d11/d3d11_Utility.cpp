@@ -109,20 +109,43 @@ namespace p3d {
 		}
 
 		bool Utility::createBackBufferRenderTargetView(
-			ID3D11Device* device,
-			IDXGISwapChain* swapChain,
-			ID3D11RenderTargetView*& renderTargetView
+			ComPtr<ID3D11Device> device,
+			ComPtr<IDXGISwapChain> swapChain,
+			ComPtr<ID3D11RenderTargetView>& renderTargetView
 		) {
-			//Create our BackBuffer
-			ID3D11Texture2D* BackBuffer;
-			P3D_ASSERT_R_DX11(swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&BackBuffer));
+			ComPtr<ID3D11Texture2D> backBuffer;
+			swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &backBuffer);
 
-			//Create our Render Target
-			HRESULT hr = device->CreateRenderTargetView(BackBuffer, NULL, &renderTargetView);
-			BackBuffer->Release();
-			P3D_ASSERT_R_DX11(hr)
+			P3D_ASSERT_R_DX11(device->CreateRenderTargetView(backBuffer.Get(), nullptr, &renderTargetView));
+			return true;
+		}
 
-				return true;
+		bool Utility::createDepthStencilView(
+			ComPtr<ID3D11Device> device,
+			Vec2_uint screenDim,
+			unsigned int msaaLevel,
+			unsigned int msaaQualityLevel,
+			ComPtr<ID3D11Texture2D> depthStencilBuff,
+			ComPtr<ID3D11DepthStencilView> depthStencilView
+		) {
+			D3D11_TEXTURE2D_DESC depthStencilDesc;
+
+			depthStencilDesc.Width = screenDim.x;
+			depthStencilDesc.Height = screenDim.y;
+			depthStencilDesc.MipLevels = 1;
+			depthStencilDesc.ArraySize = 1;
+			depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+			depthStencilDesc.SampleDesc.Count = msaaLevel;
+			depthStencilDesc.SampleDesc.Quality = msaaQualityLevel;
+			depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
+			depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+			depthStencilDesc.CPUAccessFlags = 0;
+			depthStencilDesc.MiscFlags = 0;
+
+			P3D_ASSERT_R_DX11(device->CreateTexture2D(&depthStencilDesc, nullptr, &depthStencilBuff));
+			P3D_ASSERT_R_DX11(device->CreateDepthStencilView(depthStencilBuff.Get(), nullptr, &depthStencilView));
+
+			return true;
 		}
 
 		bool Utility::createBlendStates(
@@ -168,91 +191,6 @@ namespace p3d {
 				//CONSOLE::out(CONSOLE::ERR, L"Failed to create blend state");
 				return false;
 			}
-			return true;
-		}
-
-		bool Utility::createRenderTargetViews(
-			ID3D11Device* device,
-			uint_fast32_t numViews,
-			uint_fast32_t width,
-			uint_fast32_t height,
-			ID3D11RenderTargetView*& renderTargetViews
-		) {
-			HRESULT hr;
-
-			D3D11_TEXTURE2D_DESC textDesc;
-			ZeroMemory(&textDesc, sizeof(textDesc));
-
-			textDesc.Width = width;
-			textDesc.Height = height;
-			textDesc.MipLevels = 1;
-			textDesc.ArraySize = numViews;
-			textDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-			textDesc.SampleDesc.Count = 1;
-			textDesc.SampleDesc.Quality = 0;
-			textDesc.Usage = D3D11_USAGE_DEFAULT;
-			textDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-			textDesc.CPUAccessFlags = 0;
-			textDesc.MiscFlags = 0;
-
-			ID3D11Texture2D* buffer = NULL;
-			//Create the Depth/Stencil View
-			hr = device->CreateTexture2D(&textDesc, NULL, &buffer);
-			if (FAILED(hr)) {
-				//CONSOLE::out(CONSOLE::ERR, L"Failed to create Render Target Buffer");
-				return false;
-			}
-
-			//Create our Render Target
-			hr = device->CreateRenderTargetView(buffer, NULL, &renderTargetViews);
-			buffer->Release();
-
-			if (FAILED(hr)) {
-				//CONSOLE::out(CONSOLE::ERR, L"Failed to create Back Buffer Render Target View");
-				return false;
-			}
-
-			return true;
-		}
-
-		bool Utility::createDepthStencilView(
-			ID3D11Device* device,
-			uint_fast32_t width,
-			uint_fast32_t height,
-			ID3D11DepthStencilView*& depthStencilView
-		) {
-			HRESULT hr;
-
-			//Describe our Depth/Stencil Buffer
-			D3D11_TEXTURE2D_DESC depthStencilDesc;
-
-			depthStencilDesc.Width = width;
-			depthStencilDesc.Height = height;
-			depthStencilDesc.MipLevels = 1;
-			depthStencilDesc.ArraySize = 1;
-			depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-			depthStencilDesc.SampleDesc.Count = 1;
-			depthStencilDesc.SampleDesc.Quality = 0;
-			depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
-			depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-			depthStencilDesc.CPUAccessFlags = 0;
-			depthStencilDesc.MiscFlags = 0;
-
-			//Create the Depth/Stencil View
-			ID3D11Texture2D* buffer = NULL;
-			hr = device->CreateTexture2D(&depthStencilDesc, NULL, &buffer);
-			if (FAILED(hr)) {
-				//CONSOLE::out(CONSOLE::ERR, L"Failed to create depthStencilBuffer");
-				return false;
-			}
-			hr = device->CreateDepthStencilView(buffer, NULL, &depthStencilView);
-			buffer->Release();
-
-			if (FAILED(hr)) {
-				//CONSOLE::out(CONSOLE::ERR, L"Failed to create DepthStencilView");
-				return false;
-			}
-
 			return true;
 		}
 

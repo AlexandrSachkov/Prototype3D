@@ -9,6 +9,10 @@
 struct ID3D11Device;
 struct ID3D11DeviceContext;
 struct IDXGISwapChain;
+struct ID3D11RenderTargetView;
+
+struct ID3D11Texture2D;
+struct ID3D11DepthStencilView;
 
 namespace p3d {
 	namespace d3d11 {
@@ -37,14 +41,18 @@ namespace p3d {
 			RenderingDevice();
 			~RenderingDevice();
 
-			RenderingDevice(RenderingDevice const&) = delete;             // Copy construct
-			RenderingDevice(RenderingDevice&&) = delete;                  // Move construct
-			RenderingDevice& operator=(RenderingDevice const&) = delete;  // Copy assign
-			RenderingDevice& operator=(RenderingDevice &&) = delete;      // Move assign
+			RenderingDevice(RenderingDevice const&) = delete;            
+			RenderingDevice(RenderingDevice&&) = delete;                  
+			RenderingDevice& operator=(RenderingDevice const&) = delete;  
+			RenderingDevice& operator=(RenderingDevice &&) = delete;      
 
 			ComPtr<ID3D11Device> _device = nullptr;
 			ComPtr<ID3D11DeviceContext> _deviceContext = nullptr;
 			ComPtr<IDXGISwapChain> _swapChain = nullptr;
+			ComPtr<ID3D11RenderTargetView> _backBuffRenderTargetView = nullptr;
+
+			ComPtr<ID3D11Texture2D> _depthStencilBuff = nullptr;
+			ComPtr<ID3D11DepthStencilView> _depthStencilView = nullptr;
 		};
 	}
 }

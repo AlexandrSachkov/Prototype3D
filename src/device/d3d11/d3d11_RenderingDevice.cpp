@@ -32,18 +32,35 @@ namespace p3d {
 			if (msaaLevel > 1) {
 				P3D_ASSERT_R(Utility::getMSAAQualityLevel(_device, msaaLevel, maxMsaaQualityLvl), "Failed to retrieve MSAA quality level");
 			}
+
+			unsigned int msaaQualityLevel = maxMsaaQualityLvl - 1;
 			
 			P3D_ASSERT_R(Utility::createSwapChain(
 				windowHandle,
 				screenRefreshRate,
 				screenDim,
 				msaaLevel,
-				maxMsaaQualityLvl - 1,
+				msaaQualityLevel,
 				numBackBuffers,
 				fullscreen,
 				_device,
 				_swapChain
 			), "Failed to create swap chain");
+
+			P3D_ASSERT_R(Utility::createBackBufferRenderTargetView(
+				_device,
+				_swapChain,
+				_backBuffRenderTargetView
+			), "Failed to create back buffer render target view");
+
+			P3D_ASSERT_R(Utility::createDepthStencilView(
+				_device,
+				screenDim,
+				msaaLevel,
+				msaaQualityLevel,
+				_depthStencilBuff,
+				_depthStencilView
+			), "Failed to create depth stencil view");
 
 			return true;
 		}
@@ -51,9 +68,12 @@ namespace p3d {
 		void RenderingDevice::release() {
 			if (_swapChain) Utility::setFullScreen(_swapChain, false);
 
+			_depthStencilBuff = nullptr;
+			_depthStencilView = nullptr;
+			_backBuffRenderTargetView = nullptr;
 			_swapChain		= nullptr;
 			_deviceContext	= nullptr;
-			_device = nullptr;
+			_device			= nullptr;
 		}
 	}
 }

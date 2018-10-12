@@ -50,9 +50,18 @@ namespace p3d {
 			);
 
 			static bool createBackBufferRenderTargetView(
-				ID3D11Device* device,
-				IDXGISwapChain* swapChain,
-				ID3D11RenderTargetView*& renderTargetView
+				ComPtr<ID3D11Device> device,
+				ComPtr<IDXGISwapChain> swapChain,
+				ComPtr<ID3D11RenderTargetView>& renderTargetView
+			);
+
+			static bool createDepthStencilView(
+				ComPtr<ID3D11Device> device,
+				Vec2_uint screenDim,
+				unsigned int msaaLevel,
+				unsigned int msaaQualityLevel,
+				ComPtr<ID3D11Texture2D> depthStencilBuff,
+				ComPtr<ID3D11DepthStencilView> depthStencilView
 			);
 
 			static bool createBlendStates(
@@ -73,21 +82,6 @@ namespace p3d {
 				size_t dataLength,
 				RESOURCES::Buffer& buffer
 				);*/
-
-			static bool createRenderTargetViews(
-				ID3D11Device* device,
-				uint_fast32_t numViews,
-				uint_fast32_t width,
-				uint_fast32_t height,
-				ID3D11RenderTargetView*& renderTargetViews
-			);
-
-			static bool createDepthStencilView(
-				ID3D11Device* device,
-				uint_fast32_t width,
-				uint_fast32_t height,
-				ID3D11DepthStencilView*& depthStencilView
-			);
 
 			static bool createShaderResourceViewFromTexture2D(
 				ID3D11Device* device,
