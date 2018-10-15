@@ -2,6 +2,9 @@
 #include "../../assert.h"
 #include "d3d11_Utility.h"
 
+#include "d3d11_Texture1dArray.h"
+#include "d3d11_Texture2dArray.h"
+
 #include <Windows.h>
 #include "d3d11.h"
 
@@ -74,6 +77,18 @@ namespace p3d {
 			_swapChain		= nullptr;
 			_deviceContext	= nullptr;
 			_device			= nullptr;
+		}
+
+		bool RenderingDevice::createTexture1dArray(unsigned int length, p3d::Texture1dArray*& tex) {
+			//TODO: create GPU texture array
+			tex = new Texture1dArray(ComPtr<ID3D11Texture1D>(nullptr), length);
+			return true;
+		}
+
+		bool RenderingDevice::createTexture2dArray(Vec2_uint texSize, unsigned int length, p3d::Texture2dArray*& tex) {
+			//TODO: create GPU texture array
+			tex = new Texture2dArray(ComPtr<ID3D11Texture2D>(nullptr), texSize, length);
+			return true;
 		}
 	}
 }

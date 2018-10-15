@@ -15,6 +15,11 @@ struct ID3D11Texture2D;
 struct ID3D11DepthStencilView;
 
 namespace p3d {
+	class Texture1dArray;
+	class Texture2dArray;
+}
+
+namespace p3d {
 	namespace d3d11 {
 
 		class RenderingDevice :
@@ -36,6 +41,10 @@ namespace p3d {
 				bool fullscreen
 			);
 			void release();
+
+			bool createTexture1dArray(unsigned int length, p3d::Texture1dArray*& tex);
+			bool createTexture2dArray(Vec2_uint texSize, unsigned int length, p3d::Texture2dArray*& tex);
+			
 
 		protected:
 			RenderingDevice();
