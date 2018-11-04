@@ -11,6 +11,7 @@
 
 #include <string>
 #include <cstdint>
+#include <vector>
 
 #define P3D_ASSERT_R_DX11(hresult)  \
 	P3D_ASSERT_R(!FAILED(hresult), _com_error(hresult).ErrorMessage());
@@ -61,7 +62,34 @@ namespace p3d {
 				unsigned int msaaLevel,
 				unsigned int msaaQualityLevel,
 				ComPtr<ID3D11Texture2D> depthStencilBuff,
-				ComPtr<ID3D11DepthStencilView> depthStencilView
+				ComPtr<ID3D11DepthStencilView>& depthStencilView
+			);
+
+			static bool compileShader(
+				std::string source,
+				std::string entryPoint,
+				std::string target,
+				ComPtr<ID3DBlob>& blob,
+				ComPtr<ID3DBlob>& errBlob
+			);
+
+			static bool createVertexShader(
+				ComPtr<ID3D11Device> device,
+				ComPtr<ID3DBlob> blob,
+				ComPtr<ID3D11VertexShader>& vs
+			);
+
+			static bool createPixelShader(
+				ComPtr<ID3D11Device> device,
+				ComPtr<ID3DBlob> blob,
+				ComPtr<ID3D11PixelShader>& ps
+			);
+
+			static bool createInputLayout(
+				ComPtr<ID3D11Device> device,
+				ComPtr<ID3DBlob> vsShaderBlob,
+				const std::vector<D3D11_INPUT_ELEMENT_DESC>& elementDesc,
+				ComPtr<ID3D11InputLayout>& inputLayout
 			);
 
 			static bool createBlendStates(
@@ -101,14 +129,6 @@ namespace p3d {
 				uint_fast32_t memPitch,
 				ID3D11Texture2D*& texture
 			);
-
-			/*static bool createInputLayout(
-				ID3D11Device* device,
-				D3D11_INPUT_ELEMENT_DESC ilDesc[],
-				uint_fast32_t size,
-				RESOURCES::VertexShader& vShader,
-				ID3D11InputLayout*& inputLayout
-				);*/
 
 			static bool createTextureSamplerState(ID3D11Device* device, ID3D11SamplerState*& samplerState);
 

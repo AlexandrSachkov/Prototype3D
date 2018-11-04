@@ -1,16 +1,20 @@
 #include "d3d11_RenderingDevice.h"
 #include "../../assert.h"
+#include "../dx/dx_ConstConvert.h"
 #include "d3d11_Utility.h"
 
 #include "d3d11_Texture1dArray.h"
 #include "d3d11_Texture2dArray.h"
+#include "d3d11_Texture3d.h"
+#include "d3d11_VertexShader.h"
+#include "d3d11_PixelShader.h"
 
 #include <Windows.h>
-#include "d3d11.h"
+
+#include <algorithm>
 
 namespace p3d {
 	namespace d3d11 {
-
 		RenderingDevice::RenderingDevice() {
 			
 		}
@@ -79,16 +83,93 @@ namespace p3d {
 			_device			= nullptr;
 		}
 
-		bool RenderingDevice::createTexture1dArray(unsigned int length, p3d::Texture1dArray*& tex) {
-			//TODO: create GPU texture array
-			tex = new Texture1dArray(ComPtr<ID3D11Texture1D>(nullptr), length);
+		bool RenderingDevice::createTexture1dArray(const Texture1dArrayDesc& desc, p3d::Texture1dArrayI*& tex) {
+			//TODO: create GPU texture
+			tex = new Texture1dArray({ nullptr }, desc);
 			return true;
 		}
 
-		bool RenderingDevice::createTexture2dArray(Vec2_uint texSize, unsigned int length, p3d::Texture2dArray*& tex) {
+		bool RenderingDevice::createTexture2dArray(const Texture2dArrayDesc& desc, p3d::Texture2dArrayI*& tex) {
 			//TODO: create GPU texture array
-			tex = new Texture2dArray(ComPtr<ID3D11Texture2D>(nullptr), texSize, length);
+			tex = new Texture2dArray({ nullptr }, desc);
 			return true;
+		}
+
+		bool RenderingDevice::createTexture3d(const Texture3dDesc& desc, p3d::Texture3dI*& tex) {
+			//TODO: create GPU texture array
+			tex = new Texture3d({ nullptr }, desc);
+			return true;
+		}
+
+		bool RenderingDevice::createVertexShader(const VertexShaderDesc& desc, p3d::VertexShaderI*& vs) {
+			ComPtr<ID3DBlob> blob = nullptr;
+			ComPtr<ID3DBlob> errBlob = nullptr;
+			P3D_ASSERT_R(Utility::compileShader(desc.hlslSource, desc.shaderEntryPoint, "vs_5_0", blob, errBlob), 
+				"Failed to compile vertex shader: " + std::string((char*)errBlob->GetBufferPointer())
+			);
+			
+			ComPtr<ID3D11VertexShader> shader = nullptr;
+			P3D_ASSERT_R(Utility::createVertexShader(_device, blob, shader), "Failed to create vertex shader");
+
+			ComPtr<ID3D11InputLayout> inputLayout = nullptr;
+			P3D_ASSERT_R(createInputLayout(desc.inputDesc, blob, inputLayout), "Failed to create input layout");
+
+			vs = new VertexShader(shader, blob, inputLayout, desc);
+			return true;
+		}
+
+		bool RenderingDevice::createPixelShader(const PixelShaderDesc& desc, p3d::PixelShaderI*& ps) {
+			ComPtr<ID3DBlob> blob = nullptr;
+			ComPtr<ID3DBlob> errBlob = nullptr;
+			P3D_ASSERT_R(Utility::compileShader(desc.hlslSource, desc.shaderEntryPoint, "ps_5_0", blob, errBlob),
+				"Failed to compile pixel shader: " + std::string((char*)errBlob->GetBufferPointer())
+			);
+
+			ComPtr<ID3D11PixelShader> shader = nullptr;
+			P3D_ASSERT_R(Utility::createPixelShader(_device, blob, shader), "Failed to create pixel shader");
+
+			ps = new PixelShader(shader, blob, desc);
+			return true;
+		}
+
+		bool RenderingDevice::createInputLayout(
+			const std::vector<VertexShaderDesc::InputElementDesc>& inputDesc,
+			ComPtr<ID3DBlob> vsBlob,
+			ComPtr<ID3D11InputLayout>& inputLayout
+		) {
+			std::vector<VertexShaderDesc::InputElementDesc> p3dInputDescTemp(
+				inputDesc.begin(), inputDesc.end()
+			);
+
+			//sort by input slot in assending order
+			std::sort(p3dInputDescTemp.begin(), p3dInputDescTemp.end(),
+				[](VertexShaderDesc::InputElementDesc i, VertexShaderDesc::InputElementDesc j) {
+				return i.inputSlot < j.inputSlot;
+			}
+			);
+
+			unsigned int currInputSlot = 0;
+			unsigned int currOffset = 0;
+			std::vector<D3D11_INPUT_ELEMENT_DESC> elementDesc;
+			for (int i = 0; i < p3dInputDescTemp.size(); i++) {// auto p3dElemDesc : p3dInputDescTemp) {
+				auto p3dElemDesc = p3dInputDescTemp[i];
+				if (currInputSlot != p3dElemDesc.inputSlot) {
+					currInputSlot = p3dElemDesc.inputSlot;
+					currOffset = 0;
+				}
+				elementDesc.push_back({
+					p3dInputDescTemp[i].elementName.c_str(),
+					0,
+					dx::convertFormat(p3dElemDesc.dataFormat),
+					currInputSlot,
+					currOffset,
+					D3D11_INPUT_PER_VERTEX_DATA,
+					0
+					});
+				currOffset += p3dElemDesc.dataSizeBytes;
+			}
+
+			return Utility::createInputLayout(_device, vsBlob, elementDesc, inputLayout);
 		}
 	}
 }

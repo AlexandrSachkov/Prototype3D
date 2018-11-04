@@ -3,8 +3,12 @@
 
 #include "assert.h"
 #include "device/RenderingDeviceI.h"
-#include "device/GPUMemoryManagerI.h"
-#include "device/Texture2dArray.h"
+#include "device/Texture1dArrayI.h"
+#include "device/Texture2dArrayI.h"
+#include "device/Texture3dI.h"
+#include "device/VertexShaderI.h"
+#include "device/PixelShaderI.h"
+#include "Constants.h"
 
 #include <memory>
 #include <assert.h>
@@ -20,12 +24,14 @@ bool run() {
 		//consoleQueue.push((p3d::util::CONSOLE_OUT_TYPE)level, data);
 	}), "Failed to initialize window manager");
 
-	p3d::RenderingDeviceI* device = nullptr;
-	p3d::GPUMemoryManagerI* memMngr = nullptr;
 
-#ifdef P3D_API_D3D11
-	p3d::d3d11::RenderingDevice& d3d11_device = p3d::d3d11::RenderingDevice::instance();
-	P3D_ASSERT_R(d3d11_device.initialize(
+
+
+
+	p3d::RenderingDeviceI* device = nullptr;
+#ifdef P3D_API_D3D11 
+	p3d::d3d11::RenderingDevice* d3d11_device = new p3d::d3d11::RenderingDevice();
+	P3D_ASSERT_R(d3d11_device->initialize(
 		windowManager.getWindowHandle(),
 		60,
 		{ (unsigned int)winWidth, (unsigned int)winHeight },
@@ -33,15 +39,40 @@ bool run() {
 		1,
 		false
 	), "Failed to initialize D3D11 device");
-	device, memMngr = &d3d11_device;
+	device = d3d11_device;
 #endif
 
-	p3d::Texture1dArray* texArr1d = nullptr;
-	p3d::Texture2dArray* texArr2d = nullptr;
-	P3D_ASSERT_R(memMngr->createTexture1dArray(10, texArr1d), "Failed to create 1d texture");
-	P3D_ASSERT_R(memMngr->createTexture2dArray({ 5,5 }, 10, texArr2d), "Failed to create 2d texture");
+	p3d::Texture1dArrayI* texArr1d = nullptr;
+	P3D_ASSERT_R(device->createTexture1dArray({}, texArr1d), "Failed to create 1d texture array");
 
+	p3d::Texture2dArrayI* texArr2d = nullptr;
+	P3D_ASSERT_R(device->createTexture2dArray({}, texArr2d), "Failed to create 2d texture array");
 
+	p3d::Texture3dI* tex3d = nullptr;
+	P3D_ASSERT_R(device->createTexture3d({}, tex3d), "Failed to create 3d texture");
+
+	p3d::VertexShaderDesc vsDesc;
+	vsDesc.shaderEntryPoint = "main";
+	vsDesc.hlslSource =
+		"float4 main( float3 pos : POSITION ) : SV_POSITION { "
+		"	return float4(pos, 1.0f); "
+		"}"
+		;
+	vsDesc.inputDesc = { 
+		{"POSITION", p3d::P3D_FORMAT::P3D_FORMAT_R32G32B32_FLOAT, 12, 0} 
+	};
+	p3d::VertexShaderI* vs = nullptr;
+	P3D_ASSERT_R(device->createVertexShader(vsDesc, vs), "Failed to create vertex shader");
+
+	p3d::PixelShaderDesc psDesc;
+	psDesc.shaderEntryPoint = "main";
+	psDesc.hlslSource =
+		"float4 main() : SV_TARGET {"
+		"return float4(0.0f, 1.0f, 0.0f, 0.0f);"
+		"}"
+		;
+	p3d::PixelShaderI* ps = nullptr;
+	P3D_ASSERT_R(device->createPixelShader(psDesc, ps), "Failed to create pixel shader");
 
 	p3d::util::Timer timer;
 	//end the program when the window is closed or an ESC key is pressed

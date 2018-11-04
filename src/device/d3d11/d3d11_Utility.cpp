@@ -124,7 +124,7 @@ namespace p3d {
 			unsigned int msaaLevel,
 			unsigned int msaaQualityLevel,
 			ComPtr<ID3D11Texture2D> depthStencilBuff,
-			ComPtr<ID3D11DepthStencilView> depthStencilView
+			ComPtr<ID3D11DepthStencilView>& depthStencilView
 		) {
 			D3D11_TEXTURE2D_DESC depthStencilDesc;
 
@@ -143,6 +143,73 @@ namespace p3d {
 			P3D_ASSERT_R_DX11(device->CreateTexture2D(&depthStencilDesc, nullptr, &depthStencilBuff));
 			P3D_ASSERT_R_DX11(device->CreateDepthStencilView(depthStencilBuff.Get(), nullptr, &depthStencilView));
 
+			return true;
+		}
+
+		bool Utility::compileShader(
+			std::string source,
+			std::string entryPoint,
+			std::string target,
+			ComPtr<ID3DBlob>& blob,
+			ComPtr<ID3DBlob>& errBlob
+		) {
+			UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
+		#if defined( P3D_DEBUG )
+			flags |= D3DCOMPILE_DEBUG;
+		#endif
+
+			P3D_ASSERT_R_DX11(D3DCompile(
+				source.data(),
+				source.length(),
+				nullptr,
+				nullptr,
+				nullptr,
+				entryPoint.data(),
+				target.c_str(),
+				flags,
+				0,
+				&blob,
+				&errBlob
+			));
+
+			return true;
+		}
+
+		bool Utility::createVertexShader(
+			ComPtr<ID3D11Device> device,
+			ComPtr<ID3DBlob> blob,
+			ComPtr<ID3D11VertexShader>& vs
+		) {
+			P3D_ASSERT_R_DX11(device->CreateVertexShader(
+				blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &vs
+			));
+			return true;
+		}
+
+		bool Utility::createPixelShader(
+			ComPtr<ID3D11Device> device,
+			ComPtr<ID3DBlob> blob,
+			ComPtr<ID3D11PixelShader>& ps
+		) {
+			P3D_ASSERT_R_DX11(device->CreatePixelShader(
+				blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &ps
+			));
+			return true;
+		}
+
+		bool Utility::createInputLayout(
+			ComPtr<ID3D11Device> device,
+			ComPtr<ID3DBlob> vsShaderBlob,
+			const std::vector<D3D11_INPUT_ELEMENT_DESC>& elementDesc,
+			ComPtr<ID3D11InputLayout>& inputLayout
+		) {
+			P3D_ASSERT_R_DX11(device->CreateInputLayout(
+				elementDesc.data(), 
+				(UINT)elementDesc.size(), 
+				vsShaderBlob->GetBufferPointer(), 
+				vsShaderBlob->GetBufferSize(), 
+				&inputLayout
+			));
 			return true;
 		}
 
@@ -257,25 +324,6 @@ namespace p3d {
 			}
 			return true;
 		}
-
-		/*bool Utility::createInputLayout(
-			ID3D11Device* device,
-			D3D11_INPUT_ELEMENT_DESC ilDesc[],
-			uint_fast32_t size,
-			RESOURCES::VertexShader& vShader,
-			ID3D11InputLayout*& inputLayout
-			)
-		{
-			HRESULT hr;
-			hr = device->CreateInputLayout(ilDesc, size, vShader.blob->GetBufferPointer(),
-				vShader.blob->GetBufferSize(), &inputLayout);
-			if (FAILED(hr))
-			{
-				//CONSOLE::out(CONSOLE::ERR, L"Failed to create Input Layout");
-				return false;
-			}
-			return true;
-		}*/
 
 		bool Utility::createTextureSamplerState(ID3D11Device* device, ID3D11SamplerState*& samplerState) {
 			HRESULT hr;
