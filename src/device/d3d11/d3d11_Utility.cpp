@@ -109,12 +109,11 @@ namespace p3d {
 		bool Utility::createBackBufferRenderTargetView(
 			ComPtr<ID3D11Device> device,
 			ComPtr<IDXGISwapChain> swapChain,
+			ComPtr<ID3D11Texture2D>& renderTargetBuff,
 			ComPtr<ID3D11RenderTargetView>& renderTargetView
 		) {
-			ComPtr<ID3D11Texture2D> backBuffer;
-			swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &backBuffer);
-
-			P3D_ASSERT_R_DX11(device->CreateRenderTargetView(backBuffer.Get(), nullptr, &renderTargetView));
+			swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &renderTargetBuff);
+			P3D_ASSERT_R_DX11(device->CreateRenderTargetView(renderTargetBuff.Get(), nullptr, &renderTargetView));
 			return true;
 		}
 

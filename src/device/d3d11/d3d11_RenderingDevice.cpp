@@ -57,6 +57,7 @@ namespace p3d {
 			P3D_ASSERT_R(Utility::createBackBufferRenderTargetView(
 				_device,
 				_swapChain,
+				_backBuffRenderTarget,
 				_backBuffRenderTargetView
 			), "Failed to create back buffer render target view");
 

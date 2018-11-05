@@ -53,6 +53,7 @@ namespace p3d {
 			static bool createBackBufferRenderTargetView(
 				ComPtr<ID3D11Device> device,
 				ComPtr<IDXGISwapChain> swapChain,
+				ComPtr<ID3D11Texture2D>& renderTargetBuff,
 				ComPtr<ID3D11RenderTargetView>& renderTargetView
 			);
 

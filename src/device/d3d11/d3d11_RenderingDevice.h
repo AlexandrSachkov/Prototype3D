@@ -53,6 +53,8 @@ namespace p3d {
 			ComPtr<ID3D11Device> _device = nullptr;
 			ComPtr<ID3D11DeviceContext> _deviceContext = nullptr;
 			ComPtr<IDXGISwapChain> _swapChain = nullptr;
+
+			ComPtr<ID3D11Texture2D> _backBuffRenderTarget = nullptr;
 			ComPtr<ID3D11RenderTargetView> _backBuffRenderTargetView = nullptr;
 
 			ComPtr<ID3D11Texture2D> _depthStencilBuff = nullptr;
