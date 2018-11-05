@@ -10,6 +10,8 @@
 #include "device/PixelShaderI.h"
 #include "Constants.h"
 
+#include "glm/vec4.hpp"
+
 #include <memory>
 #include <assert.h>
 
@@ -88,6 +90,14 @@ bool run() {
 	do {
 		windowManager.pollEvents();
 
+		p3d::Texture2dArrayI& renderTargetBuff = device->getRenderTargetBuff();
+		p3d::Texture2dArrayI& depthStencilBuff = device->getDepthStencilBuff();
+		device->OMSetRenderTargets(&renderTargetBuff, &depthStencilBuff);
+
+		device->clearRenderTargetBuff(&renderTargetBuff, {0.0f, 1.0f, 0.0f, 1.0f});
+		device->clearDepthStencilBuff(&depthStencilBuff, 1.0f, 0);
+
+		device->presentFrame();
 	} while (running);
 
 	return true;

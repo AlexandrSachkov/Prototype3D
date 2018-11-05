@@ -112,8 +112,10 @@ namespace p3d {
 			ComPtr<ID3D11Texture2D>& renderTargetBuff,
 			ComPtr<ID3D11RenderTargetView>& renderTargetView
 		) {
-			swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &renderTargetBuff);
-			P3D_ASSERT_R_DX11(device->CreateRenderTargetView(renderTargetBuff.Get(), nullptr, &renderTargetView));
+			ComPtr<ID3D11Texture2D> rtBuff;
+			P3D_ASSERT_R_DX11(swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &rtBuff));
+			P3D_ASSERT_R_DX11(device->CreateRenderTargetView(rtBuff.Get(), nullptr, &renderTargetView));
+			renderTargetBuff = rtBuff;
 			return true;
 		}
 

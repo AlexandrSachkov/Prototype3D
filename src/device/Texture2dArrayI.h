@@ -6,6 +6,6 @@ namespace p3d {
 	class Texture2dArrayI {
 	public:
 		virtual ~Texture2dArrayI() {};
-		virtual Texture2dArrayDesc getDescription() = 0;
+		virtual const Texture2dArrayDesc& getDescription() const = 0;
 	};
 }

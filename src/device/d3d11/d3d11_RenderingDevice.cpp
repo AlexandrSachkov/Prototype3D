@@ -54,21 +54,42 @@ namespace p3d {
 				_swapChain
 			), "Failed to create swap chain");
 
+			ComPtr<ID3D11Texture2D> backBuffRenderTarget = nullptr;
+			ComPtr<ID3D11RenderTargetView> backBuffRenderTargetView = nullptr;
 			P3D_ASSERT_R(Utility::createBackBufferRenderTargetView(
 				_device,
 				_swapChain,
-				_backBuffRenderTarget,
-				_backBuffRenderTargetView
+				backBuffRenderTarget,
+				backBuffRenderTargetView
 			), "Failed to create back buffer render target view");
+			_renderTargetBuff = Texture2dArray(
+				backBuffRenderTarget,
+				nullptr,
+				backBuffRenderTargetView,
+				nullptr,
+				nullptr,
+				{} //TODO: add a description
+			);
 
+
+			ComPtr<ID3D11Texture2D> depthStencilBuff = nullptr;
+			ComPtr<ID3D11DepthStencilView> depthStencilView = nullptr;
 			P3D_ASSERT_R(Utility::createDepthStencilView(
 				_device,
 				screenDim,
 				msaaLevel,
 				msaaQualityLevel,
-				_depthStencilBuff,
-				_depthStencilView
+				depthStencilBuff,
+				depthStencilView
 			), "Failed to create depth stencil view");
+			_depthStencilBuff = Texture2dArray(
+				depthStencilBuff,
+				depthStencilView,
+				nullptr,
+				nullptr,
+				nullptr,
+				{} //TODO: add a description
+			);
 
 			return true;
 		}
@@ -76,12 +97,75 @@ namespace p3d {
 		void RenderingDevice::release() {
 			if (_swapChain) Utility::setFullScreen(_swapChain, false);
 
-			_depthStencilBuff = nullptr;
-			_depthStencilView = nullptr;
-			_backBuffRenderTargetView = nullptr;
 			_swapChain		= nullptr;
 			_deviceContext	= nullptr;
 			_device			= nullptr;
+		}
+
+		p3d::Texture2dArrayI& RenderingDevice::getRenderTargetBuff() {
+			return _renderTargetBuff;
+		}
+
+		p3d::Texture2dArrayI& RenderingDevice::getDepthStencilBuff() {
+			return _depthStencilBuff;
+		}
+
+		bool RenderingDevice::clearRenderTargetBuff(const p3d::Texture2dArrayI* renderTargetBuff, glm::vec4 color) {
+			const d3d11::Texture2dArray* rtBuff = static_cast<const d3d11::Texture2dArray*>(renderTargetBuff);
+			P3D_ASSERT_R(rtBuff->getRenderTargetView(), "Render target view is NULL");
+
+			_deviceContext->ClearRenderTargetView(rtBuff->getRenderTargetView().Get(), color.data);
+			return true;
+		}
+
+		bool RenderingDevice::clearDepthBuff(const p3d::Texture2dArrayI* depthStencilBuff, float depth) {
+			const d3d11::Texture2dArray* dsBuff = static_cast<const d3d11::Texture2dArray*>(depthStencilBuff);
+			P3D_ASSERT_R(dsBuff->getDepthStencilView(), "Depth stencil view is NULL");
+
+			_deviceContext->ClearDepthStencilView(dsBuff->getDepthStencilView().Get(), D3D11_CLEAR_DEPTH, depth, 0);
+			return true;
+		}
+
+		bool RenderingDevice::clearStencilBuff(const p3d::Texture2dArrayI* depthStencilBuff, unsigned int stencil) {
+			const d3d11::Texture2dArray* dsBuff = static_cast<const d3d11::Texture2dArray*>(depthStencilBuff);
+			P3D_ASSERT_R(dsBuff->getDepthStencilView(), "Depth stencil view is NULL");
+
+			_deviceContext->ClearDepthStencilView(
+				dsBuff->getDepthStencilView().Get(), D3D11_CLEAR_STENCIL, 0.0f, stencil
+			);
+			return true;
+		}
+
+		bool RenderingDevice::clearDepthStencilBuff(
+			const p3d::Texture2dArrayI* depthStencilBuff, 
+			float depth, 
+			unsigned int stencil) {
+
+			const d3d11::Texture2dArray* dsBuff = static_cast<const d3d11::Texture2dArray*>(depthStencilBuff);
+			P3D_ASSERT_R(dsBuff->getDepthStencilView(), "Depth stencil view is NULL");
+
+			_deviceContext->ClearDepthStencilView(
+				dsBuff->getDepthStencilView().Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, depth, stencil
+			);
+			return true;
+		}
+
+		bool RenderingDevice::OMSetRenderTargets(
+			const p3d::Texture2dArrayI* renderTargetBuff,
+			const p3d::Texture2dArrayI* depthStencilBuff
+		) {
+			const d3d11::Texture2dArray* rtBuff = static_cast<const d3d11::Texture2dArray*>(renderTargetBuff);
+			P3D_ASSERT_R(rtBuff->getRenderTargetView(), "Render target view is NULL");
+			const d3d11::Texture2dArray* dsBuff = static_cast<const d3d11::Texture2dArray*>(depthStencilBuff);
+			P3D_ASSERT_R(dsBuff->getDepthStencilView(), "Depth stencil view is NULL");
+
+			ID3D11RenderTargetView* rtView = rtBuff->getRenderTargetView().Get();
+			_deviceContext->OMSetRenderTargets(1, &rtView, dsBuff->getDepthStencilView().Get());
+			return true;
+		}
+
+		void RenderingDevice::presentFrame() {
+			_swapChain->Present(0, 0);
 		}
 
 		bool RenderingDevice::createTexture1dArray(
@@ -95,8 +179,16 @@ namespace p3d {
 		bool RenderingDevice::createTexture2dArray(
 			const Texture2dArrayDesc& desc, 
 			std::unique_ptr <p3d::Texture2dArrayI>& tex) {
+
 			//TODO: create GPU texture array
-			tex.reset(new Texture2dArray({ nullptr }, desc));
+			tex.reset(new Texture2dArray(
+				nullptr,
+				nullptr,
+				nullptr,
+				nullptr,
+				nullptr,
+				desc
+			));
 			return true;
 		}
 

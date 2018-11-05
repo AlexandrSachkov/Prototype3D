@@ -10,21 +10,29 @@ namespace p3d {
 
 		class Texture2dArray : public p3d::Texture2dArrayI {
 		public:
+			Texture2dArray();
 			Texture2dArray(
-				ComPtr<ID3D11Texture2D> texArr, 
+				ComPtr<ID3D11Texture2D> texArr,
+				ComPtr<ID3D11DepthStencilView> depthStencilView,
+				ComPtr<ID3D11RenderTargetView> renderTargetView,
+				ComPtr<ID3D11ShaderResourceView> shaderResourceView,
+				ComPtr<ID3D11UnorderedAccessView> unorderedAccessView,
 				const Texture2dArrayDesc& desc
 			);
-			Texture2dArray(const Texture2dArray& other);
-			Texture2dArray& operator=(const Texture2dArray& other);
 
-			ComPtr<ID3D11Texture2D> getTexture();
-			Texture2dArrayDesc getDescription();
+			const ComPtr<ID3D11Texture2D> getTexture() const;
+			const ComPtr<ID3D11DepthStencilView> getDepthStencilView() const;
+			const ComPtr<ID3D11RenderTargetView> getRenderTargetView() const;
+			const ComPtr<ID3D11ShaderResourceView> getShaderResourceView() const;
+			const ComPtr<ID3D11UnorderedAccessView> getUnorderedAccessView() const;
+			const Texture2dArrayDesc& getDescription() const;
 
 		private:
-			Texture2dArray(Texture2dArray&&) = delete;
-			Texture2dArray& operator=(Texture2dArray&&) = delete;
-
 			ComPtr<ID3D11Texture2D> _texArr;
+			ComPtr<ID3D11DepthStencilView> _depthStencilView;
+			ComPtr<ID3D11RenderTargetView> _renderTargetView;
+			ComPtr<ID3D11ShaderResourceView> _shaderResourceView;
+			ComPtr<ID3D11UnorderedAccessView> _unorderedAccessView;
 			Texture2dArrayDesc _desc;
 		};
 	}

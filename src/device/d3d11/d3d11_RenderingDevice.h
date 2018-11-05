@@ -9,6 +9,9 @@
 #include "../VertexShaderI.h"
 #include "../PixelShaderI.h"
 #include "../dx/ComPtr.h"
+#include "d3d11_Texture2dArray.h"
+
+#include "glm/vec4.hpp"
 
 #include <d3d11.h>
 
@@ -30,6 +33,21 @@ namespace p3d {
 				bool fullscreen
 			);
 			void release();
+
+			p3d::Texture2dArrayI& getRenderTargetBuff();
+			p3d::Texture2dArrayI& getDepthStencilBuff();
+
+			bool clearRenderTargetBuff(const p3d::Texture2dArrayI* renderTargetBuff, glm::vec4 color);
+			bool clearDepthBuff(const p3d::Texture2dArrayI* depthStencilBuff, float depth);
+			bool clearStencilBuff(const p3d::Texture2dArrayI* depthStencilBuff, unsigned int stencil);
+			bool clearDepthStencilBuff(const p3d::Texture2dArrayI* depthStencilBuff, float depth, unsigned int stencil);
+			
+			bool OMSetRenderTargets(
+				const p3d::Texture2dArrayI* renderTargetBuff, 
+				const p3d::Texture2dArrayI* depthStencilBuff
+			);
+
+			void presentFrame();
 
 			bool createTexture1dArray(
 				const Texture1dArrayDesc& desc, 
@@ -72,11 +90,8 @@ namespace p3d {
 			ComPtr<ID3D11DeviceContext> _deviceContext = nullptr;
 			ComPtr<IDXGISwapChain> _swapChain = nullptr;
 
-			ComPtr<ID3D11Texture2D> _backBuffRenderTarget = nullptr;
-			ComPtr<ID3D11RenderTargetView> _backBuffRenderTargetView = nullptr;
-
-			ComPtr<ID3D11Texture2D> _depthStencilBuff = nullptr;
-			ComPtr<ID3D11DepthStencilView> _depthStencilView = nullptr;
+			Texture2dArray _renderTargetBuff;
+			Texture2dArray _depthStencilBuff;
 		};
 	}
 }
