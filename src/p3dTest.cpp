@@ -42,13 +42,13 @@ bool run() {
 	device = d3d11_device;
 #endif
 
-	p3d::Texture1dArrayI* texArr1d = nullptr;
+	std::unique_ptr <p3d::Texture1dArrayI> texArr1d = nullptr;
 	P3D_ASSERT_R(device->createTexture1dArray({}, texArr1d), "Failed to create 1d texture array");
 
-	p3d::Texture2dArrayI* texArr2d = nullptr;
+	std::unique_ptr <p3d::Texture2dArrayI> texArr2d = nullptr;
 	P3D_ASSERT_R(device->createTexture2dArray({}, texArr2d), "Failed to create 2d texture array");
 
-	p3d::Texture3dI* tex3d = nullptr;
+	std::unique_ptr <p3d::Texture3dI> tex3d = nullptr;
 	P3D_ASSERT_R(device->createTexture3d({}, tex3d), "Failed to create 3d texture");
 
 	p3d::VertexShaderDesc vsDesc;
@@ -61,7 +61,7 @@ bool run() {
 	vsDesc.inputDesc = { 
 		{"POSITION", p3d::P3D_FORMAT::P3D_FORMAT_R32G32B32_FLOAT, 12, 0} 
 	};
-	p3d::VertexShaderI* vs = nullptr;
+	std::unique_ptr <p3d::VertexShaderI> vs = nullptr;
 	P3D_ASSERT_R(device->createVertexShader(vsDesc, vs), "Failed to create vertex shader");
 
 	p3d::PixelShaderDesc psDesc;
@@ -71,7 +71,7 @@ bool run() {
 		"return float4(0.0f, 1.0f, 0.0f, 0.0f);"
 		"}"
 		;
-	p3d::PixelShaderI* ps = nullptr;
+	std::unique_ptr <p3d::PixelShaderI> ps = nullptr;
 	P3D_ASSERT_R(device->createPixelShader(psDesc, ps), "Failed to create pixel shader");
 
 	p3d::util::Timer timer;

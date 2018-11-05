@@ -31,12 +31,30 @@ namespace p3d {
 			);
 			void release();
 
-			bool createTexture1dArray(const Texture1dArrayDesc& desc, p3d::Texture1dArrayI*& tex);
-			bool createTexture2dArray(const Texture2dArrayDesc& desc, p3d::Texture2dArrayI*& tex);
-			bool createTexture3d(const Texture3dDesc& desc, p3d::Texture3dI*& tex);
+			bool createTexture1dArray(
+				const Texture1dArrayDesc& desc, 
+				std::unique_ptr <p3d::Texture1dArrayI>& tex
+			);
+
+			bool createTexture2dArray(
+				const Texture2dArrayDesc& desc, 
+				std::unique_ptr <p3d::Texture2dArrayI>& tex
+			);
+
+			bool createTexture3d(
+				const Texture3dDesc& desc, 
+				std::unique_ptr <p3d::Texture3dI>& tex
+			);
 			
-			bool createVertexShader(const VertexShaderDesc& desc, p3d::VertexShaderI*& vs);
-			bool createPixelShader(const PixelShaderDesc& desc, p3d::PixelShaderI*& ps);
+			bool createVertexShader(
+				const VertexShaderDesc& desc, 
+				std::unique_ptr <p3d::VertexShaderI>& vs
+			);
+
+			bool createPixelShader(
+				const PixelShaderDesc& desc, 
+				std::unique_ptr <p3d::PixelShaderI>& ps
+			);
 
 		private:
 			RenderingDevice(RenderingDevice const&) = delete;            

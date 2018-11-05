@@ -84,25 +84,34 @@ namespace p3d {
 			_device			= nullptr;
 		}
 
-		bool RenderingDevice::createTexture1dArray(const Texture1dArrayDesc& desc, p3d::Texture1dArrayI*& tex) {
+		bool RenderingDevice::createTexture1dArray(
+			const Texture1dArrayDesc& desc, 
+			std::unique_ptr <p3d::Texture1dArrayI>& tex) {
 			//TODO: create GPU texture
-			tex = new Texture1dArray({ nullptr }, desc);
+			tex.reset(new Texture1dArray({ nullptr }, desc));
 			return true;
 		}
 
-		bool RenderingDevice::createTexture2dArray(const Texture2dArrayDesc& desc, p3d::Texture2dArrayI*& tex) {
+		bool RenderingDevice::createTexture2dArray(
+			const Texture2dArrayDesc& desc, 
+			std::unique_ptr <p3d::Texture2dArrayI>& tex) {
 			//TODO: create GPU texture array
-			tex = new Texture2dArray({ nullptr }, desc);
+			tex.reset(new Texture2dArray({ nullptr }, desc));
 			return true;
 		}
 
-		bool RenderingDevice::createTexture3d(const Texture3dDesc& desc, p3d::Texture3dI*& tex) {
+		bool RenderingDevice::createTexture3d(
+			const Texture3dDesc& desc, 
+			std::unique_ptr <p3d::Texture3dI>& tex) {
 			//TODO: create GPU texture array
-			tex = new Texture3d({ nullptr }, desc);
+			tex.reset(new Texture3d({ nullptr }, desc));
 			return true;
 		}
 
-		bool RenderingDevice::createVertexShader(const VertexShaderDesc& desc, p3d::VertexShaderI*& vs) {
+		bool RenderingDevice::createVertexShader(
+			const VertexShaderDesc& desc, 
+			std::unique_ptr <p3d::VertexShaderI>& vs) {
+
 			ComPtr<ID3DBlob> blob = nullptr;
 			ComPtr<ID3DBlob> errBlob = nullptr;
 			P3D_ASSERT_R(Utility::compileShader(desc.hlslSource, desc.shaderEntryPoint, "vs_5_0", blob, errBlob), 
@@ -115,11 +124,14 @@ namespace p3d {
 			ComPtr<ID3D11InputLayout> inputLayout = nullptr;
 			P3D_ASSERT_R(createInputLayout(desc.inputDesc, blob, inputLayout), "Failed to create input layout");
 
-			vs = new VertexShader(shader, blob, inputLayout, desc);
+			vs.reset(new VertexShader(shader, blob, inputLayout, desc));
 			return true;
 		}
 
-		bool RenderingDevice::createPixelShader(const PixelShaderDesc& desc, p3d::PixelShaderI*& ps) {
+		bool RenderingDevice::createPixelShader(
+			const PixelShaderDesc& desc, 
+			std::unique_ptr <p3d::PixelShaderI>& ps) {
+
 			ComPtr<ID3DBlob> blob = nullptr;
 			ComPtr<ID3DBlob> errBlob = nullptr;
 			P3D_ASSERT_R(Utility::compileShader(desc.hlslSource, desc.shaderEntryPoint, "ps_5_0", blob, errBlob),
@@ -129,7 +141,7 @@ namespace p3d {
 			ComPtr<ID3D11PixelShader> shader = nullptr;
 			P3D_ASSERT_R(Utility::createPixelShader(_device, blob, shader), "Failed to create pixel shader");
 
-			ps = new PixelShader(shader, blob, desc);
+			ps.reset(new PixelShader(shader, blob, desc));
 			return true;
 		}
 
