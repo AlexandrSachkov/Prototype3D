@@ -61,7 +61,7 @@ namespace p3d {
 				Vec2_uint screenDim,
 				unsigned int msaaLevel,
 				unsigned int msaaQualityLevel,
-				ComPtr<ID3D11Texture2D> depthStencilBuff,
+				ComPtr<ID3D11Texture2D>& depthStencilBuff,
 				ComPtr<ID3D11DepthStencilView>& depthStencilView
 			);
 
