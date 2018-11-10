@@ -19,87 +19,87 @@
 #include <memory>
 
 namespace p3d {
-	namespace d3d11 {
-		class RenderingDevice : public p3d::RenderingDevice<p3d::d3d11::RenderingDevice>{
-		public:
-			RenderingDevice();
-			~RenderingDevice();
+    namespace d3d11 {
+        class RenderingDevice : public p3d::RenderingDevice<p3d::d3d11::RenderingDevice> {
+        public:
+            RenderingDevice();
+            ~RenderingDevice();
 
-			bool initialize(
-				HWND windowHandle,
-				unsigned int screenRefreshRate,
-				p3d::Vec2_uint screenDim,
-				unsigned int msaaLevel,
-				unsigned int numBackBuffers,
-				bool fullscreen
-			);
-			void release();
+            bool initialize(
+                HWND windowHandle,
+                unsigned int screenRefreshRate,
+                p3d::Vec2_uint screenDim,
+                unsigned int msaaLevel,
+                unsigned int numBackBuffers,
+                bool fullscreen
+            );
+            void release();
 
-			p3d::Texture2dArrayI& getRenderTargetBuff();
-			p3d::Texture2dArrayI& getDepthStencilBuff();
+            p3d::Texture2dArrayI& getRenderTargetBuff();
+            p3d::Texture2dArrayI& getDepthStencilBuff();
 
-			bool clearRenderTargetBuff(const p3d::Texture2dArrayI* renderTargetBuff, glm::vec4 color);
-			bool clearDepthBuff(const p3d::Texture2dArrayI* depthStencilBuff, float depth);
-			bool clearStencilBuff(const p3d::Texture2dArrayI* depthStencilBuff, unsigned int stencil);
-			bool clearDepthStencilBuff(const p3d::Texture2dArrayI* depthStencilBuff, float depth, unsigned int stencil);
-			
-			bool OMSetRenderTargets(
-				const p3d::Texture2dArrayI* renderTargetBuff, 
-				const p3d::Texture2dArrayI* depthStencilBuff
-			);
+            bool clearRenderTargetBuff(const p3d::Texture2dArrayI* renderTargetBuff, glm::vec4 color);
+            bool clearDepthBuff(const p3d::Texture2dArrayI* depthStencilBuff, float depth);
+            bool clearStencilBuff(const p3d::Texture2dArrayI* depthStencilBuff, unsigned int stencil);
+            bool clearDepthStencilBuff(const p3d::Texture2dArrayI* depthStencilBuff, float depth, unsigned int stencil);
 
-			void presentFrame();
+            bool OMSetRenderTargets(
+                const p3d::Texture2dArrayI* renderTargetBuff,
+                const p3d::Texture2dArrayI* depthStencilBuff
+            );
 
-			bool createTexture1dArray(
-				const Texture1dArrayDesc& desc, 
-				std::unique_ptr <p3d::Texture1dArrayI>& tex
-			);
+            void presentFrame();
 
-			bool createTexture2dArray(
-				const Texture2dArrayDesc& desc, 
-				std::unique_ptr <p3d::Texture2dArrayI>& tex
-			);
+            bool createTexture1dArray(
+                const Texture1dArrayDesc& desc,
+                std::unique_ptr <p3d::Texture1dArrayI>& tex
+            );
 
-			bool createTexture3d(
-				const Texture3dDesc& desc, 
-				std::unique_ptr <p3d::Texture3dI>& tex
-			);
-			
-			bool createVertexShader(
-				const VertexShaderDesc& desc, 
-				std::unique_ptr <p3d::VertexShaderI>& vs
-			);
+            bool createTexture2dArray(
+                const Texture2dArrayDesc& desc,
+                std::unique_ptr <p3d::Texture2dArrayI>& tex
+            );
 
-			bool createPixelShader(
-				const PixelShaderDesc& desc, 
-				std::unique_ptr <p3d::PixelShaderI>& ps
-			);
+            bool createTexture3d(
+                const Texture3dDesc& desc,
+                std::unique_ptr <p3d::Texture3dI>& tex
+            );
 
-			bool createBuffer(
-				const BufferDesc& desc,
-				const void* data,
-				unsigned int sizeBytes,
-				std::unique_ptr <p3d::BufferI>& buffer
-			);
+            bool createVertexShader(
+                const VertexShaderDesc& desc,
+                std::unique_ptr <p3d::VertexShaderI>& vs
+            );
 
-		private:
-			RenderingDevice(RenderingDevice const&) = delete;            
-			RenderingDevice(RenderingDevice&&) = delete;                  
-			RenderingDevice& operator=(RenderingDevice const&) = delete;  
-			RenderingDevice& operator=(RenderingDevice &&) = delete;     
+            bool createPixelShader(
+                const PixelShaderDesc& desc,
+                std::unique_ptr <p3d::PixelShaderI>& ps
+            );
 
-			bool createInputLayout(
-				const std::vector<VertexShaderDesc::InputElementDesc>& inputDesc,
-				ComPtr<ID3DBlob> vsBlob,
-				ComPtr<ID3D11InputLayout>& inputLayout
-			);
+            bool createBuffer(
+                const BufferDesc& desc,
+                const void* data,
+                unsigned int sizeBytes,
+                std::unique_ptr <p3d::BufferI>& buffer
+            );
 
-			ComPtr<ID3D11Device> _device = nullptr;
-			ComPtr<ID3D11DeviceContext> _deviceContext = nullptr;
-			ComPtr<IDXGISwapChain> _swapChain = nullptr;
+        private:
+            RenderingDevice(RenderingDevice const&) = delete;
+            RenderingDevice(RenderingDevice&&) = delete;
+            RenderingDevice& operator=(RenderingDevice const&) = delete;
+            RenderingDevice& operator=(RenderingDevice &&) = delete;
 
-			Texture2dArray _renderTargetBuff;
-			Texture2dArray _depthStencilBuff;
-		};
-	}
+            bool createInputLayout(
+                const std::vector<VertexShaderDesc::InputElementDesc>& inputDesc,
+                ComPtr<ID3DBlob> vsBlob,
+                ComPtr<ID3D11InputLayout>& inputLayout
+            );
+
+            ComPtr<ID3D11Device> _device = nullptr;
+            ComPtr<ID3D11DeviceContext> _deviceContext = nullptr;
+            ComPtr<IDXGISwapChain> _swapChain = nullptr;
+
+            Texture2dArray _renderTargetBuff;
+            Texture2dArray _depthStencilBuff;
+        };
+    }
 }

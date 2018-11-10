@@ -18,111 +18,110 @@
 #include <assert.h>
 
 bool run() {
-	bool fullscreen = false;
-	int winWidth = 800, winHeight = 600;
-	std::string winTitle = "Prototype3D test";
+    bool fullscreen = false;
+    int winWidth = 800, winHeight = 600;
+    std::string winTitle = "Prototype3D test";
 
-	auto windowManager = p3d::util::GlfwWindowManager();
-	P3D_ASSERT_R(windowManager.initialize(winWidth, winHeight, fullscreen, true, false, true, winTitle,
-		[&](unsigned int level, std::string data) {
-		//consoleQueue.push((p3d::util::CONSOLE_OUT_TYPE)level, data);
-	}), "Failed to initialize window manager");
-
-
+    auto windowManager = p3d::util::GlfwWindowManager();
+    P3D_ASSERT_R(windowManager.initialize(winWidth, winHeight, fullscreen, true, false, true, winTitle,
+        [&](unsigned int level, std::string data) {
+        //consoleQueue.push((p3d::util::CONSOLE_OUT_TYPE)level, data);
+    }), "Failed to initialize window manager");
 
 
 
-	p3d::RenderingDeviceI* device = nullptr;
+
+
+    p3d::RenderingDeviceI* device = nullptr;
 #ifdef P3D_API_D3D11 
-	p3d::d3d11::RenderingDevice* d3d11_device = new p3d::d3d11::RenderingDevice();
-	P3D_ASSERT_R(d3d11_device->initialize(
-		windowManager.getWindowHandle(),
-		60,
-		{ (unsigned int)winWidth, (unsigned int)winHeight },
-		4,
-		1,
-		false
-	), "Failed to initialize D3D11 device");
-	device = d3d11_device;
+    p3d::d3d11::RenderingDevice* d3d11_device = new p3d::d3d11::RenderingDevice();
+    P3D_ASSERT_R(d3d11_device->initialize(
+        windowManager.getWindowHandle(),
+        60,
+        { (unsigned int)winWidth, (unsigned int)winHeight },
+        4,
+        1,
+        false
+    ), "Failed to initialize D3D11 device");
+    device = d3d11_device;
 #endif
 
-	std::unique_ptr <p3d::Texture1dArrayI> texArr1d = nullptr;
-	P3D_ASSERT_R(device->createTexture1dArray({}, texArr1d), "Failed to create 1d texture array");
+    std::unique_ptr <p3d::Texture1dArrayI> texArr1d = nullptr;
+    P3D_ASSERT_R(device->createTexture1dArray({}, texArr1d), "Failed to create 1d texture array");
 
-	std::unique_ptr <p3d::Texture2dArrayI> texArr2d = nullptr;
-	P3D_ASSERT_R(device->createTexture2dArray({}, texArr2d), "Failed to create 2d texture array");
+    std::unique_ptr <p3d::Texture2dArrayI> texArr2d = nullptr;
+    P3D_ASSERT_R(device->createTexture2dArray({}, texArr2d), "Failed to create 2d texture array");
 
-	std::unique_ptr <p3d::Texture3dI> tex3d = nullptr;
-	P3D_ASSERT_R(device->createTexture3d({}, tex3d), "Failed to create 3d texture");
+    std::unique_ptr <p3d::Texture3dI> tex3d = nullptr;
+    P3D_ASSERT_R(device->createTexture3d({}, tex3d), "Failed to create 3d texture");
 
-	p3d::VertexShaderDesc vsDesc;
-	vsDesc.shaderEntryPoint = "main";
-	vsDesc.hlslSource =
-		"float4 main( float3 pos : POSITION ) : SV_POSITION { "
-		"	return float4(pos, 1.0f); "
-		"}"
-		;
-	vsDesc.inputDesc = { 
-		{"POSITION", p3d::P3D_FORMAT::P3D_FORMAT_R32G32B32_FLOAT, 12, 0} 
-	};
-	std::unique_ptr <p3d::VertexShaderI> vs = nullptr;
-	P3D_ASSERT_R(device->createVertexShader(vsDesc, vs), "Failed to create vertex shader");
+    p3d::VertexShaderDesc vsDesc;
+    vsDesc.shaderEntryPoint = "main";
+    vsDesc.hlslSource =
+        "float4 main( float3 pos : POSITION ) : SV_POSITION { "
+        "	return float4(pos, 1.0f); "
+        "}"
+        ;
+    vsDesc.inputDesc = {
+        {"POSITION", p3d::P3D_FORMAT::P3D_FORMAT_R32G32B32_FLOAT, 12, 0}
+    };
+    std::unique_ptr <p3d::VertexShaderI> vs = nullptr;
+    P3D_ASSERT_R(device->createVertexShader(vsDesc, vs), "Failed to create vertex shader");
 
-	p3d::PixelShaderDesc psDesc;
-	psDesc.shaderEntryPoint = "main";
-	psDesc.hlslSource =
-		"float4 main() : SV_TARGET {"
-		"return float4(0.0f, 1.0f, 0.0f, 0.0f);"
-		"}"
-		;
-	std::unique_ptr <p3d::PixelShaderI> ps = nullptr;
-	P3D_ASSERT_R(device->createPixelShader(psDesc, ps), "Failed to create pixel shader");
+    p3d::PixelShaderDesc psDesc;
+    psDesc.shaderEntryPoint = "main";
+    psDesc.hlslSource =
+        "float4 main() : SV_TARGET {"
+        "return float4(0.0f, 1.0f, 0.0f, 0.0f);"
+        "}"
+        ;
+    std::unique_ptr <p3d::PixelShaderI> ps = nullptr;
+    P3D_ASSERT_R(device->createPixelShader(psDesc, ps), "Failed to create pixel shader");
 
-	p3d::BufferDesc buffDesc;
-	buffDesc.bindFlags = { p3d::P3D_BIND_SHADER_RESOURCE };
-	buffDesc.usageFlag = p3d::P3D_USAGE_CPU_UPDATE_GPU_RW;
-	std::unique_ptr <p3d::BufferI> buffer = nullptr;
-	P3D_ASSERT_R(device->createBuffer(buffDesc, nullptr, 200, buffer), "Failed to create buffer");
+    p3d::BufferDesc buffDesc;
+    buffDesc.bindFlags = { p3d::P3D_BIND_SHADER_RESOURCE };
+    buffDesc.usageFlag = p3d::P3D_USAGE_CPU_UPDATE_GPU_RW;
+    std::unique_ptr <p3d::BufferI> buffer = nullptr;
+    P3D_ASSERT_R(device->createBuffer(buffDesc, nullptr, 200, buffer), "Failed to create buffer");
 
-	p3d::BufferDesc buffDesc2;
-	buffDesc2.bindFlags = { p3d::P3D_BIND_SHADER_RESOURCE };
-	buffDesc2.usageFlag = p3d::P3D_USAGE_CPU_UPDATE_GPU_RW;
-	std::unique_ptr <p3d::BufferI> buffer2 = nullptr;
-	std::vector<glm::vec3> bufferData2 = { {0,1,0}, {1,0,0}, {0,0,1} };
-	P3D_ASSERT_R(device->createBuffer(buffDesc2, bufferData2, buffer2), "Failed to create buffer2");
+    p3d::BufferDesc buffDesc2;
+    buffDesc2.bindFlags = { p3d::P3D_BIND_SHADER_RESOURCE };
+    buffDesc2.usageFlag = p3d::P3D_USAGE_CPU_UPDATE_GPU_RW;
+    std::unique_ptr <p3d::BufferI> buffer2 = nullptr;
+    std::vector<glm::vec3> bufferData2 = { {0,1,0}, {1,0,0}, {0,0,1} };
+    P3D_ASSERT_R(device->createBuffer(buffDesc2, bufferData2, buffer2), "Failed to create buffer2");
 
-	p3d::util::Timer timer;
-	//end the program when the window is closed or an ESC key is pressed
-	bool running = true;
-	windowManager.addWindowCloseEvCbk([&]() {
-		running = false;
-	});
-	windowManager.addKeyEvCbk([&](int key, int scancode, int action, int mod) {
-		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-			running = false;
-	});
+    p3d::util::Timer timer;
+    //end the program when the window is closed or an ESC key is pressed
+    bool running = true;
+    windowManager.addWindowCloseEvCbk([&]() {
+        running = false;
+    });
+    windowManager.addKeyEvCbk([&](int key, int scancode, int action, int mod) {
+        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+            running = false;
+    });
 
-	do {
-		windowManager.pollEvents();
+    do {
+        windowManager.pollEvents();
 
-		p3d::Texture2dArrayI& renderTargetBuff = device->getRenderTargetBuff();
-		p3d::Texture2dArrayI& depthStencilBuff = device->getDepthStencilBuff();
-		device->OMSetRenderTargets(&renderTargetBuff, &depthStencilBuff);
+        p3d::Texture2dArrayI& renderTargetBuff = device->getRenderTargetBuff();
+        p3d::Texture2dArrayI& depthStencilBuff = device->getDepthStencilBuff();
+        device->OMSetRenderTargets(&renderTargetBuff, &depthStencilBuff);
 
-		device->clearRenderTargetBuff(&renderTargetBuff, {0.0f, 1.0f, 0.0f, 1.0f});
-		device->clearDepthStencilBuff(&depthStencilBuff, 1.0f, 0);
+        device->clearRenderTargetBuff(&renderTargetBuff, { 0.0f, 1.0f, 0.0f, 1.0f });
+        device->clearDepthStencilBuff(&depthStencilBuff, 1.0f, 0);
 
-		device->presentFrame();
-	} while (running);
+        device->presentFrame();
+    } while (running);
 
-	return true;
+    return true;
 }
 
-int main()
-{
-	if (run()) {
-		return EXIT_SUCCESS;
-	}
+int main() {
+    if (run()) {
+        return EXIT_SUCCESS;
+    }
 
-	return EXIT_FAILURE;
+    return EXIT_FAILURE;
 }

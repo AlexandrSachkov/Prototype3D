@@ -6,38 +6,38 @@
 #include <string>
 
 namespace p3d {
-	struct Texture1dArrayDesc {
+    struct Texture1dArrayDesc {
 
-	};
+    };
 
-	struct Texture2dArrayDesc {
+    struct Texture2dArrayDesc {
 
-	};
+    };
 
-	struct Texture3dDesc {
+    struct Texture3dDesc {
 
-	};
+    };
 
-	struct VertexShaderDesc {
-		struct InputElementDesc {
-			std::string elementName;
-			P3D_FORMAT dataFormat;
-			unsigned int dataSizeBytes;
-			unsigned int inputSlot;
-		};
+    struct VertexShaderDesc {
+        struct InputElementDesc {
+            std::string elementName;
+            P3D_FORMAT dataFormat;
+            unsigned int dataSizeBytes;
+            unsigned int inputSlot;
+        };
 
-		std::vector<InputElementDesc> inputDesc;
-		std::string hlslSource;
-		std::string shaderEntryPoint;
-	};
+        std::vector<InputElementDesc> inputDesc;
+        std::string hlslSource;
+        std::string shaderEntryPoint;
+    };
 
-	struct PixelShaderDesc {
-		std::string hlslSource;
-		std::string shaderEntryPoint;
-	};
+    struct PixelShaderDesc {
+        std::string hlslSource;
+        std::string shaderEntryPoint;
+    };
 
-	struct BufferDesc {
-		std::vector<P3D_BIND_FLAG> bindFlags;
-		P3D_USAGE usageFlag;
-	};
+    struct BufferDesc {
+        std::vector<P3D_BIND_FLAG> bindFlags;
+        P3D_USAGE usageFlag;
+    };
 }
