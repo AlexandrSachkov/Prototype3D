@@ -59,7 +59,7 @@ bool run() {
     vsDesc.shaderEntryPoint = "main";
     vsDesc.hlslSource =
         "float4 main( float3 pos : POSITION ) : SV_POSITION { "
-        "	return float4(pos, 1.0f); "
+        "	return float4(pos, 1.0f); "  
         "}"
         ;
     vsDesc.inputDesc = {
@@ -67,29 +67,36 @@ bool run() {
     };
     std::unique_ptr <p3d::VertexShaderI> vs = nullptr;
     P3D_ASSERT_R(device->createVertexShader(vsDesc, vs), "Failed to create vertex shader");
+    device->VSSetShader(vs.get());
 
     p3d::PixelShaderDesc psDesc;
     psDesc.shaderEntryPoint = "main";
     psDesc.hlslSource =
-        "float4 main() : SV_TARGET {"
-        "return float4(0.0f, 1.0f, 0.0f, 0.0f);"
+        "float4 main(float4 pos : SV_POSITION) : SV_TARGET {"
+        "return float4(0.0f, 0.0f, 1.0f, 1.0f);"
         "}"
         ;
     std::unique_ptr <p3d::PixelShaderI> ps = nullptr;
     P3D_ASSERT_R(device->createPixelShader(psDesc, ps), "Failed to create pixel shader");
+    device->PSSetShader(ps.get());
 
     p3d::BufferDesc buffDesc;
     buffDesc.bindFlags = { p3d::P3D_BIND_SHADER_RESOURCE };
     buffDesc.usageFlag = p3d::P3D_USAGE_CPU_UPDATE_GPU_RW;
+    buffDesc.data = nullptr;
+    buffDesc.length = 1;
+    buffDesc.strideBytes = 200;
     std::unique_ptr <p3d::BufferI> buffer = nullptr;
-    P3D_ASSERT_R(device->createBuffer(buffDesc, nullptr, 200, buffer), "Failed to create buffer");
+    P3D_ASSERT_R(device->createBuffer(buffDesc, buffer), "Failed to create buffer");
 
     p3d::BufferDesc buffDesc2;
     buffDesc2.bindFlags = { p3d::P3D_BIND_SHADER_RESOURCE };
     buffDesc2.usageFlag = p3d::P3D_USAGE_CPU_UPDATE_GPU_RW;
     std::unique_ptr <p3d::BufferI> buffer2 = nullptr;
-    std::vector<glm::vec3> bufferData2 = { {0,1,0}, {1,0,0}, {0,0,1} };
+    std::vector<glm::vec3> bufferData2 = { {0,0.5f,0}, {-0.5f,0,0}, {0,0,0.5f} };
     P3D_ASSERT_R(device->createBuffer(buffDesc2, bufferData2, buffer2), "Failed to create buffer2");
+
+    device->IASetVertexBuffer(buffer2.get(), 0, 0);
 
     p3d::util::Timer timer;
     //end the program when the window is closed or an ESC key is pressed

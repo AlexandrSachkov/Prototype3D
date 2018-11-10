@@ -6,6 +6,6 @@ namespace p3d {
     class VertexShaderI {
     public:
         virtual ~VertexShaderI() {}
-        virtual VertexShaderDesc getDescription() = 0;
+        virtual const VertexShaderDesc& getDescription() const = 0;
     };
 }

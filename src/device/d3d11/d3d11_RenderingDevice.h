@@ -48,6 +48,15 @@ namespace p3d {
                 const p3d::Texture2dArrayI* depthStencilBuff
             );
 
+            bool VSSetShader(const p3d::VertexShaderI* vs);
+            bool PSSetShader(const p3d::PixelShaderI* ps);
+
+            bool IASetVertexBuffer(
+                const p3d::BufferI* vBuff,
+                unsigned int offset,
+                unsigned int slot
+            );
+
             void presentFrame();
 
             bool createTexture1dArray(
@@ -77,8 +86,6 @@ namespace p3d {
 
             bool createBuffer(
                 const BufferDesc& desc,
-                const void* data,
-                unsigned int sizeBytes,
                 std::unique_ptr <p3d::BufferI>& buffer
             );
 

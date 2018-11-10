@@ -17,7 +17,10 @@ namespace p3d {
             VertexShader(VertexShader&&);
             VertexShader& operator=(VertexShader&&);
 
-            VertexShaderDesc getDescription();
+            const VertexShaderDesc& getDescription() const;
+            const ComPtr<ID3D11VertexShader> getShader() const;
+            const ComPtr<ID3DBlob> getShaderBlob() const;
+            const ComPtr<ID3D11InputLayout> getInputLayout() const;
 
         private:
             VertexShader(const VertexShader&) = delete;

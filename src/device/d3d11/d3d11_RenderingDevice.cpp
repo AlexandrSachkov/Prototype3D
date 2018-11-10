@@ -166,6 +166,29 @@ namespace p3d {
             return true;
         }
 
+        bool RenderingDevice::VSSetShader(const p3d::VertexShaderI* vs) {
+            const d3d11::VertexShader* d3d11vs = static_cast<const d3d11::VertexShader*>(vs);
+            _deviceContext->VSSetShader(const_cast<ID3D11VertexShader*>(d3d11vs->getShader().Get()), nullptr, 0);
+            return true;
+        }
+
+        bool RenderingDevice::PSSetShader(const p3d::PixelShaderI* ps) {
+            const d3d11::PixelShader* d3d11ps = static_cast<const d3d11::PixelShader*>(ps);
+            _deviceContext->PSSetShader(const_cast<ID3D11PixelShader*>(d3d11ps->getShader().Get()), nullptr, 0);
+            return true;
+        }
+
+        bool RenderingDevice::IASetVertexBuffer(
+            const p3d::BufferI* vBuff,
+            unsigned int offset,
+            unsigned int slot
+        ) {
+            const d3d11::Buffer* d3d11buff = static_cast<const d3d11::Buffer*>(vBuff);
+            ID3D11Buffer* nativeBuff = d3d11buff->getBuffer().Get();
+            _deviceContext->IAGetVertexBuffers(slot, 1, &nativeBuff, (UINT*)&d3d11buff->getDescription().strideBytes, (UINT*)&offset);
+            return true;
+        }
+
         void RenderingDevice::presentFrame() {
             _swapChain->Present(0, 0);
         }
@@ -241,8 +264,6 @@ namespace p3d {
 
         bool RenderingDevice::createBuffer(
             const BufferDesc& desc,
-            const void* data,
-            unsigned int sizeBytes,
             std::unique_ptr <p3d::BufferI>& buffer
         ) {
             unsigned int bindFlags = 0;
@@ -257,7 +278,8 @@ namespace p3d {
             P3D_ASSERT_R(convertUsageFlag(desc.usageFlag, usageDesc),
                 "Failed to convert usage flag to d3d11 equivalent");
 
-            P3D_ASSERT_R(!(!data && usageDesc.usage == D3D11_USAGE_IMMUTABLE),
+            const unsigned int buffSize = desc.strideBytes * desc.length;
+            P3D_ASSERT_R(!((!desc.data || buffSize ==0) && usageDesc.usage == D3D11_USAGE_IMMUTABLE),
                 "Data must be provided for an immutable buffer");
 
             ComPtr<ID3D11Buffer> buff = nullptr;
@@ -266,12 +288,12 @@ namespace p3d {
                 bindFlags,
                 usageDesc.usage,
                 usageDesc.cpuAccessFlag,
-                data,
-                sizeBytes,
+                desc.data,
+                buffSize,
                 buff
             ), "Failed to create buffer");
 
-            buffer.reset(new Buffer(buff, sizeBytes, desc));
+            buffer.reset(new Buffer(buff, desc));
             return true;
         }
 

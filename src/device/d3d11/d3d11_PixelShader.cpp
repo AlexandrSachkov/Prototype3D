@@ -30,8 +30,16 @@ namespace p3d {
             return *this;
         }
 
-        PixelShaderDesc PixelShader::getDescription() {
+        const PixelShaderDesc& PixelShader::getDescription() const {
             return _desc;
+        }
+
+        const ComPtr<ID3D11PixelShader> PixelShader::getShader() const {
+            return _shader;
+        }
+
+        const ComPtr<ID3DBlob> PixelShader::getShaderBlob() const {
+            return _shaderBlob;
         }
     }
 }

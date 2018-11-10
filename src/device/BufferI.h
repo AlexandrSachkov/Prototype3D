@@ -6,6 +6,5 @@ namespace p3d {
     public:
         virtual ~BufferI() {};
         virtual const BufferDesc& getDescription() const = 0;
-        virtual unsigned int getSizeBytes() const = 0;
     };
 }

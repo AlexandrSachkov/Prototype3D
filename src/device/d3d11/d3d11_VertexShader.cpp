@@ -31,8 +31,20 @@ namespace p3d {
             return *this;
         }
 
-        VertexShaderDesc VertexShader::getDescription() {
+        const VertexShaderDesc& VertexShader::getDescription() const {
             return _desc;
+        }
+
+        const ComPtr<ID3D11VertexShader> VertexShader::getShader() const {
+            return _shader;
+        }
+
+        const ComPtr<ID3DBlob> VertexShader::getShaderBlob() const {
+            return _shaderBlob;
+        }
+
+        const ComPtr<ID3D11InputLayout> VertexShader::getInputLayout() const {
+            return _inputLayout;
         }
     }
 }

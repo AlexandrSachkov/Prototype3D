@@ -6,6 +6,6 @@ namespace p3d {
     class PixelShaderI {
     public:
         virtual ~PixelShaderI() {}
-        virtual PixelShaderDesc getDescription() = 0;
+        virtual const PixelShaderDesc& getDescription() const = 0;
     };
 }

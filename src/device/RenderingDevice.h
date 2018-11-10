@@ -47,6 +47,22 @@ namespace p3d {
             return static_cast<T*>(this)->OMSetRenderTargets(renderTargetBuff, depthStencilBuff);
         }
 
+        bool VSSetShader(const p3d::VertexShaderI* vs) {
+            return static_cast<T*>(this)->VSSetShader(vs);
+        }
+
+        bool PSSetShader(const p3d::PixelShaderI* ps) {
+            return static_cast<T*>(this)->PSSetShader(ps);
+        }
+
+        bool IASetVertexBuffer(
+            const p3d::BufferI* vBuff,
+            unsigned int offset,
+            unsigned int slot
+        ) {
+            return static_cast<T*>(this)->IASetVertexBuffer(vBuff, offset, slot);
+        }
+
         void presentFrame() {
             return static_cast<T*>(this)->presentFrame();
         }
@@ -83,20 +99,22 @@ namespace p3d {
 
         bool createBuffer(
             const BufferDesc& desc,
-            const void* data,
-            unsigned int sizeBytes,
             std::unique_ptr <p3d::BufferI>& buffer
         ) {
-            return static_cast<T*>(this)->createBuffer(desc, data, sizeBytes, buffer);
+            return static_cast<T*>(this)->createBuffer(desc, buffer);
         }
 
         template <typename Data>
         bool createBuffer(
-            const BufferDesc& desc,
+            BufferDesc& desc,
             const std::vector<Data>& data,
             std::unique_ptr <p3d::BufferI>& buffer
         ) {
-            return static_cast<T*>(this)->createBuffer(desc, data.data(), (unsigned int)(sizeof(Data) * data.size()), buffer);
+            desc.data = (void*)data.data();
+            desc.strideBytes = sizeof(Data);
+            desc.length = (unsigned int)data.size();
+
+            return static_cast<T*>(this)->createBuffer(desc, buffer);
         }
     };
 }

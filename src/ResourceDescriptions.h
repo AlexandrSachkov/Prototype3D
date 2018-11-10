@@ -39,5 +39,8 @@ namespace p3d {
     struct BufferDesc {
         std::vector<P3D_BIND_FLAG> bindFlags;
         P3D_USAGE usageFlag;
+        void* data = nullptr;
+        unsigned int strideBytes; // size of each element
+        unsigned int length;      // number of elements
     };
 }
