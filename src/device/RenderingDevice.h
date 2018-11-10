@@ -5,6 +5,7 @@
 #include "Texture3dI.h"
 #include "VertexShaderI.h"
 #include "PixelShaderI.h"
+#include "BufferI.h"
 
 #include "glm/vec4.hpp"
 
@@ -78,6 +79,24 @@ namespace p3d {
 			const PixelShaderDesc& desc, 
 			std::unique_ptr <p3d::PixelShaderI>& ps) {
 			return static_cast<T*>(this)->createPixelShader(desc, ps);
+		}
+
+		bool createBuffer(
+			const BufferDesc& desc,
+			const void* data,
+			unsigned int sizeBytes,
+			std::unique_ptr <p3d::BufferI>& buffer
+		) {
+			return static_cast<T*>(this)->createBuffer(desc, data, sizeBytes, buffer);
+		}
+
+		template <typename Data>
+		bool createBuffer(
+			const BufferDesc& desc,
+			const std::vector<Data>& data,
+			std::unique_ptr <p3d::BufferI>& buffer
+		) {
+			return static_cast<T*>(this)->createBuffer(desc, data.data(), (unsigned int)(sizeof(Data) * data.size()), buffer);
 		}
 	};
 }

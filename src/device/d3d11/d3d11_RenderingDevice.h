@@ -8,6 +8,7 @@
 #include "../Texture3dI.h"
 #include "../VertexShaderI.h"
 #include "../PixelShaderI.h"
+#include "../BufferI.h"
 #include "../dx/ComPtr.h"
 #include "d3d11_Texture2dArray.h"
 
@@ -72,6 +73,13 @@ namespace p3d {
 			bool createPixelShader(
 				const PixelShaderDesc& desc, 
 				std::unique_ptr <p3d::PixelShaderI>& ps
+			);
+
+			bool createBuffer(
+				const BufferDesc& desc,
+				const void* data,
+				unsigned int sizeBytes,
+				std::unique_ptr <p3d::BufferI>& buffer
 			);
 
 		private:

@@ -35,4 +35,9 @@ namespace p3d {
 		std::string hlslSource;
 		std::string shaderEntryPoint;
 	};
+
+	struct BufferDesc {
+		std::vector<P3D_BIND_FLAG> bindFlags;
+		P3D_USAGE usageFlag;
+	};
 }

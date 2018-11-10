@@ -8,8 +8,10 @@
 #include "device/Texture3dI.h"
 #include "device/VertexShaderI.h"
 #include "device/PixelShaderI.h"
+#include "device/BufferI.h"
 #include "Constants.h"
 
+#include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
 
 #include <memory>
@@ -75,6 +77,19 @@ bool run() {
 		;
 	std::unique_ptr <p3d::PixelShaderI> ps = nullptr;
 	P3D_ASSERT_R(device->createPixelShader(psDesc, ps), "Failed to create pixel shader");
+
+	p3d::BufferDesc buffDesc;
+	buffDesc.bindFlags = { p3d::P3D_BIND_SHADER_RESOURCE };
+	buffDesc.usageFlag = p3d::P3D_USAGE_CPU_UPDATE_GPU_RW;
+	std::unique_ptr <p3d::BufferI> buffer = nullptr;
+	P3D_ASSERT_R(device->createBuffer(buffDesc, nullptr, 200, buffer), "Failed to create buffer");
+
+	p3d::BufferDesc buffDesc2;
+	buffDesc2.bindFlags = { p3d::P3D_BIND_SHADER_RESOURCE };
+	buffDesc2.usageFlag = p3d::P3D_USAGE_CPU_UPDATE_GPU_RW;
+	std::unique_ptr <p3d::BufferI> buffer2 = nullptr;
+	std::vector<glm::vec3> bufferData2 = { {0,1,0}, {1,0,0}, {0,0,1} };
+	P3D_ASSERT_R(device->createBuffer(buffDesc2, bufferData2, buffer2), "Failed to create buffer2");
 
 	p3d::util::Timer timer;
 	//end the program when the window is closed or an ESC key is pressed

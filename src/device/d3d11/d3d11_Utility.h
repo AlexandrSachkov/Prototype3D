@@ -93,6 +93,16 @@ namespace p3d {
 				ComPtr<ID3D11InputLayout>& inputLayout
 			);
 
+			static bool createBuffer(
+				ComPtr<ID3D11Device> device,
+				unsigned int bindFlags,
+				D3D11_USAGE usage,
+				D3D11_CPU_ACCESS_FLAG cpuAccessFlag,
+				const void* data,
+				unsigned int sizeBytes,
+				ComPtr<ID3D11Buffer>& buffer
+			);
+
 			static bool createBlendStates(
 				ID3D11Device* device,
 				bool enableBlend,
@@ -101,16 +111,6 @@ namespace p3d {
 				bool enableAlphaToCoverage,
 				ID3D11BlendState*& blendState
 			);
-
-			/*template<class T>
-			static bool createBuffer(
-				ID3D11Device* device,
-				D3D11_BIND_FLAG bindFlag,
-				D3D11_USAGE usage,
-				T data[],
-				size_t dataLength,
-				RESOURCES::Buffer& buffer
-				);*/
 
 			static bool createShaderResourceViewFromTexture2D(
 				ID3D11Device* device,

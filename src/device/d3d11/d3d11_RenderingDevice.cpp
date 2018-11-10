@@ -1,6 +1,7 @@
 #include "d3d11_RenderingDevice.h"
 #include "../../assert.h"
 #include "../dx/dx_ConstConvert.h"
+#include "d3d11_ConstConvert.h"
 #include "d3d11_Utility.h"
 
 #include "d3d11_Texture1dArray.h"
@@ -8,6 +9,7 @@
 #include "d3d11_Texture3d.h"
 #include "d3d11_VertexShader.h"
 #include "d3d11_PixelShader.h"
+#include "d3d11_Buffer.h"
 
 #include <Windows.h>
 
@@ -234,6 +236,42 @@ namespace p3d {
 			P3D_ASSERT_R(Utility::createPixelShader(_device, blob, shader), "Failed to create pixel shader");
 
 			ps.reset(new PixelShader(shader, blob, desc));
+			return true;
+		}
+
+		bool RenderingDevice::createBuffer(
+			const BufferDesc& desc,
+			const void* data,
+			unsigned int sizeBytes,
+			std::unique_ptr <p3d::BufferI>& buffer
+		) {
+			unsigned int bindFlags = 0;
+			for (auto bindFlag : desc.bindFlags) {
+				D3D11_BIND_FLAG d3dBindFlag;
+				P3D_ASSERT_R(convertBindFlag(bindFlag, d3dBindFlag), 
+					"Failed to convert bind flag to d3d11 equivalent");
+
+				bindFlags |= d3dBindFlag;
+			}
+			UsageDesc usageDesc;
+			P3D_ASSERT_R(convertUsageFlag(desc.usageFlag, usageDesc), 
+				"Failed to convert usage flag to d3d11 equivalent");
+
+			P3D_ASSERT_R(!(!data && usageDesc.usage == D3D11_USAGE_IMMUTABLE), 
+				"Data must be provided for an immutable buffer");
+
+			ComPtr<ID3D11Buffer> buff = nullptr;
+			P3D_ASSERT_R(Utility::createBuffer(
+				_device,
+				bindFlags,
+				usageDesc.usage,
+				usageDesc.cpuAccessFlag,
+				data,
+				sizeBytes,
+				buff
+			), "Failed to create buffer");
+
+			buffer.reset(new Buffer(buff, sizeBytes, desc));
 			return true;
 		}
 

@@ -125,10 +125,25 @@ namespace p3d {
 	};
 
 	enum P3D_USAGE {
-		P3D_USAGE_DEFAULT,
-		P3D_USAGE_IMMUTABLE,
-		P3D_USAGE_DYNAMIC,
-		P3D_USAGE_STAGING
+		// Used for GPU input that will never change
+		// D3D11: USAGE_IMMUTABLE
+		// OGL: DRAW/STATIC
+		P3D_USAGE_GPU_R,		
+
+		// Used for GPU operations when occasional CPU update is required
+		// D3D11: D3D11_USAGE_DEFAULT
+		// OGL: DRAW/DYNAMIC
+		P3D_USAGE_CPU_UPDATE_GPU_RW,
+
+		// Used when frequent CPU updates are required
+		// D3D11: D3D11_USAGE_DYNAMIC/D3D11_CPU_ACCESS_WRITE
+		// OGL: DRAW/STREAM
+		P3D_USAGE_CPU_W_GPU_R,
+
+		// Used when data transfer from GPU to CPU is required
+		// D3D11: D3D11_USAGE_STAGING/D3D11_CPU_ACCESS_READ
+		// OGL: READ
+		P3D_USAGE_CPU_R_GPU_UPDATE
 	};
 
 	enum P3D_BIND_FLAG {
@@ -140,8 +155,8 @@ namespace p3d {
 		P3D_BIND_RENDER_TARGET,
 		P3D_BIND_DEPTH_STENCIL,
 		P3D_BIND_UNORDERED_ACCESS,
-		P3D_BIND_DECODER,
-		P3D_BIND_VIDEO_ENCODER
+		//P3D_BIND_DECODER,
+		//P3D_BIND_VIDEO_ENCODER
 	};
 
 	enum P3D_INPUT_CLASSIFICATION {

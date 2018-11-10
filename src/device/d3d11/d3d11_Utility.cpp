@@ -214,6 +214,34 @@ namespace p3d {
 			return true;
 		}
 
+		bool Utility::createBuffer(
+			ComPtr<ID3D11Device> device,
+			unsigned int bindFlags,
+			D3D11_USAGE usage,
+			D3D11_CPU_ACCESS_FLAG cpuAccessFlag,
+			const void* data,
+			unsigned int sizeBytes,
+			ComPtr<ID3D11Buffer>& buffer
+		) {
+			D3D11_BUFFER_DESC desc;
+			desc.Usage = usage;
+			desc.ByteWidth = sizeBytes;
+			desc.BindFlags = bindFlags;
+			desc.CPUAccessFlags = cpuAccessFlag;
+			desc.MiscFlags = 0;
+
+			D3D11_SUBRESOURCE_DATA subresData;
+			subresData.pSysMem = data;
+			subresData.SysMemPitch = 0;
+			subresData.SysMemSlicePitch = 0;
+
+			P3D_ASSERT_R_DX11(device->CreateBuffer(
+				&desc, 
+				data ? &subresData : nullptr,
+				&buffer));
+			return true;
+		}
+
 		bool Utility::createBlendStates(
 			ID3D11Device* device,
 			bool enableBlend,
