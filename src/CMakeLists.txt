@@ -26,25 +26,49 @@ SET(HEADERS
     util/p3d_Timer.h
     
     math/Vec2.h
+    math/Vec3.h
     
+    device/d3d11/d3d11_Buffer.h
+    device/d3d11/d3d11_ConstConvert.h
+    device/d3d11/d3d11_PixelShader.h
     device/d3d11/d3d11_RenderingDevice.h
+    device/d3d11/d3d11_Texture1dArray.h
+    device/d3d11/d3d11_Texture2dArray.h
+    device/d3d11/d3d11_Texture3d.h
     device/d3d11/d3d11_Utility.h
+    device/d3d11/d3d11_VertexShader.h
     
     device/dx/ComPtr.h
+    device/dx/dx_ConstConvert.h
     
-    device/GPUMemoryManager.h
-    device/GPUMemoryManagerI.h
+    device/BufferI.h
+    device/PixelShaderI.h
     device/RenderingDevice.h
     device/RenderingDeviceI.h
+    device/Texture1dArrayI.h
+    device/Texture2dArrayI.h
+    device/Texture3dI.h
+    device/VertexShaderI.h
     
+    Constants.h
+    ResourceDescriptions.h
     assert.h
     )
 
 SET(SOURCES 
     util/p3d_GlfwWindowManager.cpp
     
+    device/d3d11/d3d11_Buffer.cpp
+    device/d3d11/d3d11_ConstConvert.cpp
+    device/d3d11/d3d11_PixelShader.cpp
     device/d3d11/d3d11_RenderingDevice.cpp
+    device/d3d11/d3d11_Texture1dArray.cpp
+    device/d3d11/d3d11_Texture2dArray.cpp
+    device/d3d11/d3d11_Texture3d.cpp
     device/d3d11/d3d11_Utility.cpp
+    device/d3d11/d3d11_VertexShader.cpp
+
+    device/dx/dx_ConstConvert.cpp
 
     p3dTest.cpp
     )
