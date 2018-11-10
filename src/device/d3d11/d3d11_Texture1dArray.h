@@ -9,15 +9,15 @@ namespace p3d {
         class Texture1dArray : public p3d::Texture1dArrayI {
         public:
             Texture1dArray(ComPtr<ID3D11Texture1D> texArr, const Texture1dArrayDesc& desc);
-            Texture1dArray(const Texture1dArray& other);
-            Texture1dArray& operator=(const Texture1dArray& other);
+            Texture1dArray(Texture1dArray&&);
+            Texture1dArray& operator=(Texture1dArray&&);
 
             ComPtr<ID3D11Texture1D> getTexture();
             Texture1dArrayDesc getDescription();
 
         private:
-            Texture1dArray(Texture1dArray&&) = delete;
-            Texture1dArray& operator=(Texture1dArray&&) = delete;
+            Texture1dArray(const Texture1dArray&) = delete;
+            Texture1dArray& operator=(const Texture1dArray&) = delete;
 
             ComPtr<ID3D11Texture1D> _texArr;
             Texture1dArrayDesc _desc;

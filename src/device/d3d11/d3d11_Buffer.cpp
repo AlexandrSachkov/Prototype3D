@@ -9,7 +9,27 @@ namespace p3d {
         ) : _buffer(buffer), _sizeBytes(sizeBytes), _desc(desc) {
         }
 
-        Buffer::~Buffer() {}
+        Buffer::Buffer(Buffer&& other) {
+            _buffer = other._buffer;
+            _sizeBytes = other._sizeBytes;
+            _desc = other._desc;
+
+            other._buffer = nullptr;
+            other._sizeBytes = 0;
+            other._desc = {};
+        }
+
+        Buffer& Buffer::operator=(Buffer&& other) {
+            _buffer = other._buffer;
+            _sizeBytes = other._sizeBytes;
+            _desc = other._desc;
+
+            other._buffer = nullptr;
+            other._sizeBytes = 0;
+            other._desc = {};
+
+            return *this;
+        }
 
         const ComPtr<ID3D11Buffer> Buffer::getBuffer() const {
             return _buffer;

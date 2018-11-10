@@ -19,6 +19,8 @@ namespace p3d {
                 ComPtr<ID3D11UnorderedAccessView> unorderedAccessView,
                 const Texture2dArrayDesc& desc
             );
+            Texture2dArray(Texture2dArray&&);
+            Texture2dArray& operator=(Texture2dArray&&);
 
             const ComPtr<ID3D11Texture2D> getTexture() const;
             const ComPtr<ID3D11DepthStencilView> getDepthStencilView() const;
@@ -28,6 +30,9 @@ namespace p3d {
             const Texture2dArrayDesc& getDescription() const;
 
         private:
+            Texture2dArray(const Texture2dArray&) = delete;
+            Texture2dArray& operator=(const Texture2dArray&) = delete;
+
             ComPtr<ID3D11Texture2D> _texArr;
             ComPtr<ID3D11DepthStencilView> _depthStencilView;
             ComPtr<ID3D11RenderTargetView> _renderTargetView;

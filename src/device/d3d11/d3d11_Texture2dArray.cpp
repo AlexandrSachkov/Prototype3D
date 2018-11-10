@@ -20,6 +20,40 @@ namespace p3d {
             _desc(desc) {
         }
 
+        Texture2dArray::Texture2dArray(Texture2dArray&& other) {
+            _texArr = other._texArr;
+            _depthStencilView = other._depthStencilView;
+            _renderTargetView = other._renderTargetView;
+            _shaderResourceView = other._shaderResourceView;
+            _unorderedAccessView = other._unorderedAccessView;
+            _desc = other._desc;
+
+            other._texArr = nullptr;
+            other._depthStencilView = nullptr;
+            other._renderTargetView = nullptr;
+            other._shaderResourceView = nullptr;
+            other._unorderedAccessView = nullptr;
+            other._desc = {};
+        }
+
+        Texture2dArray& Texture2dArray::operator=(Texture2dArray&& other) {
+            _texArr = other._texArr;
+            _depthStencilView = other._depthStencilView;
+            _renderTargetView = other._renderTargetView;
+            _shaderResourceView = other._shaderResourceView;
+            _unorderedAccessView = other._unorderedAccessView;
+            _desc = other._desc;
+
+            other._texArr = nullptr;
+            other._depthStencilView = nullptr;
+            other._renderTargetView = nullptr;
+            other._shaderResourceView = nullptr;
+            other._unorderedAccessView = nullptr;
+            other._desc = {};
+
+            return *this;
+        }
+
         const ComPtr<ID3D11Texture2D> Texture2dArray::Texture2dArray::getTexture() const {
             return _texArr;
         }

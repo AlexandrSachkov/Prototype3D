@@ -14,15 +14,14 @@ namespace p3d {
                 ComPtr<ID3DBlob> shaderBlob,
                 ComPtr<ID3D11InputLayout> inputLayout,
                 const VertexShaderDesc& desc);
-            VertexShader(const VertexShader& other);
-            ~VertexShader();
+            VertexShader(VertexShader&&);
+            VertexShader& operator=(VertexShader&&);
 
-            VertexShader& operator=(const VertexShader& other);
             VertexShaderDesc getDescription();
 
         private:
-            VertexShader(VertexShader&&) = delete;
-            VertexShader& operator=(VertexShader&&) = delete;
+            VertexShader(const VertexShader&) = delete;
+            VertexShader& operator=(const VertexShader&) = delete;
 
             ComPtr<ID3D11VertexShader> _shader;
             ComPtr<ID3DBlob> _shaderBlob;

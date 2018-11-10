@@ -3,17 +3,23 @@
 namespace p3d {
     namespace d3d11 {
         Texture1dArray::Texture1dArray(ComPtr<ID3D11Texture1D> texArr, const Texture1dArrayDesc& desc)
-            : _texArr(texArr), _desc(desc) {
-        }
+            : _texArr(texArr), _desc(desc) {}
 
-        Texture1dArray::Texture1dArray(const Texture1dArray& other) {
+        Texture1dArray::Texture1dArray(Texture1dArray&& other) {
             _texArr = other._texArr;
             _desc = other._desc;
+
+            other._texArr = nullptr;
+            other._desc = {};
         }
 
-        Texture1dArray& Texture1dArray::operator=(const Texture1dArray& other) {
+        Texture1dArray& Texture1dArray::operator=(Texture1dArray&& other) {
             _texArr = other._texArr;
             _desc = other._desc;
+
+            other._texArr = nullptr;
+            other._desc = {};
+
             return *this;
         }
 

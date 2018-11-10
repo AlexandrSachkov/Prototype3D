@@ -13,15 +13,14 @@ namespace p3d {
                 ComPtr<ID3D11PixelShader> shader,
                 ComPtr<ID3DBlob> shaderBlob,
                 const PixelShaderDesc& desc);
-            PixelShader(const PixelShader& other);
-            ~PixelShader();
+            PixelShader(PixelShader&&);
+            PixelShader& operator=(PixelShader&&);
 
-            PixelShader& operator=(const PixelShader& other);
             PixelShaderDesc getDescription();
 
         private:
-            PixelShader(PixelShader&&) = delete;
-            PixelShader& operator=(PixelShader&&) = delete;
+            PixelShader(const PixelShader&) = delete;
+            PixelShader& operator=(const PixelShader&) = delete;
 
             ComPtr<ID3D11PixelShader> _shader;
             ComPtr<ID3DBlob> _shaderBlob;

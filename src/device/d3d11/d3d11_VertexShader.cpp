@@ -7,21 +7,27 @@ namespace p3d {
             ComPtr<ID3DBlob> shaderBlob,
             ComPtr<ID3D11InputLayout> inputLayout,
             const VertexShaderDesc& desc
-        ) : _shader(shader), _shaderBlob(shaderBlob), _inputLayout(inputLayout), _desc(desc) {
-        }
+        ) : _shader(shader), _shaderBlob(shaderBlob), _inputLayout(inputLayout), _desc(desc) {}
 
-        VertexShader::VertexShader(const VertexShader& other) {
+        VertexShader::VertexShader(VertexShader&& other) {
             _shader = other._shader;
             _shaderBlob = other._shaderBlob;
             _desc = other._desc;
+
+            other._shader = nullptr;
+            other._shaderBlob = nullptr;
+            other._desc = {};
         }
 
-        VertexShader::~VertexShader() {}
-
-        VertexShader& VertexShader::operator=(const VertexShader& other) {
+        VertexShader& VertexShader::operator=(VertexShader&& other) {
             _shader = other._shader;
             _shaderBlob = other._shaderBlob;
             _desc = other._desc;
+
+            other._shader = nullptr;
+            other._shaderBlob = nullptr;
+            other._desc = {};
+
             return *this;
         }
 

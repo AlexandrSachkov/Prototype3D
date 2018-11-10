@@ -13,13 +13,17 @@ namespace p3d {
                 ComPtr<ID3D11Buffer> buffer,
                 unsigned int sizeBytes,
                 const BufferDesc& desc);
-            ~Buffer();
+            Buffer(Buffer&&);
+            Buffer& operator=(Buffer&&);
 
             const ComPtr<ID3D11Buffer> getBuffer() const;
             const BufferDesc& getDescription() const;
             unsigned int getSizeBytes() const;
 
         private:
+            Buffer(const Buffer&) = delete;
+            Buffer& operator=(const Buffer&) = delete;
+
             ComPtr<ID3D11Buffer> _buffer;
             unsigned int _sizeBytes;
             BufferDesc _desc;

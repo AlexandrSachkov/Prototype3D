@@ -14,15 +14,15 @@ namespace p3d {
                 ComPtr<ID3D11Texture3D> tex,
                 const Texture3dDesc& desc
             );
-            Texture3d(const Texture3d& other);
-            Texture3d& operator=(const Texture3d& other);
+            Texture3d(Texture3d&&);
+            Texture3d& operator=(Texture3d&&);
 
             ComPtr<ID3D11Texture3D> getTexture();
             Texture3dDesc getDescription();
 
         private:
-            Texture3d(Texture3d&&) = delete;
-            Texture3d& operator=(Texture3d&&) = delete;
+            Texture3d(const Texture3d&) = delete;
+            Texture3d& operator=(const Texture3d&) = delete;
 
             ComPtr<ID3D11Texture3D> _tex;
             Texture3dDesc _desc;
