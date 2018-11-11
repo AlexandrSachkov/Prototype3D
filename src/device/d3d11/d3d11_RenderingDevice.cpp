@@ -18,12 +18,14 @@
 
 namespace p3d {
     namespace d3d11 {
-        RenderingDevice::RenderingDevice() {
-
-        }
+        RenderingDevice::RenderingDevice() {}
 
         RenderingDevice::~RenderingDevice() {
-            release();
+            if (_swapChain) Utility::setFullScreen(_swapChain, false);
+
+            _swapChain = nullptr;
+            _deviceContext = nullptr;
+            _device = nullptr;
         }
 
         bool RenderingDevice::initialize(
@@ -95,14 +97,6 @@ namespace p3d {
             );
 
             return true;
-        }
-
-        void RenderingDevice::release() {
-            if (_swapChain) Utility::setFullScreen(_swapChain, false);
-
-            _swapChain = nullptr;
-            _deviceContext = nullptr;
-            _device = nullptr;
         }
 
         p3d::Texture2dArrayI& RenderingDevice::getRenderTargetBuff() {

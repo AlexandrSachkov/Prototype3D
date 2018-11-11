@@ -31,7 +31,6 @@ namespace p3d {
                 unsigned int numBackBuffers,
                 bool fullscreen
             );
-            void release();
 
             p3d::Texture2dArrayI& getRenderTargetBuff();
             p3d::Texture2dArrayI& getDepthStencilBuff();
