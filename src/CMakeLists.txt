@@ -23,54 +23,54 @@ ENDIF(MSVC)
 # =====================================================================================
 
 SET(HEADERS       
-    util/util_GlfwWindowManager.h
-    util/util_DefaultSampleRunner.h
+    p3d/util/util_GlfwWindowManager.h
+    p3d/util/util_DefaultSampleRunner.h
     
-    device/d3d11/d3d11_Buffer.h
-    device/d3d11/d3d11_ConstConvert.h
-    device/d3d11/d3d11_PixelShader.h
-    device/d3d11/d3d11_Rasterizer.h
-    device/d3d11/d3d11_RenderingDevice.h
-    device/d3d11/d3d11_Texture1dArray.h
-    device/d3d11/d3d11_Texture2dArray.h
-    device/d3d11/d3d11_Texture3d.h
-    device/d3d11/d3d11_Utility.h
-    device/d3d11/d3d11_VertexShader.h
+    p3d/device/d3d11/d3d11_Buffer.h
+    p3d/device/d3d11/d3d11_ConstConvert.h
+    p3d/device/d3d11/d3d11_PixelShader.h
+    p3d/device/d3d11/d3d11_Rasterizer.h
+    p3d/device/d3d11/d3d11_RenderingDevice.h
+    p3d/device/d3d11/d3d11_Texture1dArray.h
+    p3d/device/d3d11/d3d11_Texture2dArray.h
+    p3d/device/d3d11/d3d11_Texture3d.h
+    p3d/device/d3d11/d3d11_Utility.h
+    p3d/device/d3d11/d3d11_VertexShader.h
     
-    device/dx/dx_ComPtr.h
-    device/dx/dx_ConstConvert.h
+    p3d/device/dx/dx_ComPtr.h
+    p3d/device/dx/dx_ConstConvert.h
     
-    device/BufferI.h
-    device/PixelShaderI.h
-    device/RasterizerI.h
-    device/RenderingDevice.h
-    device/RenderingDeviceI.h
-    device/Texture1dArrayI.h
-    device/Texture2dArrayI.h
-    device/Texture3dI.h
-    device/VertexShaderI.h
+    p3d/device/BufferI.h
+    p3d/device/PixelShaderI.h
+    p3d/device/RasterizerI.h
+    p3d/device/RenderingDevice.h
+    p3d/device/RenderingDeviceI.h
+    p3d/device/Texture1dArrayI.h
+    p3d/device/Texture2dArrayI.h
+    p3d/device/Texture3dI.h
+    p3d/device/VertexShaderI.h
     
-    Constants.h
-    ResourceDescriptions.h
-    assert.h
+    p3d/Constants.h
+    p3d/ResourceDescriptions.h
+    p3d/assert.h
     )
 
 SET(SOURCES 
-    util/util_GlfwWindowManager.cpp
-    util/util_DefaultSampleRunner.cpp
+    p3d/util/util_GlfwWindowManager.cpp
+    p3d/util/util_DefaultSampleRunner.cpp
     
-    device/d3d11/d3d11_Buffer.cpp
-    device/d3d11/d3d11_ConstConvert.cpp
-    device/d3d11/d3d11_PixelShader.cpp
-    device/d3d11/d3d11_Rasterizer.cpp
-    device/d3d11/d3d11_RenderingDevice.cpp
-    device/d3d11/d3d11_Texture1dArray.cpp
-    device/d3d11/d3d11_Texture2dArray.cpp
-    device/d3d11/d3d11_Texture3d.cpp
-    device/d3d11/d3d11_Utility.cpp
-    device/d3d11/d3d11_VertexShader.cpp
+    p3d/device/d3d11/d3d11_Buffer.cpp
+    p3d/device/d3d11/d3d11_ConstConvert.cpp
+    p3d/device/d3d11/d3d11_PixelShader.cpp
+    p3d/device/d3d11/d3d11_Rasterizer.cpp
+    p3d/device/d3d11/d3d11_RenderingDevice.cpp
+    p3d/device/d3d11/d3d11_Texture1dArray.cpp
+    p3d/device/d3d11/d3d11_Texture2dArray.cpp
+    p3d/device/d3d11/d3d11_Texture3d.cpp
+    p3d/device/d3d11/d3d11_Utility.cpp
+    p3d/device/d3d11/d3d11_VertexShader.cpp
 
-    device/dx/dx_ConstConvert.cpp
+    p3d/device/dx/dx_ConstConvert.cpp
     )
 
 

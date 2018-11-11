@@ -140,11 +140,11 @@ set(LIBS
 
 
 add_executable (Sample1
-  Sample1_CreateWindow.cpp
+  Sample1/Sample1_CreateWindow.cpp
 )
 
 add_executable (Sample2
-  Sample2_Triangle.cpp
+  Sample2/Sample2_Triangle.cpp
 )
 
 TARGET_LINK_LIBRARIES(Sample1 ${LIBS})
