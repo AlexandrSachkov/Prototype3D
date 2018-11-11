@@ -79,9 +79,9 @@ bool run() {
     p3d::BufferDesc indexBuffDesc;
     indexBuffDesc.bindFlags = { p3d::P3D_BIND_INDEX_BUFFER };
     indexBuffDesc.usageFlag = p3d::P3D_USAGE_CPU_UPDATE_GPU_RW;
-    indexBuffDesc.dataFormat = p3d::P3D_FORMAT_R32_UINT;
+    indexBuffDesc.dataFormat = p3d::P3D_FORMAT_R16_UINT;
     std::unique_ptr <p3d::BufferI> indexBuff = nullptr;
-    std::vector<unsigned int> indices = { 0, 1, 2, 2, 1, 3 };
+    std::vector<unsigned short> indices = { 0, 1, 2, 2, 1, 3 };
     P3D_ASSERT_R(device->createBuffer(indexBuffDesc, indices, indexBuff), "Failed to create index buffer");
     device->IASetIndexBuffer(indexBuff.get(), 0);
 
