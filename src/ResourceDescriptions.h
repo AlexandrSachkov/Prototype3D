@@ -43,4 +43,10 @@ namespace p3d {
         unsigned int strideBytes; // size of each element
         unsigned int length;      // number of elements
     };
+
+    struct RasterizerDesc {
+        P3D_FILL_MODE fillMode;
+        P3D_CULL_MODE cullMode;
+        bool frontCounterClockwise;
+    };
 }

@@ -103,6 +103,14 @@ namespace p3d {
                 ComPtr<ID3D11Buffer>& buffer
             );
 
+            static bool createRasterizerState(
+                ComPtr <ID3D11Device> device,
+                D3D11_CULL_MODE cullMode,
+                D3D11_FILL_MODE fillMode,
+                bool frontCounterClockwise,
+                ComPtr <ID3D11RasterizerState>& rasterizerState
+            );
+
             static bool createBlendStates(
                 ID3D11Device* device,
                 bool enableBlend,
@@ -132,13 +140,6 @@ namespace p3d {
             );
 
             static bool createTextureSamplerState(ID3D11Device* device, ID3D11SamplerState*& samplerState);
-
-            static bool createRasterizerState(
-                ID3D11Device* device,
-                D3D11_CULL_MODE cullMode,
-                D3D11_FILL_MODE fillMode,
-                ID3D11RasterizerState*& rasterizerState
-            );
 
             /*static bool loadVertexShader(ID3D11Device* device, std::wstring path, RESOURCES::VertexShader& vertexShader);
             static bool loadPixelShader(ID3D11Device* device, std::wstring path, RESOURCES::PixelShader& pixelShader);

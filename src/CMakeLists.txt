@@ -32,6 +32,7 @@ SET(HEADERS
     device/d3d11/d3d11_Buffer.h
     device/d3d11/d3d11_ConstConvert.h
     device/d3d11/d3d11_PixelShader.h
+    device/d3d11/d3d11_Rasterizer.h
     device/d3d11/d3d11_RenderingDevice.h
     device/d3d11/d3d11_Texture1dArray.h
     device/d3d11/d3d11_Texture2dArray.h
@@ -44,6 +45,7 @@ SET(HEADERS
     
     device/BufferI.h
     device/PixelShaderI.h
+    device/RasterizerI.h
     device/RenderingDevice.h
     device/RenderingDeviceI.h
     device/Texture1dArrayI.h
@@ -62,6 +64,7 @@ SET(SOURCES
     device/d3d11/d3d11_Buffer.cpp
     device/d3d11/d3d11_ConstConvert.cpp
     device/d3d11/d3d11_PixelShader.cpp
+    device/d3d11/d3d11_Rasterizer.cpp
     device/d3d11/d3d11_RenderingDevice.cpp
     device/d3d11/d3d11_Texture1dArray.cpp
     device/d3d11/d3d11_Texture2dArray.cpp

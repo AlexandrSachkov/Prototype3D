@@ -163,4 +163,15 @@ namespace p3d {
         P3D_INPUT_PER_VERTEX,
         P3D_INPUT_PER_INSTANCE
     };
+
+    enum P3D_FILL_MODE {
+        P3D_FILL_SOLID,
+        P3D_FILL_WIREFRAME
+    };
+
+    enum P3D_CULL_MODE {
+        P3D_CULL_NONE,
+        P3D_CULL_FRONT,
+        P3D_CULL_BACK
+    };
 }

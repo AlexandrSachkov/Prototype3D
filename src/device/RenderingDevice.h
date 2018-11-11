@@ -6,6 +6,7 @@
 #include "VertexShaderI.h"
 #include "PixelShaderI.h"
 #include "BufferI.h"
+#include "RasterizerI.h"
 
 #include "glm/vec4.hpp"
 
@@ -53,6 +54,10 @@ namespace p3d {
 
         bool PSSetShader(const p3d::PixelShaderI* ps) {
             return static_cast<T*>(this)->PSSetShader(ps);
+        }
+
+        bool RSSetState(const p3d::RasterizerI* rast) {
+            return static_cast<T*>(this)->RSSetState(rast);
         }
 
         bool IASetVertexBuffer(
@@ -115,6 +120,13 @@ namespace p3d {
             desc.length = (unsigned int)data.size();
 
             return static_cast<T*>(this)->createBuffer(desc, buffer);
+        }
+
+        bool createRasterizer(
+            const RasterizerDesc& desc,
+            std::unique_ptr <p3d::RasterizerI>& rasterizer
+        ) {
+            return static_cast<T*>(this)->createRasterizer(desc, rasterizer);
         }
     };
 }

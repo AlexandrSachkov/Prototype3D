@@ -52,5 +52,34 @@ namespace p3d {
                 P3D_ASSERT_R(false, "Unable to convert usage flag to d3d11 equivalent");
             }
         }
+
+        bool convertFillMode(P3D_FILL_MODE fill, D3D11_FILL_MODE& d3d11Fill) {
+            switch (fill) {
+            case P3D_FILL_SOLID:
+                d3d11Fill = D3D11_FILL_SOLID;
+                return true;
+            case P3D_FILL_WIREFRAME:
+                d3d11Fill = D3D11_FILL_WIREFRAME;
+                return true;
+            default:
+                P3D_ASSERT_R(false, "Unable to convert fill mode to d3d11 equivalent");
+            }
+        }
+
+        bool convertCullMode(P3D_CULL_MODE cull, D3D11_CULL_MODE& d3d11Cull) {
+            switch (cull) {
+            case P3D_CULL_NONE:
+                d3d11Cull = D3D11_CULL_NONE;
+                return true;
+            case P3D_CULL_BACK:
+                d3d11Cull = D3D11_CULL_BACK;
+                return true;
+            case P3D_CULL_FRONT:
+                d3d11Cull = D3D11_CULL_FRONT;
+                return true;
+            default:
+                P3D_ASSERT_R(false, "Unable to convert cull mode to d3d11 equivalent");
+            }
+        }
     }
 }

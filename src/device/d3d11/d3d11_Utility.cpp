@@ -380,26 +380,21 @@ namespace p3d {
 
 
         bool Utility::createRasterizerState(
-            ID3D11Device* device,
+            ComPtr<ID3D11Device> device,
             D3D11_CULL_MODE cullMode,
             D3D11_FILL_MODE fillMode,
-            ID3D11RasterizerState*& rasterizerState
+            bool frontCounterClockwise,
+            ComPtr<ID3D11RasterizerState>& rasterizerState
         ) {
-            HRESULT hr;
+            D3D11_RASTERIZER_DESC desc;
+            ZeroMemory(&desc, sizeof(D3D11_RASTERIZER_DESC));
 
-            D3D11_RASTERIZER_DESC cmdesc;
-            ZeroMemory(&cmdesc, sizeof(D3D11_RASTERIZER_DESC));
+            desc.CullMode = cullMode;
+            desc.FillMode = fillMode;
+            desc.FrontCounterClockwise = frontCounterClockwise;
+            desc.DepthClipEnable = true;
 
-            cmdesc.CullMode = cullMode;
-            cmdesc.FillMode = fillMode;
-            cmdesc.FrontCounterClockwise = true;
-
-            hr = device->CreateRasterizerState(&cmdesc, &rasterizerState);
-            if (FAILED(hr)) {
-                //CONSOLE::out(CONSOLE::ERR, L"Failed to create rasterizer state");
-                return false;
-            }
-
+            P3D_ASSERT_R_DX11(device->CreateRasterizerState(&desc, &rasterizerState));
             return true;
         }
 

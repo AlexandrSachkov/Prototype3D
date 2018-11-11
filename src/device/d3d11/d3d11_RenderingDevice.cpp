@@ -10,6 +10,7 @@
 #include "d3d11_VertexShader.h"
 #include "d3d11_PixelShader.h"
 #include "d3d11_Buffer.h"
+#include "d3d11_Rasterizer.h"
 
 #include <Windows.h>
 
@@ -178,6 +179,12 @@ namespace p3d {
             return true;
         }
 
+        bool RenderingDevice::RSSetState(const p3d::RasterizerI* rast) {
+            const d3d11::Rasterizer* d3d11rast = static_cast<const d3d11::Rasterizer*>(rast);
+            _deviceContext->RSSetState(const_cast<ID3D11RasterizerState*>(d3d11rast->getRasterizer().Get()));
+            return true;
+        }
+
         bool RenderingDevice::IASetVertexBuffer(
             const p3d::BufferI* vBuff,
             unsigned int offset,
@@ -294,6 +301,31 @@ namespace p3d {
             ), "Failed to create buffer");
 
             buffer.reset(new Buffer(buff, desc));
+            return true;
+        }
+
+        bool RenderingDevice::createRasterizer(
+            const RasterizerDesc& desc,
+            std::unique_ptr <p3d::RasterizerI>& rasterizer
+        ) {
+            D3D11_CULL_MODE d3d11Cull;
+            P3D_ASSERT_R(convertCullMode(desc.cullMode, d3d11Cull), 
+                "Failed to convert cull mode to d3d11 equivalent");
+
+            D3D11_FILL_MODE d3d11Fill;
+            P3D_ASSERT_R(convertFillMode(desc.fillMode, d3d11Fill),
+                "Failed to convert fill mode to d3d11 equivalent");
+
+            ComPtr<ID3D11RasterizerState> rs = nullptr;
+            P3D_ASSERT_R(Utility::createRasterizerState(
+                _device,
+                d3d11Cull,
+                d3d11Fill,
+                desc.frontCounterClockwise,
+                rs
+            ), "Failed to create rasterizer state");
+
+            rasterizer.reset(new Rasterizer(rs, desc));
             return true;
         }
 

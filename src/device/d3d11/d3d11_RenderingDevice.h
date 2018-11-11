@@ -9,6 +9,7 @@
 #include "../VertexShaderI.h"
 #include "../PixelShaderI.h"
 #include "../BufferI.h"
+#include "../RasterizerI.h"
 #include "../dx/ComPtr.h"
 #include "d3d11_Texture2dArray.h"
 
@@ -49,7 +50,8 @@ namespace p3d {
             );
 
             bool VSSetShader(const p3d::VertexShaderI* vs);
-            bool PSSetShader(const p3d::PixelShaderI* ps);
+            bool PSSetShader(const p3d::PixelShaderI* ps); 
+            bool RSSetState(const p3d::RasterizerI* rast);
 
             bool IASetVertexBuffer(
                 const p3d::BufferI* vBuff,
@@ -87,6 +89,11 @@ namespace p3d {
             bool createBuffer(
                 const BufferDesc& desc,
                 std::unique_ptr <p3d::BufferI>& buffer
+            );
+
+            bool createRasterizer(
+                const RasterizerDesc& desc,
+                std::unique_ptr <p3d::RasterizerI>& rasterizer
             );
 
         private:

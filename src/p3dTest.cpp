@@ -9,6 +9,7 @@
 #include "device/VertexShaderI.h"
 #include "device/PixelShaderI.h"
 #include "device/BufferI.h"
+#include "device/RasterizerI.h"
 #include "Constants.h"
 
 #include "glm/vec3.hpp"
@@ -95,8 +96,15 @@ bool run() {
     std::unique_ptr <p3d::BufferI> buffer2 = nullptr;
     std::vector<glm::vec3> bufferData2 = { {0,0.5f,0}, {-0.5f,0,0}, {0,0,0.5f} };
     P3D_ASSERT_R(device->createBuffer(buffDesc2, bufferData2, buffer2), "Failed to create buffer2");
-
     device->IASetVertexBuffer(buffer2.get(), 0, 0);
+
+    p3d::RasterizerDesc rastDesc;
+    rastDesc.cullMode = p3d::P3D_CULL_BACK;
+    rastDesc.fillMode = p3d::P3D_FILL_SOLID;
+    rastDesc.frontCounterClockwise = true;
+    std::unique_ptr <p3d::RasterizerI> rast = nullptr;
+    P3D_ASSERT_R(device->createRasterizer(rastDesc, rast), "Failed to create rasterizer");
+    device->RSSetState(rast.get());
 
     p3d::util::Timer timer;
     //end the program when the window is closed or an ESC key is pressed
