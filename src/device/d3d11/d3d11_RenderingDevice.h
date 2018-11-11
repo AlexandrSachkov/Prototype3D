@@ -10,7 +10,7 @@
 #include "../PixelShaderI.h"
 #include "../BufferI.h"
 #include "../RasterizerI.h"
-#include "../dx/ComPtr.h"
+#include "../dx/dx_ComPtr.h"
 #include "d3d11_Texture2dArray.h"
 
 #include "glm/vec4.hpp"

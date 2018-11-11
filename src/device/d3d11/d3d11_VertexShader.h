@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../dx/ComPtr.h"
+#include "../dx/dx_ComPtr.h"
 #include "../VertexShaderI.h"
 
 #include <d3d11.h>

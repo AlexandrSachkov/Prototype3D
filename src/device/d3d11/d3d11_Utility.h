@@ -7,7 +7,7 @@
 #include <Windows.h>
 #include <d3d11.h>
 #include "comdef.h"
-#include "../dx/ComPtr.h"
+#include "../dx/dx_ComPtr.h"
 
 #include <string>
 #include <cstdint>

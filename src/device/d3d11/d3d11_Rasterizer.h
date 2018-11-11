@@ -1,5 +1,5 @@
 #pragma once
-#include "../dx/ComPtr.h"
+#include "../dx/dx_ComPtr.h"
 #include "../RasterizerI.h"
 
 #include <d3d11.h>
