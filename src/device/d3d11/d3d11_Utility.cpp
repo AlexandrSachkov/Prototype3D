@@ -32,7 +32,7 @@ namespace p3d {
         }
 
         bool Utility::getMSAAQualityLevel(
-            ComPtr<ID3D11Device> device,
+            const ComPtr<ID3D11Device> device,
             unsigned int msaaLvl,
             unsigned int& qualityLvl
         ) {
@@ -43,7 +43,7 @@ namespace p3d {
         }
 
         bool Utility::setFullScreen(
-            ComPtr<IDXGISwapChain> swapChain,
+            const ComPtr<IDXGISwapChain> swapChain,
             bool fullscreen
         ) {
             P3D_ASSERT_R_DX11(swapChain->SetFullscreenState(fullscreen, nullptr));
@@ -52,13 +52,13 @@ namespace p3d {
 
         bool Utility::createSwapChain(
             HWND windowHandle,
+            const unsigned int screenDim[2],
             unsigned int screenRefreshRate,
-            unsigned int screenDim[2],
             unsigned int msaaLevel,
             unsigned int msaaQualityLevel,
             unsigned int numBackBuffers,
             bool fullScreen,
-            ComPtr<ID3D11Device> device,
+            const ComPtr<ID3D11Device> device,
             ComPtr<IDXGISwapChain>& swapChain
         ) {
             DXGI_MODE_DESC bufferDesc;
@@ -107,8 +107,8 @@ namespace p3d {
         }
 
         bool Utility::createBackBufferRenderTargetView(
-            ComPtr<ID3D11Device> device,
-            ComPtr<IDXGISwapChain> swapChain,
+            const ComPtr<ID3D11Device> device,
+            const ComPtr<IDXGISwapChain> swapChain,
             ComPtr<ID3D11Texture2D>& renderTargetBuff,
             ComPtr<ID3D11RenderTargetView>& renderTargetView
         ) {
@@ -120,8 +120,8 @@ namespace p3d {
         }
 
         bool Utility::createDepthStencilView(
-            ComPtr<ID3D11Device> device,
-            unsigned int screenDim[2],
+            const ComPtr<ID3D11Device> device,
+            const unsigned int screenDim[2],
             unsigned int msaaLevel,
             unsigned int msaaQualityLevel,
             ComPtr<ID3D11Texture2D>& depthStencilBuff,
@@ -148,9 +148,9 @@ namespace p3d {
         }
 
         bool Utility::compileShader(
-            std::string source,
-            std::string entryPoint,
-            std::string target,
+            const std::string source,
+            const std::string entryPoint,
+            const std::string target,
             ComPtr<ID3DBlob>& blob,
             ComPtr<ID3DBlob>& errBlob
         ) {
@@ -177,8 +177,8 @@ namespace p3d {
         }
 
         bool Utility::createVertexShader(
-            ComPtr<ID3D11Device> device,
-            ComPtr<ID3DBlob> blob,
+            const ComPtr<ID3D11Device> device,
+            const ComPtr<ID3DBlob> blob,
             ComPtr<ID3D11VertexShader>& vs
         ) {
             P3D_ASSERT_R_DX11(device->CreateVertexShader(
@@ -188,8 +188,8 @@ namespace p3d {
         }
 
         bool Utility::createPixelShader(
-            ComPtr<ID3D11Device> device,
-            ComPtr<ID3DBlob> blob,
+            const ComPtr<ID3D11Device> device,
+            const ComPtr<ID3DBlob> blob,
             ComPtr<ID3D11PixelShader>& ps
         ) {
             P3D_ASSERT_R_DX11(device->CreatePixelShader(
@@ -199,8 +199,8 @@ namespace p3d {
         }
 
         bool Utility::createInputLayout(
-            ComPtr<ID3D11Device> device,
-            ComPtr<ID3DBlob> vsShaderBlob,
+            const ComPtr<ID3D11Device> device,
+            const ComPtr<ID3DBlob> vsShaderBlob,
             const std::vector<D3D11_INPUT_ELEMENT_DESC>& elementDesc,
             ComPtr<ID3D11InputLayout>& inputLayout
         ) {
@@ -215,7 +215,7 @@ namespace p3d {
         }
 
         bool Utility::createBuffer(
-            ComPtr<ID3D11Device> device,
+            const ComPtr<ID3D11Device> device,
             unsigned int bindFlags,
             D3D11_USAGE usage,
             D3D11_CPU_ACCESS_FLAG cpuAccessFlag,
@@ -380,7 +380,7 @@ namespace p3d {
 
 
         bool Utility::createRasterizerState(
-            ComPtr<ID3D11Device> device,
+            const ComPtr<ID3D11Device> device,
             D3D11_CULL_MODE cullMode,
             D3D11_FILL_MODE fillMode,
             bool frontCounterClockwise,
@@ -399,10 +399,10 @@ namespace p3d {
         }
 
         void Utility::setViewPort(
-            ComPtr<ID3D11DeviceContext> deviceContext,
-            float topLeft[2],
-            float dimensions[2],
-            float minMaxDepth[2]
+            const ComPtr<ID3D11DeviceContext> deviceContext,
+            const float topLeft[2],
+            const float dimensions[2],
+            const float minMaxDepth[2]
         ) {
             D3D11_VIEWPORT viewport;
             ZeroMemory(&viewport, sizeof(D3D11_VIEWPORT));

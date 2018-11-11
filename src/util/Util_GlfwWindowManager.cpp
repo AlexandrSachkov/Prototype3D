@@ -19,12 +19,12 @@ namespace p3d {
 
 
         bool GlfwWindowManager::initialize(
-            unsigned int screenDim[2],
+            const std::string title,
+            const unsigned int screenDim[2],
             bool fullscreen,
             bool decorated,
             bool resizable,
-            bool enableCurs,
-            std::string title
+            bool enableCurs
         ) {
             glfwSetErrorCallback(glfwErrorCallback);
             P3D_ASSERT_R(glfwInit(), "GLFW failed to initialize");

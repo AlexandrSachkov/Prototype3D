@@ -12,18 +12,18 @@
 #include "Constants.h"
 
 #include "glm/vec3.hpp"
-#include "glm/vec4.hpp"
 
 #include <memory>
 #include <assert.h>
 
 bool run() {
-    bool fullscreen = false;
-    unsigned int windowDim[] = {800, 600};
-    std::string winTitle = "Prototype3D test";
+    // Window initialization
+    const bool fullscreen = false;
+    const unsigned int windowDim[] = {800, 600};
+    const std::string winTitle = "Prototype3D sample 2: Triangle";
 
     auto sampleRunner = p3d::util::DefaultSampleRunner();
-    P3D_ASSERT_R(sampleRunner.initialize(windowDim, fullscreen, true, false, true, winTitle),
+    P3D_ASSERT_R(sampleRunner.initialize(winTitle, windowDim, fullscreen, true, false, true),
         "Failed to initialize window manager");
 
 
@@ -33,8 +33,8 @@ bool run() {
     p3d::d3d11::RenderingDevice* d3d11_device = new p3d::d3d11::RenderingDevice();
     P3D_ASSERT_R(d3d11_device->initialize(
         sampleRunner.getWindowHandle(),
-        60,
         windowDim,
+        60,
         4,
         1,
         false

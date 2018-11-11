@@ -25,8 +25,8 @@ namespace p3d {
 
             bool initialize(
                 HWND windowHandle,
+                const unsigned int screenDim[2],
                 unsigned int screenRefreshRate,
-                unsigned int screenDim[2],
                 unsigned int msaaLevel,
                 unsigned int numBackBuffers,
                 bool fullscreen
@@ -35,7 +35,7 @@ namespace p3d {
             p3d::Texture2dArrayI& getRenderTargetBuff();
             p3d::Texture2dArrayI& getDepthStencilBuff();
 
-            bool clearRenderTargetBuff(const p3d::Texture2dArrayI* renderTargetBuff, float color[4]);
+            bool clearRenderTargetBuff(const p3d::Texture2dArrayI* renderTargetBuff, const float color[4]);
             bool clearDepthBuff(const p3d::Texture2dArrayI* depthStencilBuff, float depth);
             bool clearStencilBuff(const p3d::Texture2dArrayI* depthStencilBuff, unsigned int stencil);
             bool clearDepthStencilBuff(const p3d::Texture2dArrayI* depthStencilBuff, float depth, unsigned int stencil);
@@ -49,7 +49,11 @@ namespace p3d {
             bool VSSetShader(const p3d::VertexShaderI* vs);
             bool PSSetShader(const p3d::PixelShaderI* ps); 
             bool RSSetState(const p3d::RasterizerI* rast);
-            void RSSetViewport(float topLeft[2], float dimensions[2], float minMaxDepth[2]);
+            void RSSetViewport(
+                const float topLeft[2], 
+                const float dimensions[2], 
+                const float minMaxDepth[2]
+            );
 
             bool IASetVertexBuffer(
                 const p3d::BufferI* vBuff,

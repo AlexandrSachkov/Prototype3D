@@ -27,38 +27,38 @@ namespace p3d {
             );
 
             static bool Utility::getMSAAQualityLevel(
-                ComPtr<ID3D11Device> device,
+                const ComPtr<ID3D11Device> device,
                 unsigned int msaaLvl,
                 unsigned int& qualityLvl
             );
 
             static bool setFullScreen(
-                ComPtr<IDXGISwapChain> swapChain,
+                const ComPtr<IDXGISwapChain> swapChain,
                 bool fullscreen
             );
 
             static bool createSwapChain(
                 HWND windowHandle,
+                const unsigned int screenDim[2],
                 unsigned int screenRefreshRate,
-                unsigned int screenDim[2],
                 unsigned int msaaLevel, //1 or below considered off
                 unsigned int msaaQualityLevel,
                 unsigned int numBackBuffers,
                 bool fullScreen,
-                ComPtr<ID3D11Device> device,
+                const ComPtr<ID3D11Device> device,
                 ComPtr<IDXGISwapChain>& swapChain
             );
 
             static bool createBackBufferRenderTargetView(
-                ComPtr<ID3D11Device> device,
-                ComPtr<IDXGISwapChain> swapChain,
+                const ComPtr<ID3D11Device> device,
+                const ComPtr<IDXGISwapChain> swapChain,
                 ComPtr<ID3D11Texture2D>& renderTargetBuff,
                 ComPtr<ID3D11RenderTargetView>& renderTargetView
             );
 
             static bool createDepthStencilView(
-                ComPtr<ID3D11Device> device,
-                unsigned int screenDim[2],
+                const ComPtr<ID3D11Device> device,
+                const unsigned int screenDim[2],
                 unsigned int msaaLevel,
                 unsigned int msaaQualityLevel,
                 ComPtr<ID3D11Texture2D>& depthStencilBuff,
@@ -66,34 +66,34 @@ namespace p3d {
             );
 
             static bool compileShader(
-                std::string source,
-                std::string entryPoint,
-                std::string target,
+                const std::string source,
+                const std::string entryPoint,
+                const std::string target,
                 ComPtr<ID3DBlob>& blob,
                 ComPtr<ID3DBlob>& errBlob
             );
 
             static bool createVertexShader(
-                ComPtr<ID3D11Device> device,
-                ComPtr<ID3DBlob> blob,
+                const ComPtr<ID3D11Device> device,
+                const ComPtr<ID3DBlob> blob,
                 ComPtr<ID3D11VertexShader>& vs
             );
 
             static bool createPixelShader(
-                ComPtr<ID3D11Device> device,
-                ComPtr<ID3DBlob> blob,
+                const ComPtr<ID3D11Device> device,
+                const ComPtr<ID3DBlob> blob,
                 ComPtr<ID3D11PixelShader>& ps
             );
 
             static bool createInputLayout(
-                ComPtr<ID3D11Device> device,
-                ComPtr<ID3DBlob> vsShaderBlob,
+                const ComPtr<ID3D11Device> device,
+                const ComPtr<ID3DBlob> vsShaderBlob,
                 const std::vector<D3D11_INPUT_ELEMENT_DESC>& elementDesc,
                 ComPtr<ID3D11InputLayout>& inputLayout
             );
 
             static bool createBuffer(
-                ComPtr<ID3D11Device> device,
+                const ComPtr<ID3D11Device> device,
                 unsigned int bindFlags,
                 D3D11_USAGE usage,
                 D3D11_CPU_ACCESS_FLAG cpuAccessFlag,
@@ -103,7 +103,7 @@ namespace p3d {
             );
 
             static bool createRasterizerState(
-                ComPtr <ID3D11Device> device,
+                const ComPtr <ID3D11Device> device,
                 D3D11_CULL_MODE cullMode,
                 D3D11_FILL_MODE fillMode,
                 bool frontCounterClockwise,
@@ -145,10 +145,10 @@ namespace p3d {
             */
 
             static void setViewPort(
-                ComPtr<ID3D11DeviceContext> deviceContext,
-                float topLeft[2],
-                float dimensions[2],
-                float minMaxDepth[2]
+                const ComPtr<ID3D11DeviceContext> deviceContext,
+                const float topLeft[2],
+                const float dimensions[2],
+                const float minMaxDepth[2]
             );
 
             /*static void updateBuffer(

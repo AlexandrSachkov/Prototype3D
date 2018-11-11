@@ -11,12 +11,12 @@ namespace p3d {
             ~DefaultSampleRunner();
 
             bool initialize(
-                unsigned int screenDim[2],
+                const std::string title,
+                const unsigned int screenDim[2],
                 bool fullscreen,
                 bool decorated,
                 bool resizable,
-                bool enableCursor,
-                std::string title
+                bool enableCursor
             );
 
             void setRunProcedure(std::function<void()> procedure);

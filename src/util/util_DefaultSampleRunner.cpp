@@ -9,20 +9,20 @@ namespace p3d {
         DefaultSampleRunner::~DefaultSampleRunner() {}
 
         bool DefaultSampleRunner::initialize(
-            unsigned int screenDim[2],
+            const std::string title,
+            const unsigned int screenDim[2],
             bool fullscreen,
             bool decorated,
             bool resizable,
-            bool enableCursor,
-            std::string title
+            bool enableCursor
         ) {
             P3D_ASSERT_R(GlfwWindowManager::initialize(
+                title,
                 screenDim,
                 fullscreen,
                 decorated,
                 resizable,
-                enableCursor,
-                title
+                enableCursor
             ), "Failed to initialize window manager");
 
             addWindowCloseEvCbk([&]() {

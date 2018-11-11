@@ -30,8 +30,8 @@ namespace p3d {
 
         bool RenderingDevice::initialize(
             HWND windowHandle,
+            const unsigned int screenDim[2],
             unsigned int screenRefreshRate,
-            unsigned int screenDim[2],
             unsigned int msaaLevel,
             unsigned int numBackBuffers,
             bool fullscreen
@@ -49,8 +49,8 @@ namespace p3d {
 
             P3D_ASSERT_R(Utility::createSwapChain(
                 windowHandle,
-                screenRefreshRate,
                 screenDim,
+                screenRefreshRate,
                 msaaLevel,
                 msaaQualityLevel,
                 numBackBuffers,
@@ -107,7 +107,7 @@ namespace p3d {
             return _depthStencilBuff;
         }
 
-        bool RenderingDevice::clearRenderTargetBuff(const p3d::Texture2dArrayI* renderTargetBuff, float color[4]) {
+        bool RenderingDevice::clearRenderTargetBuff(const p3d::Texture2dArrayI* renderTargetBuff, const float color[4]) {
             const d3d11::Texture2dArray* rtBuff = static_cast<const d3d11::Texture2dArray*>(renderTargetBuff);
             P3D_ASSERT_R(rtBuff->getRenderTargetView(), "Render target view is NULL");
 
@@ -185,7 +185,7 @@ namespace p3d {
             return true;
         }
 
-        void RenderingDevice::RSSetViewport(float topLeft[2], float dimensions[2], float minMaxDepth[2]) {
+        void RenderingDevice::RSSetViewport(const float topLeft[2], const float dimensions[2], const float minMaxDepth[2]) {
             Utility::setViewPort(_deviceContext, topLeft, dimensions, minMaxDepth);
         }
 
