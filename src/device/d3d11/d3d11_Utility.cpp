@@ -53,7 +53,7 @@ namespace p3d {
         bool Utility::createSwapChain(
             HWND windowHandle,
             unsigned int screenRefreshRate,
-            Vec2_uint screenDim,
+            unsigned int screenDim[2],
             unsigned int msaaLevel,
             unsigned int msaaQualityLevel,
             unsigned int numBackBuffers,
@@ -64,8 +64,8 @@ namespace p3d {
             DXGI_MODE_DESC bufferDesc;
             ZeroMemory(&bufferDesc, sizeof(DXGI_MODE_DESC));
 
-            bufferDesc.Width = screenDim.x;
-            bufferDesc.Height = screenDim.y;
+            bufferDesc.Width = screenDim[0];
+            bufferDesc.Height = screenDim[1];
             bufferDesc.RefreshRate.Numerator = screenRefreshRate;
             bufferDesc.RefreshRate.Denominator = 1;
             bufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -121,7 +121,7 @@ namespace p3d {
 
         bool Utility::createDepthStencilView(
             ComPtr<ID3D11Device> device,
-            Vec2_uint screenDim,
+            unsigned int screenDim[2],
             unsigned int msaaLevel,
             unsigned int msaaQualityLevel,
             ComPtr<ID3D11Texture2D>& depthStencilBuff,
@@ -129,8 +129,8 @@ namespace p3d {
         ) {
             D3D11_TEXTURE2D_DESC depthStencilDesc;
 
-            depthStencilDesc.Width = screenDim.x;
-            depthStencilDesc.Height = screenDim.y;
+            depthStencilDesc.Width = screenDim[0];
+            depthStencilDesc.Height = screenDim[1];
             depthStencilDesc.MipLevels = 1;
             depthStencilDesc.ArraySize = 1;
             depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -400,19 +400,19 @@ namespace p3d {
 
         void Utility::setViewPort(
             ComPtr<ID3D11DeviceContext> deviceContext,
-            Vec2 topLeft,
-            Vec2 dimensions,
-            Vec2 minMaxDepth
+            float topLeft[2],
+            float dimensions[2],
+            float minMaxDepth[2]
         ) {
             D3D11_VIEWPORT viewport;
             ZeroMemory(&viewport, sizeof(D3D11_VIEWPORT));
 
-            viewport.TopLeftX = topLeft.x;
-            viewport.TopLeftY = topLeft.y;
-            viewport.Width = dimensions.x;
-            viewport.Height = dimensions.y;
-            viewport.MinDepth = minMaxDepth.x;
-            viewport.MaxDepth = minMaxDepth.y;
+            viewport.TopLeftX = topLeft[0];
+            viewport.TopLeftY = topLeft[1];
+            viewport.Width = dimensions[0];
+            viewport.Height = dimensions[1];
+            viewport.MinDepth = minMaxDepth[0];
+            viewport.MaxDepth = minMaxDepth[1];
 
             deviceContext->RSSetViewports(1, &viewport);
         }

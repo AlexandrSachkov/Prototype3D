@@ -8,9 +8,6 @@
 #include "BufferI.h"
 #include "RasterizerI.h"
 
-#include "../math/Vec2.h"
-#include "glm/vec4.hpp"
-
 #include <memory>
 
 namespace p3d {
@@ -26,7 +23,7 @@ namespace p3d {
             return static_cast<T*>(this)->getDepthStencilBuff();
         }
 
-        bool clearRenderTargetBuff(const p3d::Texture2dArrayI* renderTargetBuff, glm::vec4 color) {
+        bool clearRenderTargetBuff(const p3d::Texture2dArrayI* renderTargetBuff, float color[4]) {
             return static_cast<T*>(this)->clearRenderTargetBuff(renderTargetBuff, color);
         }
 
@@ -65,7 +62,7 @@ namespace p3d {
             return static_cast<T*>(this)->RSSetState(rast);
         }
 
-        void RSSetViewport(Vec2 topLeft, Vec2 dimensions, Vec2 minMaxDepth) {
+        void RSSetViewport(float topLeft[2], float dimensions[2], float minMaxDepth[2]) {
             static_cast<T*>(this)->RSSetViewport(topLeft, dimensions, minMaxDepth);
         }
 

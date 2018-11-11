@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../RenderingDevice.h"
-#include "../../math/Vec2.h"
 #include "../../ResourceDescriptions.h"
 #include "../Texture1dArrayI.h"
 #include "../Texture2dArrayI.h"
@@ -12,8 +11,6 @@
 #include "../RasterizerI.h"
 #include "../dx/dx_ComPtr.h"
 #include "d3d11_Texture2dArray.h"
-
-#include "glm/vec4.hpp"
 
 #include <d3d11.h>
 
@@ -29,7 +26,7 @@ namespace p3d {
             bool initialize(
                 HWND windowHandle,
                 unsigned int screenRefreshRate,
-                p3d::Vec2_uint screenDim,
+                unsigned int screenDim[2],
                 unsigned int msaaLevel,
                 unsigned int numBackBuffers,
                 bool fullscreen
@@ -39,7 +36,7 @@ namespace p3d {
             p3d::Texture2dArrayI& getRenderTargetBuff();
             p3d::Texture2dArrayI& getDepthStencilBuff();
 
-            bool clearRenderTargetBuff(const p3d::Texture2dArrayI* renderTargetBuff, glm::vec4 color);
+            bool clearRenderTargetBuff(const p3d::Texture2dArrayI* renderTargetBuff, float color[4]);
             bool clearDepthBuff(const p3d::Texture2dArrayI* depthStencilBuff, float depth);
             bool clearStencilBuff(const p3d::Texture2dArrayI* depthStencilBuff, unsigned int stencil);
             bool clearDepthStencilBuff(const p3d::Texture2dArrayI* depthStencilBuff, float depth, unsigned int stencil);
@@ -53,7 +50,7 @@ namespace p3d {
             bool VSSetShader(const p3d::VertexShaderI* vs);
             bool PSSetShader(const p3d::PixelShaderI* ps); 
             bool RSSetState(const p3d::RasterizerI* rast);
-            void RSSetViewport(Vec2 topLeft, Vec2 dimensions, Vec2 minMaxDepth);
+            void RSSetViewport(float topLeft[2], float dimensions[2], float minMaxDepth[2]);
 
             bool IASetVertexBuffer(
                 const p3d::BufferI* vBuff,

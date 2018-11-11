@@ -1,4 +1,3 @@
-#include "util/util_GlfwWindowManager.h"
 #include "util/util_DefaultSampleRunner.h"
 
 #include "assert.h"
@@ -21,7 +20,6 @@
 bool run() {
     bool fullscreen = false;
     unsigned int windowDim[] = {800, 600};
-    int winWidth = 800, winHeight = 600;
     std::string winTitle = "Prototype3D test";
 
     auto sampleRunner = p3d::util::DefaultSampleRunner();
@@ -36,7 +34,7 @@ bool run() {
     P3D_ASSERT_R(d3d11_device->initialize(
         sampleRunner.getWindowHandle(),
         60,
-        { (unsigned int)winWidth, (unsigned int)winHeight },
+        windowDim,
         4,
         1,
         false
@@ -104,14 +102,18 @@ bool run() {
     P3D_ASSERT_R(device->createRasterizer(rastDesc, rast), "Failed to create rasterizer");
     device->RSSetState(rast.get());
 
-    device->RSSetViewport({ 0.0f,0.0f }, { (float)winWidth, (float)winHeight }, { 0.0f,1.0f });
+    float topLeft[] = { 0.0f,0.0f };
+    float dimensions[] = { (float)windowDim[0], (float)windowDim[1] };
+    float minMaxDepth[] = { 0.0f, 1.0f };
+    device->RSSetViewport(topLeft, dimensions, minMaxDepth);
 
     p3d::Texture2dArrayI& renderTargetBuff = device->getRenderTargetBuff();
     p3d::Texture2dArrayI& depthStencilBuff = device->getDepthStencilBuff();
     device->OMSetRenderTargets(&renderTargetBuff, &depthStencilBuff);
 
     sampleRunner.setRunProcedure([&]() {
-        device->clearRenderTargetBuff(&renderTargetBuff, { 0.0f, 1.0f, 0.0f, 1.0f });
+        float color[] = { 0.0f, 1.0f, 0.0f, 1.0f };
+        device->clearRenderTargetBuff(&renderTargetBuff, color);
         device->clearDepthStencilBuff(&depthStencilBuff, 1.0f, 0);
 
         device->draw(buffer2->getDescription().length, 0);

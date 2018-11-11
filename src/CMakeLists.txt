@@ -26,9 +26,6 @@ SET(HEADERS
     util/util_GlfwWindowManager.h
     util/util_DefaultSampleRunner.h
     
-    math/Vec2.h
-    math/Vec3.h
-    
     device/d3d11/d3d11_Buffer.h
     device/d3d11/d3d11_ConstConvert.h
     device/d3d11/d3d11_PixelShader.h

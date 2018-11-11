@@ -2,7 +2,6 @@
 #define NL_D3D11_UTILITY_H_
 
 #include "../../assert.h"
-#include "../../math/Vec2.h"
 
 #include <Windows.h>
 #include <d3d11.h>
@@ -41,7 +40,7 @@ namespace p3d {
             static bool createSwapChain(
                 HWND windowHandle,
                 unsigned int screenRefreshRate,
-                Vec2_uint screenDim,
+                unsigned int screenDim[2],
                 unsigned int msaaLevel, //1 or below considered off
                 unsigned int msaaQualityLevel,
                 unsigned int numBackBuffers,
@@ -59,7 +58,7 @@ namespace p3d {
 
             static bool createDepthStencilView(
                 ComPtr<ID3D11Device> device,
-                Vec2_uint screenDim,
+                unsigned int screenDim[2],
                 unsigned int msaaLevel,
                 unsigned int msaaQualityLevel,
                 ComPtr<ID3D11Texture2D>& depthStencilBuff,
@@ -147,9 +146,9 @@ namespace p3d {
 
             static void setViewPort(
                 ComPtr<ID3D11DeviceContext> deviceContext,
-                Vec2 topLeft,
-                Vec2 dimensions,
-                Vec2 minMaxDepth
+                float topLeft[2],
+                float dimensions[2],
+                float minMaxDepth[2]
             );
 
             /*static void updateBuffer(
