@@ -175,6 +175,7 @@ namespace p3d {
         bool RenderingDevice::VSSetShader(const p3d::VertexShaderI* vs) {
             const d3d11::VertexShader* d3d11vs = static_cast<const d3d11::VertexShader*>(vs);
             _deviceContext->VSSetShader(const_cast<ID3D11VertexShader*>(d3d11vs->getShader().Get()), nullptr, 0);
+            _deviceContext->IASetInputLayout(const_cast<ID3D11InputLayout*>(d3d11vs->getInputLayout().Get()));
             return true;
         }
 
@@ -190,6 +191,10 @@ namespace p3d {
             return true;
         }
 
+        void RenderingDevice::RSSetViewport(Vec2 topLeft, Vec2 dimensions, Vec2 minMaxDepth) {
+            Utility::setViewPort(_deviceContext, topLeft, dimensions, minMaxDepth);
+        }
+
         bool RenderingDevice::IASetVertexBuffer(
             const p3d::BufferI* vBuff,
             unsigned int offset,
@@ -197,8 +202,12 @@ namespace p3d {
         ) {
             const d3d11::Buffer* d3d11buff = static_cast<const d3d11::Buffer*>(vBuff);
             ID3D11Buffer* nativeBuff = d3d11buff->getBuffer().Get();
-            _deviceContext->IAGetVertexBuffers(slot, 1, &nativeBuff, (UINT*)&d3d11buff->getDescription().strideBytes, (UINT*)&offset);
+            _deviceContext->IASetVertexBuffers(slot, 1, &nativeBuff, (UINT*)&d3d11buff->getDescription().strideBytes, (UINT*)&offset);
             return true;
+        }
+
+        void RenderingDevice::draw(unsigned int vertexCount, unsigned int vertexStartLocation) {
+            _deviceContext->Draw(vertexCount, vertexStartLocation);
         }
 
         void RenderingDevice::presentFrame() {

@@ -398,6 +398,25 @@ namespace p3d {
             return true;
         }
 
+        void Utility::setViewPort(
+            ComPtr<ID3D11DeviceContext> deviceContext,
+            Vec2 topLeft,
+            Vec2 dimensions,
+            Vec2 minMaxDepth
+        ) {
+            D3D11_VIEWPORT viewport;
+            ZeroMemory(&viewport, sizeof(D3D11_VIEWPORT));
+
+            viewport.TopLeftX = topLeft.x;
+            viewport.TopLeftY = topLeft.y;
+            viewport.Width = dimensions.x;
+            viewport.Height = dimensions.y;
+            viewport.MinDepth = minMaxDepth.x;
+            viewport.MaxDepth = minMaxDepth.y;
+
+            deviceContext->RSSetViewports(1, &viewport);
+        }
+
         bool Utility::compileBlobFromFile(std::wstring path, LPCSTR entryPoint, LPCSTR profile, ID3DBlob*& blob) {
             UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
         #if defined( DEBUG ) || defined( _DEBUG )

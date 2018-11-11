@@ -146,20 +146,10 @@ namespace p3d {
             */
 
             static void setViewPort(
-                ID3D11DeviceContext*& deviceContext,
-                uint_fast32_t numViewports,
-                float x,
-                float y,
-                float width,
-                float height,
-                float minDepth,
-                float maxDepth
-            );
-
-            static void setViewPort(
-                ID3D11DeviceContext*& deviceContext,
-                float screenWidth,
-                float screenHeight
+                ComPtr<ID3D11DeviceContext> deviceContext,
+                Vec2 topLeft,
+                Vec2 dimensions,
+                Vec2 minMaxDepth
             );
 
             /*static void updateBuffer(

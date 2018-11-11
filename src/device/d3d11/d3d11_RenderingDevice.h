@@ -53,6 +53,7 @@ namespace p3d {
             bool VSSetShader(const p3d::VertexShaderI* vs);
             bool PSSetShader(const p3d::PixelShaderI* ps); 
             bool RSSetState(const p3d::RasterizerI* rast);
+            void RSSetViewport(Vec2 topLeft, Vec2 dimensions, Vec2 minMaxDepth);
 
             bool IASetVertexBuffer(
                 const p3d::BufferI* vBuff,
@@ -60,6 +61,7 @@ namespace p3d {
                 unsigned int slot
             );
 
+            void draw(unsigned int vertexCount, unsigned int vertexStartLocation);
             void presentFrame();
 
             bool createTexture1dArray(

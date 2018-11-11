@@ -8,6 +8,7 @@
 #include "BufferI.h"
 #include "RasterizerI.h"
 
+#include "../math/Vec2.h"
 #include "glm/vec4.hpp"
 
 #include <memory>
@@ -64,12 +65,20 @@ namespace p3d {
             return static_cast<T*>(this)->RSSetState(rast);
         }
 
+        void RSSetViewport(Vec2 topLeft, Vec2 dimensions, Vec2 minMaxDepth) {
+            static_cast<T*>(this)->RSSetViewport(topLeft, dimensions, minMaxDepth);
+        }
+
         bool IASetVertexBuffer(
             const p3d::BufferI* vBuff,
             unsigned int offset,
             unsigned int slot
         ) {
             return static_cast<T*>(this)->IASetVertexBuffer(vBuff, offset, slot);
+        }
+
+        void draw(unsigned int vertexCount, unsigned int vertexStartLocation) {
+            return static_cast<T*>(this)->draw(vertexCount, vertexStartLocation);
         }
 
         void presentFrame() {

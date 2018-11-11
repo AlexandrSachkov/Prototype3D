@@ -91,7 +91,7 @@ bool run() {
     P3D_ASSERT_R(device->createBuffer(buffDesc, buffer), "Failed to create buffer");
 
     p3d::BufferDesc buffDesc2;
-    buffDesc2.bindFlags = { p3d::P3D_BIND_SHADER_RESOURCE };
+    buffDesc2.bindFlags = { p3d::P3D_BIND_VERTEX_BUFFER };
     buffDesc2.usageFlag = p3d::P3D_USAGE_CPU_UPDATE_GPU_RW;
     std::unique_ptr <p3d::BufferI> buffer2 = nullptr;
     std::vector<glm::vec3> bufferData2 = { {0,0.5f,0}, {-0.5f,0,0}, {0,0,0.5f} };
@@ -107,6 +107,12 @@ bool run() {
     P3D_ASSERT_R(device->createRasterizer(rastDesc, rast), "Failed to create rasterizer");
     device->RSSetState(rast.get());
 
+    device->RSSetViewport({ 0.0f,0.0f }, { (float)winWidth, (float)winHeight }, { 0.0f,1.0f });
+
+    p3d::Texture2dArrayI& renderTargetBuff = device->getRenderTargetBuff();
+    p3d::Texture2dArrayI& depthStencilBuff = device->getDepthStencilBuff();
+    device->OMSetRenderTargets(&renderTargetBuff, &depthStencilBuff);
+
     p3d::util::Timer timer;
     //end the program when the window is closed or an ESC key is pressed
     bool running = true;
@@ -121,13 +127,10 @@ bool run() {
     do {
         windowManager.pollEvents();
 
-        p3d::Texture2dArrayI& renderTargetBuff = device->getRenderTargetBuff();
-        p3d::Texture2dArrayI& depthStencilBuff = device->getDepthStencilBuff();
-        device->OMSetRenderTargets(&renderTargetBuff, &depthStencilBuff);
-
         device->clearRenderTargetBuff(&renderTargetBuff, { 0.0f, 1.0f, 0.0f, 1.0f });
         device->clearDepthStencilBuff(&depthStencilBuff, 1.0f, 0);
 
+        device->draw(buffer2->getDescription().length, 0);
         device->presentFrame();
     } while (running);
 
