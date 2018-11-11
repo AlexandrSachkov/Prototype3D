@@ -23,8 +23,8 @@ ENDIF(MSVC)
 # =====================================================================================
 
 SET(HEADERS       
-    util/p3d_GlfwWindowManager.h
-    util/p3d_Timer.h
+    util/util_GlfwWindowManager.h
+    util/util_DefaultSampleRunner.h
     
     math/Vec2.h
     math/Vec3.h
@@ -40,7 +40,7 @@ SET(HEADERS
     device/d3d11/d3d11_Utility.h
     device/d3d11/d3d11_VertexShader.h
     
-    device/dx/ComPtr.h
+    device/dx/dx_ComPtr.h
     device/dx/dx_ConstConvert.h
     
     device/BufferI.h
@@ -59,7 +59,8 @@ SET(HEADERS
     )
 
 SET(SOURCES 
-    util/p3d_GlfwWindowManager.cpp
+    util/util_GlfwWindowManager.cpp
+    util/util_DefaultSampleRunner.cpp
     
     device/d3d11/d3d11_Buffer.cpp
     device/d3d11/d3d11_ConstConvert.cpp
