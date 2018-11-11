@@ -49,7 +49,7 @@ bool run() {
         "}"
         ;
     vsDesc.inputDesc = {
-        { POSITION_IE, p3d::P3D_FORMAT::P3D_FORMAT_R32G32B32_FLOAT, 12, 0 }
+        { POSITION_IE, p3d::P3D_FORMAT_R32G32B32_FLOAT, 0 }
     };
     std::unique_ptr <p3d::VertexShaderI> vs = nullptr;
     P3D_ASSERT_R(device->createVertexShader(vsDesc, vs), "Failed to create vertex shader");
@@ -69,11 +69,21 @@ bool run() {
     p3d::BufferDesc vertexBuffDesc;
     vertexBuffDesc.bindFlags = { p3d::P3D_BIND_VERTEX_BUFFER };
     vertexBuffDesc.usageFlag = p3d::P3D_USAGE_CPU_UPDATE_GPU_RW;
+    vertexBuffDesc.dataFormat = p3d::P3D_FORMAT_R32G32B32_FLOAT;
     std::unique_ptr <p3d::BufferI> vertexBuff = nullptr;
-    std::vector<glm::vec3> vertices = { {0,0.5f,0}, {-0.5f,0,0}, {0,0,0.5f} };
-    P3D_ASSERT_R(device->createBuffer(vertexBuffDesc, vertices, vertexBuff), "Failed to create buffer2");
+    std::vector<glm::vec3> vertices = { {0,0.5f,0}, {-0.5f,0,0}, {0.5f,0,0.0f}, {0,-0.5f,0} };
+    P3D_ASSERT_R(device->createBuffer(vertexBuffDesc, vertices, vertexBuff), "Failed to create vertex buffer");
     device->IASetVertexBuffer(vertexBuff.get(), 0, 0);
     device->IASetPrimitiveTopology(p3d::P3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    p3d::BufferDesc indexBuffDesc;
+    indexBuffDesc.bindFlags = { p3d::P3D_BIND_INDEX_BUFFER };
+    indexBuffDesc.usageFlag = p3d::P3D_USAGE_CPU_UPDATE_GPU_RW;
+    indexBuffDesc.dataFormat = p3d::P3D_FORMAT_R32_UINT;
+    std::unique_ptr <p3d::BufferI> indexBuff = nullptr;
+    std::vector<unsigned int> indices = { 0, 1, 2, 2, 1, 3 };
+    P3D_ASSERT_R(device->createBuffer(indexBuffDesc, indices, indexBuff), "Failed to create index buffer");
+    device->IASetIndexBuffer(indexBuff.get(), 0);
 
     p3d::RasterizerDesc rastDesc;
     rastDesc.cullMode = p3d::P3D_CULL_BACK;
@@ -97,7 +107,7 @@ bool run() {
         device->clearRenderTargetBuff(&renderTargetBuff, color);
         device->clearDepthStencilBuff(&depthStencilBuff, 1.0f, 0);
 
-        device->draw(vertexBuff->getDescription().length, 0);
+        device->drawIndexed(indexBuff->getDescription().length, 0, 0);
         device->presentFrame();
     });
     sampleRunner.start();

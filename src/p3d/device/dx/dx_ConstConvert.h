@@ -5,6 +5,6 @@
 
 namespace p3d {
     namespace dx {
-        DXGI_FORMAT convertFormat(P3D_FORMAT format);
+        DXGI_FORMAT convertVectorFormat(P3D_VECTOR_FORMAT format);
     }
 }

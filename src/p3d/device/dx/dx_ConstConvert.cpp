@@ -2,7 +2,7 @@
 
 namespace p3d {
     namespace dx {
-        DXGI_FORMAT convertFormat(P3D_FORMAT format) {
+        DXGI_FORMAT convertVectorFormat(P3D_VECTOR_FORMAT format) {
             switch (format) {
             case P3D_FORMAT_UNKNOWN:
                 return DXGI_FORMAT_UNKNOWN;
@@ -138,52 +138,14 @@ namespace p3d {
                 return DXGI_FORMAT_A8_UNORM;
             case P3D_FORMAT_R1_UNORM:
                 return DXGI_FORMAT_R1_UNORM;
-            case P3D_FORMAT_R9G9B9E5_SHAREDEXP:
-                return DXGI_FORMAT_R9G9B9E5_SHAREDEXP;
             case P3D_FORMAT_R8G8_B8G8_UNORM:
                 return DXGI_FORMAT_R8G8_B8G8_UNORM;
             case P3D_FORMAT_G8R8_G8B8_UNORM:
                 return DXGI_FORMAT_G8R8_G8B8_UNORM;
-            case P3D_FORMAT_BC1_TYPELESS:
-                return DXGI_FORMAT_BC1_TYPELESS;
-            case P3D_FORMAT_BC1_UNORM:
-                return DXGI_FORMAT_BC1_UNORM;
-            case P3D_FORMAT_BC1_UNORM_SRGB:
-                return DXGI_FORMAT_BC1_UNORM_SRGB;
-            case P3D_FORMAT_BC2_TYPELESS:
-                return DXGI_FORMAT_BC2_TYPELESS;
-            case P3D_FORMAT_BC2_UNORM:
-                return DXGI_FORMAT_BC2_UNORM;
-            case P3D_FORMAT_BC2_UNORM_SRGB:
-                return DXGI_FORMAT_BC2_UNORM_SRGB;
-            case P3D_FORMAT_BC3_TYPELESS:
-                return DXGI_FORMAT_BC3_TYPELESS;
-            case P3D_FORMAT_BC3_UNORM:
-                return DXGI_FORMAT_BC3_UNORM;
-            case P3D_FORMAT_BC3_UNORM_SRGB:
-                return DXGI_FORMAT_BC3_UNORM_SRGB;
-            case P3D_FORMAT_BC4_TYPELESS:
-                return DXGI_FORMAT_BC4_TYPELESS;
-            case P3D_FORMAT_BC4_UNORM:
-                return DXGI_FORMAT_BC4_UNORM;
-            case P3D_FORMAT_BC4_SNORM:
-                return DXGI_FORMAT_BC4_SNORM;
-            case P3D_FORMAT_BC5_TYPELESS:
-                return DXGI_FORMAT_BC5_TYPELESS;
-            case P3D_FORMAT_BC5_UNORM:
-                return DXGI_FORMAT_BC5_UNORM;
-            case P3D_FORMAT_BC5_SNORM:
-                return DXGI_FORMAT_BC5_SNORM;
-            case P3D_FORMAT_B5G6R5_UNORM:
-                return DXGI_FORMAT_B5G6R5_UNORM;
-            case P3D_FORMAT_B5G5R5A1_UNORM:
-                return DXGI_FORMAT_B5G5R5A1_UNORM;
             case P3D_FORMAT_B8G8R8A8_UNORM:
                 return DXGI_FORMAT_B8G8R8A8_UNORM;
             case P3D_FORMAT_B8G8R8X8_UNORM:
                 return DXGI_FORMAT_B8G8R8X8_UNORM;
-            case P3D_FORMAT_R10G10B10_XR_BIAS_A2_UNORM:
-                return DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM;
             case P3D_FORMAT_B8G8R8A8_TYPELESS:
                 return DXGI_FORMAT_B8G8R8A8_TYPELESS;
             case P3D_FORMAT_B8G8R8A8_UNORM_SRGB:
@@ -192,57 +154,7 @@ namespace p3d {
                 return DXGI_FORMAT_B8G8R8X8_TYPELESS;
             case P3D_FORMAT_B8G8R8X8_UNORM_SRGB:
                 return DXGI_FORMAT_B8G8R8X8_UNORM_SRGB;
-            case P3D_FORMAT_BC6H_TYPELESS:
-                return DXGI_FORMAT_BC6H_TYPELESS;
-            case P3D_FORMAT_BC6H_UF16:
-                return DXGI_FORMAT_BC6H_UF16;
-            case P3D_FORMAT_BC6H_SF16:
-                return DXGI_FORMAT_BC6H_SF16;
-            case P3D_FORMAT_BC7_TYPELESS:
-                return DXGI_FORMAT_BC7_TYPELESS;
-            case P3D_FORMAT_BC7_UNORM:
-                return DXGI_FORMAT_BC7_UNORM;
-            case P3D_FORMAT_BC7_UNORM_SRGB:
-                return DXGI_FORMAT_BC7_UNORM_SRGB;
-            case P3D_FORMAT_AYUV:
-                return DXGI_FORMAT_AYUV;
-            case P3D_FORMAT_Y410:
-                return DXGI_FORMAT_Y410;
-            case P3D_FORMAT_Y416:
-                return DXGI_FORMAT_Y416;
-            case P3D_FORMAT_NV12:
-                return DXGI_FORMAT_NV12;
-            case P3D_FORMAT_P010:
-                return DXGI_FORMAT_P010;
-            case P3D_FORMAT_P016:
-                return DXGI_FORMAT_P016;
-            case P3D_FORMAT_420_OPAQUE:
-                return DXGI_FORMAT_420_OPAQUE;
-            case P3D_FORMAT_YUY2:
-                return DXGI_FORMAT_YUY2;
-            case P3D_FORMAT_Y210:
-                return DXGI_FORMAT_Y210;
-            case P3D_FORMAT_Y216:
-                return DXGI_FORMAT_Y216;
-            case P3D_FORMAT_NV11:
-                return DXGI_FORMAT_NV11;
-            case P3D_FORMAT_AI44:
-                return DXGI_FORMAT_AI44;
-            case P3D_FORMAT_IA44:
-                return DXGI_FORMAT_IA44;
-            case P3D_FORMAT_P8:
-                return DXGI_FORMAT_P8;
-            case P3D_FORMAT_A8P8:
-                return DXGI_FORMAT_A8P8;
-            case P3D_FORMAT_B4G4R4A4_UNORM:
-                return DXGI_FORMAT_B4G4R4A4_UNORM;
 
-            case P3D_FORMAT_P208:
-                return DXGI_FORMAT_P208;
-            case P3D_FORMAT_V208:
-                return DXGI_FORMAT_V208;
-            case P3D_FORMAT_V408:
-                return DXGI_FORMAT_V408;
             default:
                 return DXGI_FORMAT_UNKNOWN;
             }

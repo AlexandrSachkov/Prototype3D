@@ -21,8 +21,7 @@ namespace p3d {
     struct VertexShaderDesc {
         struct InputElementDesc {
             std::string elementName;
-            P3D_FORMAT dataFormat;
-            unsigned int dataSizeBytes;
+            P3D_VECTOR_FORMAT dataFormat;
             unsigned int inputSlot;
         };
 
@@ -38,10 +37,10 @@ namespace p3d {
 
     struct BufferDesc {
         std::vector<P3D_BIND_FLAG> bindFlags;
-        P3D_USAGE usageFlag;
         void* data = nullptr;
-        unsigned int strideBytes; // size of each element
-        unsigned int length;      // number of elements
+        P3D_USAGE usageFlag;
+        P3D_VECTOR_FORMAT dataFormat;
+        unsigned int length;
     };
 
     struct RasterizerDesc {

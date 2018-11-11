@@ -60,7 +60,9 @@ namespace p3d {
                 unsigned int offset,
                 unsigned int slot
             );
+            bool IASetIndexBuffer(const p3d::BufferI* iBuff, unsigned int offset);
 
+            void drawIndexed(unsigned int numIndices, unsigned int startIndex, unsigned int startVertex);
             void draw(unsigned int vertexCount, unsigned int vertexStartLocation);
             void presentFrame();
 

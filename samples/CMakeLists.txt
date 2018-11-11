@@ -140,14 +140,25 @@ set(LIBS
 
 
 add_executable (Sample1
-  Sample1/Sample1_CreateWindow.cpp
+  Sample1/CreateWindow.cpp
 )
 
 add_executable (Sample2
-  Sample2/Sample2_Triangle.cpp
+  Sample2/DrawTriangle.cpp
+)
+
+add_executable (Sample3
+  Sample3/DrawIndexed.cpp
 )
 
 TARGET_LINK_LIBRARIES(Sample1 ${LIBS})
 TARGET_LINK_LIBRARIES(Sample2 ${LIBS})
+TARGET_LINK_LIBRARIES(Sample3 ${LIBS})
 
-set_target_properties(Sample1 Sample2 PROPERTIES DEBUG_POSTFIX _d)
+set_target_properties(
+    Sample1
+    Sample2
+    Sample3
+
+    PROPERTIES DEBUG_POSTFIX _d
+)

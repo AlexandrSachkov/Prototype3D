@@ -74,6 +74,14 @@ namespace p3d {
             return static_cast<T*>(this)->IASetVertexBuffer(vBuff, offset, slot);
         }
 
+        bool IASetIndexBuffer(const p3d::BufferI* iBuff, unsigned int offset) {
+            return static_cast<T*>(this)->IASetIndexBuffer(iBuff, offset);
+        }
+
+        void drawIndexed(unsigned int numIndices, unsigned int startIndex, unsigned int startVertex) {
+            return static_cast<T*>(this)->drawIndexed(numIndices, startIndex, startVertex);
+        }
+
         void draw(unsigned int vertexCount, unsigned int vertexStartLocation) {
             return static_cast<T*>(this)->draw(vertexCount, vertexStartLocation);
         }
@@ -126,9 +134,7 @@ namespace p3d {
             std::unique_ptr <p3d::BufferI>& buffer
         ) {
             desc.data = (void*)data.data();
-            desc.strideBytes = sizeof(Data);
             desc.length = (unsigned int)data.size();
-
             return static_cast<T*>(this)->createBuffer(desc, buffer);
         }
 

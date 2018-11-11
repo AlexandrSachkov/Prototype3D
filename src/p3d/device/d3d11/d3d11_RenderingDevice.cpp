@@ -196,8 +196,29 @@ namespace p3d {
         ) {
             const d3d11::Buffer* d3d11buff = static_cast<const d3d11::Buffer*>(vBuff);
             ID3D11Buffer* nativeBuff = d3d11buff->getBuffer().Get();
-            _deviceContext->IASetVertexBuffers(slot, 1, &nativeBuff, (UINT*)&d3d11buff->getDescription().strideBytes, (UINT*)&offset);
+            unsigned int elemSizeBits = getVecFormatSizeBits(d3d11buff->getDescription().dataFormat);
+            P3D_ASSERT_R(elemSizeBits > 0, "Unable to get format size");
+
+            unsigned int elemSizeBytes = elemSizeBits / 8;
+            unsigned int offsetBytes = offset * elemSizeBytes;
+            _deviceContext->IASetVertexBuffers(slot, 1, &nativeBuff, (UINT*)&elemSizeBytes, (UINT*)&offsetBytes);
             return true;
+        }
+
+        bool RenderingDevice::IASetIndexBuffer(const p3d::BufferI* iBuff, unsigned int offset) {
+            const d3d11::Buffer* d3d11buff = static_cast<const d3d11::Buffer*>(iBuff);
+            unsigned int elemSizeBits = getVecFormatSizeBits(d3d11buff->getDescription().dataFormat);
+            P3D_ASSERT_R(elemSizeBits > 0, "Unable to get format size");
+            _deviceContext->IASetIndexBuffer(
+                d3d11buff->getBuffer().Get(),
+                dx::convertVectorFormat(d3d11buff->getDescription().dataFormat), 
+                elemSizeBits / 8 * offset
+            );
+            return true;
+        }
+
+        void RenderingDevice::drawIndexed(unsigned int numIndices, unsigned int startIndex, unsigned int startVertex) {
+            _deviceContext->DrawIndexed(numIndices, startIndex, startVertex);
         }
 
         void RenderingDevice::draw(unsigned int vertexCount, unsigned int vertexStartLocation) {
@@ -293,8 +314,11 @@ namespace p3d {
             P3D_ASSERT_R(convertUsageFlag(desc.usageFlag, usageDesc),
                 "Failed to convert usage flag to d3d11 equivalent");
 
-            const unsigned int buffSize = desc.strideBytes * desc.length;
-            P3D_ASSERT_R(!((!desc.data || buffSize ==0) && usageDesc.usage == D3D11_USAGE_IMMUTABLE),
+            unsigned int elemSizeBits = getVecFormatSizeBits(desc.dataFormat);
+            P3D_ASSERT_R(elemSizeBits > 0, "Unable to get format size");
+
+            const unsigned int buffSize = elemSizeBits / 8 * desc.length;
+            P3D_ASSERT_R(!((!desc.data || buffSize == 0) && usageDesc.usage == D3D11_USAGE_IMMUTABLE),
                 "Data must be provided for an immutable buffer");
 
             ComPtr<ID3D11Buffer> buff = nullptr;
@@ -354,24 +378,27 @@ namespace p3d {
             );
 
             unsigned int currInputSlot = 0;
-            unsigned int currOffset = 0;
+            unsigned int currOffsetBytes = 0;
             std::vector<D3D11_INPUT_ELEMENT_DESC> elementDesc;
             for (int i = 0; i < p3dInputDescTemp.size(); i++) {// auto p3dElemDesc : p3dInputDescTemp) {
                 auto p3dElemDesc = p3dInputDescTemp[i];
                 if (currInputSlot != p3dElemDesc.inputSlot) {
                     currInputSlot = p3dElemDesc.inputSlot;
-                    currOffset = 0;
+                    currOffsetBytes = 0;
                 }
                 elementDesc.push_back({
                     p3dInputDescTemp[i].elementName.c_str(),
                     0,
-                    dx::convertFormat(p3dElemDesc.dataFormat),
+                    dx::convertVectorFormat(p3dElemDesc.dataFormat),
                     currInputSlot,
-                    currOffset,
+                    currOffsetBytes,
                     D3D11_INPUT_PER_VERTEX_DATA,
                     0
                     });
-                currOffset += p3dElemDesc.dataSizeBytes;
+
+                unsigned int elemSizeBits = getVecFormatSizeBits(p3dElemDesc.dataFormat);
+                P3D_ASSERT_R(elemSizeBits > 0, "Unable to get format size");
+                currOffsetBytes += elemSizeBits / 8;
             }
 
             return Utility::createInputLayout(_device, vsBlob, elementDesc, inputLayout);
