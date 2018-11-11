@@ -1,5 +1,5 @@
-#include "util/p3d_GlfwWindowManager.h"
-#include "util/p3d_Timer.h"
+#include "util/util_GlfwWindowManager.h"
+#include "util/util_DefaultSampleRunner.h"
 
 #include "assert.h"
 #include "device/RenderingDeviceI.h"
@@ -20,16 +20,13 @@
 
 bool run() {
     bool fullscreen = false;
+    unsigned int windowDim[] = {800, 600};
     int winWidth = 800, winHeight = 600;
     std::string winTitle = "Prototype3D test";
 
-    auto windowManager = p3d::util::GlfwWindowManager();
-    P3D_ASSERT_R(windowManager.initialize(winWidth, winHeight, fullscreen, true, false, true, winTitle,
-        [&](unsigned int level, std::string data) {
-        //consoleQueue.push((p3d::util::CONSOLE_OUT_TYPE)level, data);
-    }), "Failed to initialize window manager");
-
-
+    auto sampleRunner = p3d::util::DefaultSampleRunner();
+    P3D_ASSERT_R(sampleRunner.initialize(windowDim, fullscreen, true, false, true, winTitle),
+        "Failed to initialize window manager");
 
 
 
@@ -37,7 +34,7 @@ bool run() {
 #ifdef P3D_API_D3D11 
     p3d::d3d11::RenderingDevice* d3d11_device = new p3d::d3d11::RenderingDevice();
     P3D_ASSERT_R(d3d11_device->initialize(
-        windowManager.getWindowHandle(),
+        sampleRunner.getWindowHandle(),
         60,
         { (unsigned int)winWidth, (unsigned int)winHeight },
         4,
@@ -113,26 +110,14 @@ bool run() {
     p3d::Texture2dArrayI& depthStencilBuff = device->getDepthStencilBuff();
     device->OMSetRenderTargets(&renderTargetBuff, &depthStencilBuff);
 
-    p3d::util::Timer timer;
-    //end the program when the window is closed or an ESC key is pressed
-    bool running = true;
-    windowManager.addWindowCloseEvCbk([&]() {
-        running = false;
-    });
-    windowManager.addKeyEvCbk([&](int key, int scancode, int action, int mod) {
-        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-            running = false;
-    });
-
-    do {
-        windowManager.pollEvents();
-
+    sampleRunner.setRunProcedure([&]() {
         device->clearRenderTargetBuff(&renderTargetBuff, { 0.0f, 1.0f, 0.0f, 1.0f });
         device->clearDepthStencilBuff(&depthStencilBuff, 1.0f, 0);
 
         device->draw(buffer2->getDescription().length, 0);
         device->presentFrame();
-    } while (running);
+    });
+    sampleRunner.start();
 
     return true;
 }

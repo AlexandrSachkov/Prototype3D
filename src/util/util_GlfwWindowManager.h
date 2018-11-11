@@ -1,7 +1,5 @@
 #pragma once
 
-#include "p3d_ConsoleQueue.h"
-
 #define GLFW_EXPOSE_NATIVE_WIN32
 #define GLFW_EXPOSE_NATIVE_WGL
 #define GLFW_INCLUDE_NONE
@@ -21,17 +19,15 @@ namespace p3d {
             ~GlfwWindowManager();
 
             bool initialize(
-                int screenWidth,
-                int screenHeight,
+                unsigned int screenDim[2],
                 bool fullscreen,
                 bool decorated,
                 bool resizable,
                 bool enableCursor,
-                std::string title,
-                std::function<void(unsigned int level, std::string)> consoleOutCallback
+                std::string title
             );
 
-            void getClientSize(int& width, int& height);
+            void getClientSize(unsigned int clientDim[2]);
             HWND getWindowHandle();
 
             void enableCursor(bool enable);

@@ -1,5 +1,6 @@
-#include "p3d_GlfwWindowManager.h"
+#include "util_GlfwWindowManager.h"
 
+#include "../assert.h"
 #include <assert.h>
 
 namespace p3d {
@@ -9,27 +10,24 @@ namespace p3d {
         }
 
         GlfwWindowManager::~GlfwWindowManager() {
-            if (_window)
+            if (_window) {
                 glfwDestroyWindow(_window);
+                _window = nullptr;
+            }    
             glfwTerminate();
         }
 
 
         bool GlfwWindowManager::initialize(
-            int screenWidth,
-            int screenHeight,
+            unsigned int screenDim[2],
             bool fullscreen,
             bool decorated,
             bool resizable,
             bool enableCurs,
-            std::string title,
-            std::function<void(unsigned int level, std::string)> consoleOutCallback
+            std::string title
         ) {
             glfwSetErrorCallback(glfwErrorCallback);
-            if (!glfwInit()) {
-                consoleOutCallback(3, "GLFW failed to initialize");
-                return false;
-            }
+            P3D_ASSERT_R(glfwInit(), "GLFW failed to initialize");
 
             glfwWindowHint(GLFW_RESIZABLE, resizable);
             glfwWindowHint(GLFW_DECORATED, decorated);
@@ -38,14 +36,12 @@ namespace p3d {
                 const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
                 _window = glfwCreateWindow(mode->width, mode->height, title.c_str(), glfwGetPrimaryMonitor(), NULL);
             } else {
-                _window = glfwCreateWindow(screenWidth, screenHeight, title.c_str(), NULL, NULL);
+                _window = glfwCreateWindow(screenDim[0], screenDim[1], title.c_str(), NULL, NULL);
             }
-
 
             if (!_window) {
                 glfwTerminate();
-                consoleOutCallback(3, "GLFW Window failed to initialize");
-                return false;
+                P3D_ASSERT_R(false, "GLFW Window failed to initialize");
             }
             glfwSetWindowUserPointer(_window, this);
             setWindowCallbacks(_window);
@@ -89,8 +85,8 @@ namespace p3d {
             });
         }
 
-        void GlfwWindowManager::getClientSize(int& width, int& height) {
-            glfwGetWindowSize(_window, &width, &height);
+        void GlfwWindowManager::getClientSize(unsigned int clientDim[2]) {
+            glfwGetWindowSize(_window, (int*)&clientDim[0], (int*)&clientDim[1]);
         }
 
         HWND GlfwWindowManager::getWindowHandle() {
