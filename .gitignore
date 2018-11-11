@@ -220,4 +220,5 @@ pip-log.txt
 ############
 
 bin64/
+samples_bin64/
 resources/

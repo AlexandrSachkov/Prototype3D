@@ -1,6 +1,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-PROJECT (Prototype3D)
+PROJECT (Prototype3D_Samples)
 
 set (P3D_VERSION_MAJOR 0)
 set (P3D_VERSION_MINOR 1)
@@ -22,56 +22,27 @@ ENDIF(MSVC)
 
 # =====================================================================================
 
-SET(HEADERS       
-    util/util_GlfwWindowManager.h
-    util/util_DefaultSampleRunner.h
-    
-    device/d3d11/d3d11_Buffer.h
-    device/d3d11/d3d11_ConstConvert.h
-    device/d3d11/d3d11_PixelShader.h
-    device/d3d11/d3d11_Rasterizer.h
-    device/d3d11/d3d11_RenderingDevice.h
-    device/d3d11/d3d11_Texture1dArray.h
-    device/d3d11/d3d11_Texture2dArray.h
-    device/d3d11/d3d11_Texture3d.h
-    device/d3d11/d3d11_Utility.h
-    device/d3d11/d3d11_VertexShader.h
-    
-    device/dx/dx_ComPtr.h
-    device/dx/dx_ConstConvert.h
-    
-    device/BufferI.h
-    device/PixelShaderI.h
-    device/RasterizerI.h
-    device/RenderingDevice.h
-    device/RenderingDeviceI.h
-    device/Texture1dArrayI.h
-    device/Texture2dArrayI.h
-    device/Texture3dI.h
-    device/VertexShaderI.h
-    
-    Constants.h
-    ResourceDescriptions.h
-    assert.h
-    )
+# P3D
+SET(P3D_INCLUDE_PATH
+    "" CACHE PATH "P3D include path")
 
-SET(SOURCES 
-    util/util_GlfwWindowManager.cpp
-    util/util_DefaultSampleRunner.cpp
-    
-    device/d3d11/d3d11_Buffer.cpp
-    device/d3d11/d3d11_ConstConvert.cpp
-    device/d3d11/d3d11_PixelShader.cpp
-    device/d3d11/d3d11_Rasterizer.cpp
-    device/d3d11/d3d11_RenderingDevice.cpp
-    device/d3d11/d3d11_Texture1dArray.cpp
-    device/d3d11/d3d11_Texture2dArray.cpp
-    device/d3d11/d3d11_Texture3d.cpp
-    device/d3d11/d3d11_Utility.cpp
-    device/d3d11/d3d11_VertexShader.cpp
+IF(P3D_INCLUDE_PATH STREQUAL "")
+    MESSAGE(SEND_ERROR "P3D include path must be specified")
+ENDIF(P3D_INCLUDE_PATH STREQUAL "")
 
-    device/dx/dx_ConstConvert.cpp
-    )
+SET(P3D_LIBRARY_DEBUG_PATH
+    "" CACHE PATH "P3D library debug path")
+
+IF(P3D_LIBRARY_DEBUG_PATH STREQUAL "")
+    MESSAGE(SEND_ERROR "P3D library debug path must be specified")
+ENDIF(P3D_LIBRARY_DEBUG_PATH STREQUAL "")
+
+SET(P3D_LIBRARY_RELEASE_PATH
+    "" CACHE PATH "P3D library release path")
+
+IF(P3D_LIBRARY_RELEASE_PATH STREQUAL "")
+    MESSAGE(SEND_ERROR "P3D library release path must be specified")
+ENDIF(P3D_LIBRARY_RELEASE_PATH STREQUAL "")
 
 
 # GLFW
@@ -131,32 +102,12 @@ IF(P3D_GLM_INCLUDE_PATH STREQUAL "")
 ENDIF(P3D_GLM_INCLUDE_PATH STREQUAL "")
 
 
-SET(HEADERS
-        ${HEADERS}
-        #${NLE_IMGUI_INCLUDE_PATH}/imgui.h
-        #${NLE_IMGUI_INCLUDE_PATH}/imconfig.h
-        #${NLE_IMGUI_INCLUDE_PATH}/imgui_internal.h
-        #${NLE_IMGUI_INCLUDE_PATH}/stb_rect_pack.h
-        #${NLE_IMGUI_INCLUDE_PATH}/stb_textedit.h
-        #${NLE_IMGUI_INCLUDE_PATH}/stb_truetype.h
-        #${P3D_DIRECT_X_TEX_INCLUDE_PATH}/DDSTextureLoader/DDSTextureLoader.h
-        #${P3D_DIRECT_X_TEX_INCLUDE_PATH}/WICTextureLoader/WICTextureLoader.h
-    )
-
-    SET(SOURCES 
-        ${SOURCES}
-        #${NLE_IMGUI_INCLUDE_PATH}/imgui.cpp
-        #${NLE_IMGUI_INCLUDE_PATH}/imgui_demo.cpp
-        #${NLE_IMGUI_INCLUDE_PATH}/imgui_draw.cpp
-        #${P3D_DIRECT_X_TEX_INCLUDE_PATH}/DDSTextureLoader/DDSTextureLoader.cpp
-        #${P3D_DIRECT_X_TEX_INCLUDE_PATH}/WICTextureLoader/WICTextureLoader.cpp
-    )
-
 
 INCLUDE_DIRECTORIES(
     ${NLE_GLFW_INCLUDE_PATH}
     ${NLE_D3D11_INCLUDE_PATH}
     ${P3D_GLM_INCLUDE_PATH}
+    ${P3D_INCLUDE_PATH}
     )
 
 ADD_DEFINITIONS(
@@ -170,14 +121,11 @@ LINK_DIRECTORIES(
     ${NLE_GLFW_LIBRARY_RELEASE_PATH}
     ${NLE_D3D11_LIBRARY_DEBUG_PATH}
     ${NLE_D3D11_LIBRARY_RELEASE_PATH}
+    ${P3D_LIBRARY_DEBUG_PATH}
+    ${P3D_LIBRARY_RELEASE_PATH}
     )
 
-add_library (P3D STATIC
-  ${HEADERS}
-  ${SOURCES}
-)
-
-TARGET_LINK_LIBRARIES(P3D 
+set(LIBS 
     debug glfw3
     optimized glfw3
 
@@ -185,6 +133,21 @@ TARGET_LINK_LIBRARIES(P3D
     optimized d3d11.lib
     debug d3dcompiler.lib
     optimized d3dcompiler.lib
-    )
 
-set_target_properties(P3D PROPERTIES DEBUG_POSTFIX _d)
+    debug p3d_d.lib
+    optimized p3d.lib
+)
+
+
+add_executable (Sample1
+  Sample1_CreateWindow.cpp
+)
+
+add_executable (Sample2
+  Sample2_Triangle.cpp
+)
+
+TARGET_LINK_LIBRARIES(Sample1 ${LIBS})
+TARGET_LINK_LIBRARIES(Sample2 ${LIBS})
+
+set_target_properties(Sample1 Sample2 PROPERTIES DEBUG_POSTFIX _d)
