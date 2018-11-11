@@ -48,6 +48,10 @@ namespace p3d {
             return static_cast<T*>(this)->OMSetRenderTargets(renderTargetBuff, depthStencilBuff);
         }
 
+        bool IASetPrimitiveTopology(P3D_PRIMITIVE_TOPOLOGY tp) {
+            return static_cast<T*>(this)->IASetPrimitiveTopology(tp);
+        }
+
         bool VSSetShader(const p3d::VertexShaderI* vs) {
             return static_cast<T*>(this)->VSSetShader(vs);
         }

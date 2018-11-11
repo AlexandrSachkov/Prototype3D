@@ -97,6 +97,7 @@ bool run() {
     std::vector<glm::vec3> bufferData2 = { {0,0.5f,0}, {-0.5f,0,0}, {0,0,0.5f} };
     P3D_ASSERT_R(device->createBuffer(buffDesc2, bufferData2, buffer2), "Failed to create buffer2");
     device->IASetVertexBuffer(buffer2.get(), 0, 0);
+    device->IASetPrimitiveTopology(p3d::P3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     p3d::RasterizerDesc rastDesc;
     rastDesc.cullMode = p3d::P3D_CULL_BACK;

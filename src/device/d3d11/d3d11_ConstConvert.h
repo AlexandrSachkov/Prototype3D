@@ -14,5 +14,6 @@ namespace p3d {
         bool convertUsageFlag(P3D_USAGE flag, UsageDesc& usageDesc);
         bool convertFillMode(P3D_FILL_MODE fill, D3D11_FILL_MODE& d3d11Fill);
         bool convertCullMode(P3D_CULL_MODE cull, D3D11_CULL_MODE& d3d11Cull);
+        D3D11_PRIMITIVE_TOPOLOGY convertPrimitiveTopology(P3D_PRIMITIVE_TOPOLOGY tp);
     }
 }

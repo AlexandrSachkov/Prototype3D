@@ -49,6 +49,7 @@ namespace p3d {
                 const p3d::Texture2dArrayI* depthStencilBuff
             );
 
+            bool IASetPrimitiveTopology(P3D_PRIMITIVE_TOPOLOGY tp);
             bool VSSetShader(const p3d::VertexShaderI* vs);
             bool PSSetShader(const p3d::PixelShaderI* ps); 
             bool RSSetState(const p3d::RasterizerI* rast);

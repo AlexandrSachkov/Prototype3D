@@ -81,5 +81,32 @@ namespace p3d {
                 P3D_ASSERT_R(false, "Unable to convert cull mode to d3d11 equivalent");
             }
         }
+
+        D3D11_PRIMITIVE_TOPOLOGY convertPrimitiveTopology(P3D_PRIMITIVE_TOPOLOGY tp) {
+            switch (tp) {
+            case P3D_PRIMITIVE_TOPOLOGY_UNDEFINED:
+                return D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+            case P3D_PRIMITIVE_TOPOLOGY_POINTLIST:
+                return D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
+            case P3D_PRIMITIVE_TOPOLOGY_LINELIST:
+                return D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
+            case P3D_PRIMITIVE_TOPOLOGY_LINESTRIP:
+                return D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
+            case P3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST:
+                return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+            case P3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP:
+                return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+            case P3D_PRIMITIVE_TOPOLOGY_LINELIST_ADJ:
+                return D3D11_PRIMITIVE_TOPOLOGY_LINELIST_ADJ;
+            case P3D_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ:
+                return D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ;
+            case P3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ:
+                return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ;
+            case P3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ:
+                return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ;
+            default:
+                return D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+            }
+        }
     }
 }

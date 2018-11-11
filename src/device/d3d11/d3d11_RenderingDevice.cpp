@@ -167,6 +167,11 @@ namespace p3d {
             return true;
         }
 
+        bool RenderingDevice::IASetPrimitiveTopology(P3D_PRIMITIVE_TOPOLOGY tp) {
+            _deviceContext->IASetPrimitiveTopology(convertPrimitiveTopology(tp));
+            return true;
+        }
+
         bool RenderingDevice::VSSetShader(const p3d::VertexShaderI* vs) {
             const d3d11::VertexShader* d3d11vs = static_cast<const d3d11::VertexShader*>(vs);
             _deviceContext->VSSetShader(const_cast<ID3D11VertexShader*>(d3d11vs->getShader().Get()), nullptr, 0);
