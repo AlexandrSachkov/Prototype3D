@@ -11,6 +11,8 @@
 #include "p3d/device/RasterizerI.h"
 #include "p3d/Constants.h"
 
+#include "p3d/util/util_DDSTextureLoader.h"
+
 #include "glm/vec3.hpp"
 
 #include <memory>
@@ -24,6 +26,8 @@ bool run() {
     auto sampleRunner = p3d::util::DefaultSampleRunner();
     P3D_ASSERT_R(sampleRunner.initialize(winTitle, windowDim, fullscreen, true, false, true),
         "Failed to initialize window manager");
+
+    p3d::util::DDSTextureLoader::loadDDSTextureFromFile("D:\\Repositories\\Prototype3D\\resources\\crytek-sponza\\textures\\background.dds");
 
 
     std::unique_ptr<p3d::RenderingDeviceI> device = nullptr;

@@ -45,14 +45,14 @@ namespace p3d {
                 P3D_ASSERT_R(Utility::getMSAAQualityLevel(_device, msaaLevel, maxMsaaQualityLvl), "Failed to retrieve MSAA quality level");
             }
 
-            unsigned int msaaQualityLevel = maxMsaaQualityLvl - 1;
+            _msaaQualityLevel = maxMsaaQualityLvl - 1;
 
             P3D_ASSERT_R(Utility::createSwapChain(
                 windowHandle,
                 screenDim,
                 screenRefreshRate,
                 msaaLevel,
-                msaaQualityLevel,
+                _msaaQualityLevel,
                 numBackBuffers,
                 fullscreen,
                 _device,
@@ -83,7 +83,7 @@ namespace p3d {
                 _device,
                 screenDim,
                 msaaLevel,
-                msaaQualityLevel,
+                _msaaQualityLevel,
                 depthStencilBuff,
                 depthStencilView
             ), "Failed to create depth stencil view");
@@ -241,9 +241,53 @@ namespace p3d {
             const Texture2dArrayDesc& desc,
             std::unique_ptr <p3d::Texture2dArrayI>& tex) {
 
-            //TODO: create GPU texture array
+            unsigned int bindFlags = 0;
+            for (auto bindFlag : desc.bindFlags) {
+                D3D11_BIND_FLAG d3dBindFlag;
+                P3D_ASSERT_R(convertBindFlag(bindFlag, d3dBindFlag),
+                    "Failed to convert bind flag to d3d11 equivalent");
+
+                bindFlags |= d3dBindFlag;
+            }
+            UsageDesc usageDesc;
+            P3D_ASSERT_R(convertUsageFlag(desc.usageFlag, usageDesc),
+                "Failed to convert usage flag to d3d11 equivalent");
+
+            DXGI_FORMAT format;
+            P3D_ASSERT_R(dx::convertFormat(desc.format, format), 
+                L"Failed to convert format to d3d11 equivalent");
+
+            std::vector<D3D11_SUBRESOURCE_DATA> subresData;
+            for (auto& texMipMaps : desc.surfaceMatrix) {
+                for (auto& surface : texMipMaps) {
+                    subresData.push_back({
+                            surface.data,
+                            surface.rowSizeBytes,
+                            0
+                    });
+                }
+            }
+
+            ComPtr<ID3D11Texture2D> textureArr = nullptr;
+            P3D_ASSERT_R(Utility::createTexture2DArray(
+                _device,
+                desc.surfaceMatrix[0][0].surfaceDim,
+                (unsigned int)desc.surfaceMatrix.size(),
+                (unsigned int)desc.surfaceMatrix[0].size(),
+                desc.generateMipMaps,
+                _msaaQualityLevel,
+                format,
+                usageDesc.usage,
+                usageDesc.cpuAccessFlag,
+                (D3D11_BIND_FLAG)bindFlags,
+                subresData,
+                textureArr
+            ), L"Failed to create Texture2D array");
+
+            //TODO: create texture views
+
             tex.reset(new Texture2dArray(
-                nullptr,
+                textureArr,
                 nullptr,
                 nullptr,
                 nullptr,

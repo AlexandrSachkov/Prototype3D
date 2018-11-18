@@ -25,6 +25,7 @@ ENDIF(MSVC)
 SET(HEADERS       
     p3d/util/util_GlfwWindowManager.h
     p3d/util/util_DefaultSampleRunner.h
+    #p3d/util/util_DDSTextureLoader.h
     
     p3d/device/d3d11/d3d11_Buffer.h
     p3d/device/d3d11/d3d11_ConstConvert.h
@@ -58,6 +59,7 @@ SET(HEADERS
 SET(SOURCES 
     p3d/util/util_GlfwWindowManager.cpp
     p3d/util/util_DefaultSampleRunner.cpp
+    #p3d/util/util_DDSTextureLoader.cpp
     
     p3d/device/d3d11/d3d11_Buffer.cpp
     p3d/device/d3d11/d3d11_ConstConvert.cpp
@@ -71,6 +73,8 @@ SET(SOURCES
     p3d/device/d3d11/d3d11_VertexShader.cpp
 
     p3d/device/dx/dx_ConstConvert.cpp
+
+    p3d/Constants.cpp
     )
 
 

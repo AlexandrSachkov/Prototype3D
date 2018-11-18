@@ -138,10 +138,6 @@ namespace p3d {
                 return DXGI_FORMAT_A8_UNORM;
             case P3D_FORMAT_R1_UNORM:
                 return DXGI_FORMAT_R1_UNORM;
-            case P3D_FORMAT_R8G8_B8G8_UNORM:
-                return DXGI_FORMAT_R8G8_B8G8_UNORM;
-            case P3D_FORMAT_G8R8_G8B8_UNORM:
-                return DXGI_FORMAT_G8R8_G8B8_UNORM;
             case P3D_FORMAT_B8G8R8A8_UNORM:
                 return DXGI_FORMAT_B8G8R8A8_UNORM;
             case P3D_FORMAT_B8G8R8X8_UNORM:
@@ -157,6 +153,68 @@ namespace p3d {
 
             default:
                 return DXGI_FORMAT_UNKNOWN;
+            }
+        }
+
+        DXGI_FORMAT convertBlockCompressionFormat(P3D_BLOCK_COMPRESSION_FORMAT format) {
+            switch (format) {
+            case P3D_FORMAT_BC1_TYPELESS:
+                return DXGI_FORMAT_BC1_TYPELESS;
+            case P3D_FORMAT_BC1_UNORM:
+                return DXGI_FORMAT_BC1_UNORM;
+            case P3D_FORMAT_BC1_UNORM_SRGB:
+                return DXGI_FORMAT_BC1_UNORM_SRGB;
+            case P3D_FORMAT_BC2_TYPELESS:
+                return DXGI_FORMAT_BC2_TYPELESS;
+            case P3D_FORMAT_BC2_UNORM:
+                return DXGI_FORMAT_BC2_UNORM;
+            case P3D_FORMAT_BC2_UNORM_SRGB:
+                return DXGI_FORMAT_BC2_UNORM_SRGB;
+            case P3D_FORMAT_BC3_TYPELESS:
+                return DXGI_FORMAT_BC3_TYPELESS;
+            case P3D_FORMAT_BC3_UNORM:
+                return DXGI_FORMAT_BC3_UNORM;
+            case P3D_FORMAT_BC3_UNORM_SRGB:
+                return DXGI_FORMAT_BC3_UNORM_SRGB;
+            case P3D_FORMAT_BC4_TYPELESS:
+                return DXGI_FORMAT_BC4_TYPELESS;
+            case P3D_FORMAT_BC4_UNORM:
+                return DXGI_FORMAT_BC4_UNORM;
+            case P3D_FORMAT_BC4_SNORM:
+                return DXGI_FORMAT_BC4_SNORM;
+            case P3D_FORMAT_BC5_TYPELESS:
+                return DXGI_FORMAT_BC5_TYPELESS;
+            case P3D_FORMAT_BC5_UNORM:
+                return DXGI_FORMAT_BC5_UNORM;
+            case P3D_FORMAT_BC5_SNORM:
+                return DXGI_FORMAT_BC5_SNORM;
+            case P3D_FORMAT_BC6H_TYPELESS:
+                return DXGI_FORMAT_BC6H_TYPELESS;
+            case P3D_FORMAT_BC6H_UF16:
+                return DXGI_FORMAT_BC6H_UF16;
+            case P3D_FORMAT_BC6H_SF16:
+                return DXGI_FORMAT_BC6H_SF16;
+            case P3D_FORMAT_BC7_TYPELESS:
+                return DXGI_FORMAT_BC7_TYPELESS;
+            case P3D_FORMAT_BC7_UNORM:
+                return DXGI_FORMAT_BC7_UNORM;
+            case P3D_FORMAT_BC7_UNORM_SRGB:
+                return DXGI_FORMAT_BC7_UNORM_SRGB;
+            default:
+                return DXGI_FORMAT_UNKNOWN;
+            }
+        }
+
+        bool convertFormat(Format format, DXGI_FORMAT& dxgiFormat) {
+            switch (format.type) {
+            case P3D_FORMAT_TYPE_VECTOR:
+                dxgiFormat = convertVectorFormat(format.format.vecFormat);
+                return true;
+            case P3D_FORMAT_TYPE_BLOCK_COMPRESSION:
+                dxgiFormat = convertBlockCompressionFormat(format.format.bcFormat);
+                return true;
+            default:
+                return false;
             }
         }
     }

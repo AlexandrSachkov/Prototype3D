@@ -119,6 +119,8 @@ namespace p3d {
 
             Texture2dArray _renderTargetBuff;
             Texture2dArray _depthStencilBuff;
+
+            unsigned int _msaaQualityLevel = 0;
         };
     }
 }

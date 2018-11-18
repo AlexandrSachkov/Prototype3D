@@ -11,11 +11,22 @@ namespace p3d {
     };
 
     struct Texture2dArrayDesc {
+        struct SurfaceDesc {
+            unsigned int surfaceDim[2];
+            void* data;
+            unsigned int dataSizeBytes;
+            unsigned int rowSizeBytes;
+        };
 
+        std::vector<std::vector<SurfaceDesc>> surfaceMatrix; // Texture[MipMap[]]
+        Format format;
+        P3D_USAGE usageFlag;
+        std::vector<P3D_BIND_FLAG> bindFlags;
+        bool generateMipMaps;
     };
 
     struct Texture3dDesc {
-
+        
     };
 
     struct VertexShaderDesc {

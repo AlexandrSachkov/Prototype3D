@@ -309,48 +309,40 @@ namespace p3d {
             return true;
         }
 
-        bool Utility::createTexture2D(
-            ID3D11Device* device,
-            uint_fast32_t width,
-            uint_fast32_t height,
+        bool Utility::createTexture2DArray(
+            const ComPtr<ID3D11Device> device,
+            const unsigned int texDim[2],
+            unsigned int numTextures,
+            unsigned int numMipMaps,
             bool generateMipMaps,
-            uint_fast32_t MSAALevel,
+            unsigned int msaaLevel,
+            DXGI_FORMAT format,
             D3D11_USAGE usage,
-            D3D11_BIND_FLAG bindFlag,
-            void* data,
-            uint_fast32_t memPitch,
-            ID3D11Texture2D*& texture
+            unsigned int cpuAccessFlag,
+            D3D11_BIND_FLAG bindFlags,
+            const std::vector<D3D11_SUBRESOURCE_DATA>& subresDesc,
+            ComPtr <ID3D11Texture2D>& texture
         ) {
             D3D11_TEXTURE2D_DESC textDesc;
             ZeroMemory(&textDesc, sizeof(textDesc));
-            textDesc.Width = width;
-            textDesc.Height = height;
-            textDesc.MipLevels = generateMipMaps == true ? 0 : 1;
-            textDesc.ArraySize = 1;
-            textDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM; //needs to change based on texture format
+            textDesc.Width = texDim[0];
+            textDesc.Height = texDim[1];
+            textDesc.MipLevels = (generateMipMaps && numMipMaps == 1) ? 0 : 1;
+            textDesc.ArraySize = numTextures;
+            textDesc.Format = format;
 
             DXGI_SAMPLE_DESC sampleDesc;
             ZeroMemory(&sampleDesc, sizeof(sampleDesc));
-            sampleDesc.Count = MSAALevel;
+            sampleDesc.Count = msaaLevel;
             sampleDesc.Quality = D3D11_STANDARD_MULTISAMPLE_PATTERN;
 
             textDesc.SampleDesc = sampleDesc;
             textDesc.Usage = usage;
-            textDesc.BindFlags = bindFlag;
-            textDesc.CPUAccessFlags = usage == D3D11_USAGE_DYNAMIC ? D3D11_CPU_ACCESS_WRITE : 0;
+            textDesc.BindFlags = bindFlags;
+            textDesc.CPUAccessFlags = cpuAccessFlag;
             textDesc.MiscFlags = 0;
 
-            D3D11_SUBRESOURCE_DATA subresData;
-            ZeroMemory(&subresData, sizeof(subresData));
-            subresData.pSysMem = data;
-            subresData.SysMemPitch = memPitch;
-
-            HRESULT hr;
-            hr = device->CreateTexture2D(&textDesc, &subresData, &texture);
-            if (FAILED(hr)) {
-                //CONSOLE::out(CONSOLE::ERR, L"Failed to create texture");
-                return false;
-            }
+            P3D_ASSERT_R_DX11(device->CreateTexture2D(&textDesc, subresDesc.data(), &texture));
             return true;
         }
 
@@ -416,120 +408,6 @@ namespace p3d {
 
             deviceContext->RSSetViewports(1, &viewport);
         }
-
-        bool Utility::compileBlobFromFile(std::wstring path, LPCSTR entryPoint, LPCSTR profile, ID3DBlob*& blob) {
-            UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
-        #if defined( DEBUG ) || defined( _DEBUG )
-            flags |= D3DCOMPILE_DEBUG;
-        #endif
-
-            ID3DBlob* errorBlob = nullptr;
-            HRESULT hr = D3DCompileFromFile(path.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
-                entryPoint, profile,
-                flags, 0, &blob, &errorBlob);
-            if (FAILED(hr)) {
-                if (errorBlob) {
-                    OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-                    errorBlob->Release();
-
-                    //CONSOLE::out(CONSOLE::ERR, L"Failed to compile blob.\n");
-                }
-                return false;
-            }
-            return true;
-        }
-
-        bool Utility::loadBlobFromFile(std::wstring path, ID3DBlob*& blob) {
-            HRESULT hr;
-
-            hr = D3DReadFileToBlob(path.c_str(), &blob);
-            if (FAILED(hr)) {
-                //CONSOLE::out(CONSOLE::ERR, L"Failed to load blob.\n");
-                return false;
-            }
-            return true;
-        }
-
-
-        /*bool D3D11Utility::loadVertexShader(ID3D11Device* device, std::wstring path, RESOURCES::VertexShader& vertexShader)
-        {
-            HRESULT hr;
-            //Load vertex shader from file
-            std::wstring source(L".hlsl");
-            std::wstring binary(L".cso");
-
-            bool result;
-            if (path.rfind(source) != std::string::npos)
-            {
-                result = compileBlobFromFile(path, "VSMain", "vs_5_0", vertexShader.blob);
-            }
-            else if (path.rfind(binary) != std::string::npos)
-            {
-                result = loadBlobFromFile(path, vertexShader.blob);
-            }
-            else
-            {
-                //CONSOLE::out(CONSOLE::ERR, L"Invalid shader file extension: " + path);
-                return false;
-            }
-
-            if (!result)
-            {
-                //CONSOLE::out(CONSOLE::ERR, L"Failed to load Vertex Shader: " + path);
-                return false;
-            }
-
-            //Create Vertex Shader
-            hr = device->CreateVertexShader(vertexShader.blob->GetBufferPointer(), vertexShader.blob->GetBufferSize(), NULL, &vertexShader.apiVertexShader);
-            if (FAILED(hr))
-            {
-                //CONSOLE::out(CONSOLE::ERR, L"Failed to create Vertex Shader");
-                return false;
-            }
-
-            return true;
-        }*/
-
-        /*bool D3D11Utility::loadPixelShader(ID3D11Device* device, std::wstring path, RESOURCES::PixelShader& pixelShader)
-        {
-            HRESULT hr;
-
-            //Load pixel shader from file
-            std::wstring source(L".hlsl");
-            std::wstring binary(L".cso");
-
-            bool result;
-            if (path.rfind(source) != std::string::npos)
-            {
-                result = compileBlobFromFile(path, "PSMain", "ps_5_0", pixelShader.blob);
-            }
-            else if (path.rfind(binary) != std::string::npos)
-            {
-                result = loadBlobFromFile(path, pixelShader.blob);
-            }
-            else
-            {
-                //CONSOLE::out(CONSOLE::ERR, L"Invalid shader file extension: " + path);
-                return false;
-            }
-
-            if (!result)
-            {
-                //CONSOLE::out(CONSOLE::ERR, L"Failed to load Pixel Shader: " + path);
-                return false;
-            }
-
-            //Create Pixel Shader
-            ID3D11PixelShader* ps = NULL;
-            hr = device->CreatePixelShader(pixelShader.blob->GetBufferPointer(), pixelShader.blob->GetBufferSize(), NULL, &pixelShader.apiPixelShader);
-            if (FAILED(hr))
-            {
-                //CONSOLE::out(CONSOLE::ERR, L"Failed to create Pixel Shader");
-                return false;
-            }
-
-            return true;
-        }*/
     }
 }
 

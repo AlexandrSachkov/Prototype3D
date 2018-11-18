@@ -125,24 +125,22 @@ namespace p3d {
                 ID3D11ShaderResourceView*& resourceView
             );
 
-            static bool createTexture2D(
-                ID3D11Device* device,
-                uint_fast32_t width,
-                uint_fast32_t height,
+            static bool createTexture2DArray(
+                const ComPtr<ID3D11Device> device,
+                const unsigned int texDim[2],
+                unsigned int numTextures,
+                unsigned int numMipMaps,
                 bool generateMipMaps,
-                uint_fast32_t MSAALevel,
+                unsigned int msaaLevel,
+                DXGI_FORMAT format,
                 D3D11_USAGE usage,
-                D3D11_BIND_FLAG bindFlag,
-                void* data,
-                uint_fast32_t memPitch,
-                ID3D11Texture2D*& texture
+                unsigned int cpuAccessFlag,
+                D3D11_BIND_FLAG bindFlags,
+                const std::vector<D3D11_SUBRESOURCE_DATA>& subresDesc,
+                ComPtr <ID3D11Texture2D>& texture
             );
 
             static bool createTextureSamplerState(ID3D11Device* device, ID3D11SamplerState*& samplerState);
-
-            /*static bool loadVertexShader(ID3D11Device* device, std::wstring path, RESOURCES::VertexShader& vertexShader);
-            static bool loadPixelShader(ID3D11Device* device, std::wstring path, RESOURCES::PixelShader& pixelShader);
-            */
 
             static void setViewPort(
                 const ComPtr<ID3D11DeviceContext> deviceContext,
@@ -157,16 +155,6 @@ namespace p3d {
                 void* data,
                 size_t dataSize
                 );*/
-
-        private:
-            static bool compileBlobFromFile(
-                std::wstring path,
-                LPCSTR entryPoint,
-                LPCSTR profile,
-                ID3DBlob*& blob
-            );
-
-            static bool loadBlobFromFile(std::wstring path, ID3DBlob*& blob);
         };
     }
 }

@@ -1,6 +1,11 @@
 #pragma once
 
 namespace p3d {
+    enum P3D_FORMAT_TYPE {
+        P3D_FORMAT_TYPE_VECTOR,
+        P3D_FORMAT_TYPE_BLOCK_COMPRESSION
+    };
+
     enum P3D_VECTOR_FORMAT {
         P3D_FORMAT_UNKNOWN,
         P3D_FORMAT_R32G32B32A32_TYPELESS,
@@ -76,14 +81,46 @@ namespace p3d {
         P3D_FORMAT_B8G8R8A8_TYPELESS,
         P3D_FORMAT_B8G8R8A8_UNORM_SRGB,
         P3D_FORMAT_B8G8R8X8_TYPELESS,
-        P3D_FORMAT_B8G8R8X8_UNORM_SRGB,
+        P3D_FORMAT_B8G8R8X8_UNORM_SRGB
+    };
+
+    enum P3D_BLOCK_COMPRESSION_FORMAT {
+        P3D_FORMAT_BC1_TYPELESS,
+        P3D_FORMAT_BC1_UNORM,
+        P3D_FORMAT_BC1_UNORM_SRGB,
+        P3D_FORMAT_BC2_TYPELESS,
+        P3D_FORMAT_BC2_UNORM,
+        P3D_FORMAT_BC2_UNORM_SRGB,
+        P3D_FORMAT_BC3_TYPELESS,
+        P3D_FORMAT_BC3_UNORM,
+        P3D_FORMAT_BC3_UNORM_SRGB,
+        P3D_FORMAT_BC4_TYPELESS,
+        P3D_FORMAT_BC4_UNORM,
+        P3D_FORMAT_BC4_SNORM,
+        P3D_FORMAT_BC5_TYPELESS,
+        P3D_FORMAT_BC5_UNORM,
+        P3D_FORMAT_BC5_SNORM,
+        P3D_FORMAT_BC6H_TYPELESS,
+        P3D_FORMAT_BC6H_UF16,
+        P3D_FORMAT_BC6H_SF16,
+        P3D_FORMAT_BC7_TYPELESS,
+        P3D_FORMAT_BC7_UNORM,
+        P3D_FORMAT_BC7_UNORM_SRGB
+    };
+
+    struct Format {
+        P3D_FORMAT_TYPE type;
+        union {
+            P3D_VECTOR_FORMAT vecFormat;
+            P3D_BLOCK_COMPRESSION_FORMAT bcFormat;
+        } format;
     };
 
     enum P3D_USAGE {
         // Used for GPU input that will never change
         // D3D11: USAGE_IMMUTABLE
         // OGL: DRAW/STATIC
-        P3D_USAGE_GPU_R,		
+        P3D_USAGE_GPU_R,
 
         // Used for GPU operations when occasional CPU update is required
         // D3D11: D3D11_USAGE_DEFAULT
@@ -109,9 +146,7 @@ namespace p3d {
         P3D_BIND_STREAM_OUTPUT,
         P3D_BIND_RENDER_TARGET,
         P3D_BIND_DEPTH_STENCIL,
-        P3D_BIND_UNORDERED_ACCESS,
-        //P3D_BIND_DECODER,
-        //P3D_BIND_VIDEO_ENCODER
+        P3D_BIND_UNORDERED_ACCESS
     };
 
     enum P3D_INPUT_CLASSIFICATION {
@@ -144,4 +179,5 @@ namespace p3d {
     };
 
     unsigned int getVecFormatSizeBits(P3D_VECTOR_FORMAT format);
+    unsigned int getBlockCompressionFormatSizeBytes(P3D_BLOCK_COMPRESSION_FORMAT format);
 }
