@@ -19,7 +19,7 @@
 bool run() {
     const bool fullscreen = false;
     const unsigned int windowDim[] = { 800, 600 };
-    const std::string winTitle = "Prototype3D sample 2: Triangle";
+    const std::string winTitle = "Prototype3D sample 1: Create window";
 
     auto sampleRunner = p3d::util::DefaultSampleRunner();
     P3D_ASSERT_R(sampleRunner.initialize(winTitle, windowDim, fullscreen, true, false, true),
