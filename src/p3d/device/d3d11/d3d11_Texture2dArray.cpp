@@ -3,22 +3,21 @@
 namespace p3d {
     namespace d3d11 {
         Texture2dArray::Texture2dArray() {}
-
         Texture2dArray::Texture2dArray(
             ComPtr<ID3D11Texture2D> texArr,
             ComPtr<ID3D11DepthStencilView> depthStencilView,
             ComPtr<ID3D11RenderTargetView> renderTargetView,
             ComPtr<ID3D11ShaderResourceView> shaderResourceView,
             ComPtr<ID3D11UnorderedAccessView> unorderedAccessView,
-            const Texture2dArrayDesc& desc
+            const TextureDesc& desc
         ) :
             _texArr(texArr),
             _depthStencilView(depthStencilView),
             _renderTargetView(renderTargetView),
             _shaderResourceView(shaderResourceView),
             _unorderedAccessView(unorderedAccessView),
-            _desc(desc) {
-        }
+            _desc(desc) 
+        {}
 
         Texture2dArray::Texture2dArray(Texture2dArray&& other) {
             _texArr = other._texArr;
@@ -74,7 +73,7 @@ namespace p3d {
             return _unorderedAccessView;
         }
 
-        const Texture2dArrayDesc& Texture2dArray::getDescription() const {
+        const TextureDesc& Texture2dArray::getDescription() const {
             return _desc;
         }
     }

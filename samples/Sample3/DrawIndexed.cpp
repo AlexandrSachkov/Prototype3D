@@ -27,8 +27,10 @@ bool run() {
     P3D_ASSERT_R(sampleRunner.initialize(winTitle, windowDim, fullscreen, true, false, true),
         "Failed to initialize window manager");
 
-    p3d::util::DDSTextureLoader::loadDDSTextureFromFile("D:\\Repositories\\Prototype3D\\resources\\crytek-sponza\\textures\\background.dds");
-
+    p3d::TextureDesc texDesc;
+    p3d::util::DDSTextureLoader::loadDDSTextureFromFile("D:\\Repositories\\Prototype3D\\resources\\crytek-sponza\\textures\\background.dds", texDesc);
+    texDesc.bindFlags = { p3d::P3D_BIND_SHADER_RESOURCE };
+    texDesc.usageFlag = p3d::P3D_USAGE_CPU_UPDATE_GPU_RW;
 
     std::unique_ptr<p3d::RenderingDeviceI> device = nullptr;
 #ifdef P3D_API_D3D11 
@@ -43,6 +45,9 @@ bool run() {
     ), "Failed to initialize D3D11 device");
     device.reset(d3d11_device);
 #endif
+
+    std::unique_ptr<p3d::Texture2dArrayI> tex = nullptr;
+    device->createTexture2dArray(texDesc, tex);
 
     const std::string POSITION_IE = "POSITION";
     p3d::VertexShaderDesc vsDesc;

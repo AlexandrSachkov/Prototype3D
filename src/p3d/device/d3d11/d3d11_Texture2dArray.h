@@ -17,7 +17,7 @@ namespace p3d {
                 ComPtr<ID3D11RenderTargetView> renderTargetView,
                 ComPtr<ID3D11ShaderResourceView> shaderResourceView,
                 ComPtr<ID3D11UnorderedAccessView> unorderedAccessView,
-                const Texture2dArrayDesc& desc
+                const TextureDesc& desc
             );
             Texture2dArray(Texture2dArray&&);
             Texture2dArray& operator=(Texture2dArray&&);
@@ -27,18 +27,18 @@ namespace p3d {
             const ComPtr<ID3D11RenderTargetView> getRenderTargetView() const;
             const ComPtr<ID3D11ShaderResourceView> getShaderResourceView() const;
             const ComPtr<ID3D11UnorderedAccessView> getUnorderedAccessView() const;
-            const Texture2dArrayDesc& getDescription() const;
+            const TextureDesc& getDescription() const;
 
         private:
             Texture2dArray(const Texture2dArray&) = delete;
             Texture2dArray& operator=(const Texture2dArray&) = delete;
 
-            ComPtr<ID3D11Texture2D> _texArr;
-            ComPtr<ID3D11DepthStencilView> _depthStencilView;
-            ComPtr<ID3D11RenderTargetView> _renderTargetView;
-            ComPtr<ID3D11ShaderResourceView> _shaderResourceView;
-            ComPtr<ID3D11UnorderedAccessView> _unorderedAccessView;
-            Texture2dArrayDesc _desc;
+            ComPtr<ID3D11Texture2D> _texArr = nullptr;
+            ComPtr<ID3D11DepthStencilView> _depthStencilView = nullptr;
+            ComPtr<ID3D11RenderTargetView> _renderTargetView = nullptr;
+            ComPtr<ID3D11ShaderResourceView> _shaderResourceView = nullptr;
+            ComPtr<ID3D11UnorderedAccessView> _unorderedAccessView = nullptr;
+            TextureDesc _desc;
         };
     }
 }

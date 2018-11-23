@@ -49,20 +49,33 @@ namespace p3d {
                 ComPtr<IDXGISwapChain>& swapChain
             );
 
-            static bool createBackBufferRenderTargetView(
-                const ComPtr<ID3D11Device> device,
+            static bool Utility::getBackBuffer(
                 const ComPtr<IDXGISwapChain> swapChain,
-                ComPtr<ID3D11Texture2D>& renderTargetBuff,
+                ComPtr<ID3D11Texture2D>& renderTargetBuff
+            );
+
+            static bool createRenderTargetView(
+                const ComPtr<ID3D11Device> device,
+                const ComPtr<ID3D11Resource> resource,
                 ComPtr<ID3D11RenderTargetView>& renderTargetView
             );
 
             static bool createDepthStencilView(
                 const ComPtr<ID3D11Device> device,
-                const unsigned int screenDim[2],
-                unsigned int msaaLevel,
-                unsigned int msaaQualityLevel,
-                ComPtr<ID3D11Texture2D>& depthStencilBuff,
+                const ComPtr<ID3D11Resource> resource,
                 ComPtr<ID3D11DepthStencilView>& depthStencilView
+            );
+
+            static bool createShaderResourceView(
+                const ComPtr<ID3D11Device> device,
+                const ComPtr<ID3D11Resource> resource,
+                ComPtr<ID3D11ShaderResourceView>& shaderResourceView
+            );
+
+            static bool createUnorderedAccessView(
+                const ComPtr<ID3D11Device> device,
+                const ComPtr<ID3D11Resource> resource,
+                ComPtr<ID3D11UnorderedAccessView>& unorderedAccessView
             );
 
             static bool compileShader(
@@ -125,6 +138,20 @@ namespace p3d {
                 ID3D11ShaderResourceView*& resourceView
             );
 
+            static bool createTexture1DArray(
+                const ComPtr<ID3D11Device> device,
+                const unsigned int texWidth,
+                unsigned int numTextures,
+                unsigned int numMipMaps,
+                bool generateMipMaps,
+                DXGI_FORMAT format,
+                D3D11_USAGE usage,
+                unsigned int cpuAccessFlag,
+                D3D11_BIND_FLAG bindFlags,
+                const std::vector<D3D11_SUBRESOURCE_DATA>& subresDesc,
+                ComPtr <ID3D11Texture1D>& texture
+            );
+
             static bool createTexture2DArray(
                 const ComPtr<ID3D11Device> device,
                 const unsigned int texDim[2],
@@ -132,12 +159,26 @@ namespace p3d {
                 unsigned int numMipMaps,
                 bool generateMipMaps,
                 unsigned int msaaLevel,
+                unsigned int msaaQualityLevel,
                 DXGI_FORMAT format,
                 D3D11_USAGE usage,
                 unsigned int cpuAccessFlag,
                 D3D11_BIND_FLAG bindFlags,
                 const std::vector<D3D11_SUBRESOURCE_DATA>& subresDesc,
                 ComPtr <ID3D11Texture2D>& texture
+            );
+
+            static bool createTexture3D(
+                const ComPtr<ID3D11Device> device,
+                const unsigned int texDim[3],
+                unsigned int numMipMaps,
+                bool generateMipMaps,
+                DXGI_FORMAT format,
+                D3D11_USAGE usage,
+                unsigned int cpuAccessFlag,
+                D3D11_BIND_FLAG bindFlags,
+                const std::vector<D3D11_SUBRESOURCE_DATA>& subresDesc,
+                ComPtr <ID3D11Texture3D>& texture
             );
 
             static bool createTextureSamplerState(ID3D11Device* device, ID3D11SamplerState*& samplerState);
@@ -148,13 +189,6 @@ namespace p3d {
                 const float dimensions[2],
                 const float minMaxDepth[2]
             );
-
-            /*static void updateBuffer(
-                ID3D11DeviceContext*& deviceContext,
-                RESOURCES::Buffer& buffer,
-                void* data,
-                size_t dataSize
-                );*/
         };
     }
 }

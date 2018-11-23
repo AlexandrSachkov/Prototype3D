@@ -91,19 +91,19 @@ namespace p3d {
         }
 
         bool createTexture1dArray(
-            const Texture1dArrayDesc& desc,
+            const TextureDesc& desc,
             std::unique_ptr <p3d::Texture1dArrayI>& tex) {
             return static_cast<T*>(this)->createTexture1dArray(desc, tex);
         }
 
         bool createTexture2dArray(
-            const Texture2dArrayDesc& desc,
+            const TextureDesc& desc,
             std::unique_ptr <p3d::Texture2dArrayI>& tex) {
             return static_cast<T*>(this)->createTexture2dArray(desc, tex);
         }
 
         bool createTexture3d(
-            const Texture3dDesc& desc,
+            const TextureDesc& desc,
             std::unique_ptr <p3d::Texture3dI>& tex) {
             return static_cast<T*>(this)->createTexture3d(desc, tex);
         }

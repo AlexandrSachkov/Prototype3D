@@ -106,44 +106,47 @@ namespace p3d {
             return true;
         }
 
-        bool Utility::createBackBufferRenderTargetView(
-            const ComPtr<ID3D11Device> device,
+        bool Utility::getBackBuffer(
             const ComPtr<IDXGISwapChain> swapChain,
-            ComPtr<ID3D11Texture2D>& renderTargetBuff,
+            ComPtr<ID3D11Texture2D>& renderTargetBuff
+        ) {
+            P3D_ASSERT_R_DX11(swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &renderTargetBuff));
+            return true;
+        }
+
+        bool Utility::createRenderTargetView(
+            const ComPtr<ID3D11Device> device,
+            const ComPtr<ID3D11Resource> resource,
             ComPtr<ID3D11RenderTargetView>& renderTargetView
         ) {
-            ComPtr<ID3D11Texture2D> rtBuff;
-            P3D_ASSERT_R_DX11(swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &rtBuff));
-            P3D_ASSERT_R_DX11(device->CreateRenderTargetView(rtBuff.Get(), nullptr, &renderTargetView));
-            renderTargetBuff = rtBuff;
+            P3D_ASSERT_R_DX11(device->CreateRenderTargetView(resource.Get(), nullptr, &renderTargetView));
             return true;
         }
 
         bool Utility::createDepthStencilView(
             const ComPtr<ID3D11Device> device,
-            const unsigned int screenDim[2],
-            unsigned int msaaLevel,
-            unsigned int msaaQualityLevel,
-            ComPtr<ID3D11Texture2D>& depthStencilBuff,
+            const ComPtr<ID3D11Resource> resource,
             ComPtr<ID3D11DepthStencilView>& depthStencilView
         ) {
-            D3D11_TEXTURE2D_DESC depthStencilDesc;
+            P3D_ASSERT_R_DX11(device->CreateDepthStencilView(resource.Get(), nullptr, &depthStencilView));
+            return true;
+        }
 
-            depthStencilDesc.Width = screenDim[0];
-            depthStencilDesc.Height = screenDim[1];
-            depthStencilDesc.MipLevels = 1;
-            depthStencilDesc.ArraySize = 1;
-            depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-            depthStencilDesc.SampleDesc.Count = msaaLevel;
-            depthStencilDesc.SampleDesc.Quality = msaaQualityLevel;
-            depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
-            depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-            depthStencilDesc.CPUAccessFlags = 0;
-            depthStencilDesc.MiscFlags = 0;
+        bool Utility::createShaderResourceView(
+            const ComPtr<ID3D11Device> device,
+            const ComPtr<ID3D11Resource> resource,
+            ComPtr<ID3D11ShaderResourceView>& shaderResourceView
+        ) {
+            P3D_ASSERT_R_DX11(device->CreateShaderResourceView(resource.Get(), nullptr, &shaderResourceView));
+            return true;
+        }
 
-            P3D_ASSERT_R_DX11(device->CreateTexture2D(&depthStencilDesc, nullptr, &depthStencilBuff));
-            P3D_ASSERT_R_DX11(device->CreateDepthStencilView(depthStencilBuff.Get(), nullptr, &depthStencilView));
-
+        bool Utility::createUnorderedAccessView(
+            const ComPtr<ID3D11Device> device,
+            const ComPtr<ID3D11Resource> resource,
+            ComPtr<ID3D11UnorderedAccessView>& unorderedAccessView
+        ) {
+            P3D_ASSERT_R_DX11(device->CreateUnorderedAccessView(resource.Get(), nullptr, &unorderedAccessView));
             return true;
         }
 
@@ -309,6 +312,39 @@ namespace p3d {
             return true;
         }
 
+        bool Utility::createTexture1DArray(
+            const ComPtr<ID3D11Device> device,
+            const unsigned int texWidth,
+            unsigned int numTextures,
+            unsigned int numMipMaps,
+            bool generateMipMaps,
+            DXGI_FORMAT format,
+            D3D11_USAGE usage,
+            unsigned int cpuAccessFlag,
+            D3D11_BIND_FLAG bindFlags,
+            const std::vector<D3D11_SUBRESOURCE_DATA>& subresDesc,
+            ComPtr <ID3D11Texture1D>& texture
+        ) {
+            D3D11_TEXTURE1D_DESC textDesc;
+            ZeroMemory(&textDesc, sizeof(textDesc));
+            textDesc.Width = texWidth;
+            textDesc.MipLevels = (generateMipMaps && numMipMaps == 1) ? 0 : 1;
+            textDesc.ArraySize = numTextures;
+            textDesc.Format = format;
+
+            textDesc.Usage = usage;
+            textDesc.BindFlags = bindFlags;
+            textDesc.CPUAccessFlags = cpuAccessFlag;
+            textDesc.MiscFlags = 0;
+
+            P3D_ASSERT_R_DX11(device->CreateTexture1D(
+                &textDesc,
+                subresDesc.size() > 0 ? subresDesc.data() : nullptr,
+                &texture
+            ));
+            return true;
+        }
+
         bool Utility::createTexture2DArray(
             const ComPtr<ID3D11Device> device,
             const unsigned int texDim[2],
@@ -316,6 +352,7 @@ namespace p3d {
             unsigned int numMipMaps,
             bool generateMipMaps,
             unsigned int msaaLevel,
+            unsigned int msaaQualityLevel,
             DXGI_FORMAT format,
             D3D11_USAGE usage,
             unsigned int cpuAccessFlag,
@@ -334,7 +371,7 @@ namespace p3d {
             DXGI_SAMPLE_DESC sampleDesc;
             ZeroMemory(&sampleDesc, sizeof(sampleDesc));
             sampleDesc.Count = msaaLevel;
-            sampleDesc.Quality = D3D11_STANDARD_MULTISAMPLE_PATTERN;
+            sampleDesc.Quality = msaaQualityLevel;
 
             textDesc.SampleDesc = sampleDesc;
             textDesc.Usage = usage;
@@ -342,7 +379,44 @@ namespace p3d {
             textDesc.CPUAccessFlags = cpuAccessFlag;
             textDesc.MiscFlags = 0;
 
-            P3D_ASSERT_R_DX11(device->CreateTexture2D(&textDesc, subresDesc.data(), &texture));
+            P3D_ASSERT_R_DX11(device->CreateTexture2D(
+                &textDesc, 
+                subresDesc.size() > 0 ? subresDesc.data() : nullptr, 
+                &texture
+            ));
+            return true;
+        }
+
+        bool Utility::createTexture3D(
+            const ComPtr<ID3D11Device> device,
+            const unsigned int texDim[3],
+            unsigned int numMipMaps,
+            bool generateMipMaps,
+            DXGI_FORMAT format,
+            D3D11_USAGE usage,
+            unsigned int cpuAccessFlag,
+            D3D11_BIND_FLAG bindFlags,
+            const std::vector<D3D11_SUBRESOURCE_DATA>& subresDesc,
+            ComPtr <ID3D11Texture3D>& texture
+        ) {
+            D3D11_TEXTURE3D_DESC textDesc;
+            ZeroMemory(&textDesc, sizeof(textDesc));
+            textDesc.Width = texDim[0];
+            textDesc.Height = texDim[1];
+            textDesc.Depth = texDim[2];
+            textDesc.MipLevels = (generateMipMaps && numMipMaps == 1) ? 0 : 1;
+            textDesc.Format = format;
+
+            textDesc.Usage = usage;
+            textDesc.BindFlags = bindFlags;
+            textDesc.CPUAccessFlags = cpuAccessFlag;
+            textDesc.MiscFlags = 0;
+
+            P3D_ASSERT_R_DX11(device->CreateTexture3D(
+                &textDesc,
+                subresDesc.size() > 0 ? subresDesc.data() : nullptr,
+                &texture
+            ));
             return true;
         }
 

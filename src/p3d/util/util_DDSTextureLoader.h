@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../ResourceDescriptions.h"
+
 #include <string>
 #include <memory>
 
@@ -8,7 +10,8 @@ namespace p3d {
         class DDSTextureLoader {
         public:
             static bool loadDDSTextureFromFile(
-                const std::string& path
+                const std::string& path,
+                TextureDesc& texDesc
             );
 
         private:
@@ -155,10 +158,50 @@ namespace p3d {
                 DDPF_LUMINANCE = 0x20000
             };
 
+            enum DDS_HEADER_FLAGS {
+                DDSD_CAPS = 0x1,
+                DDSD_HEIGHT = 0x2,
+                DDSD_WIDTH = 0x4,
+                DDSD_PITCH = 0x8,
+                DDSD_PIXELFORMAT = 0x1000,
+                DDSD_MIPMAPCOUNT = 0x20000,
+                DDSD_LINEARSIZE = 0x80000,
+                DDSD_DEPTH = 0x800000
+            };
+
+            enum DDS_HEADER_CAPS_FLAGS {
+                DDSCAPS_COMPLEX = 0x8,
+                DDSCAPS_MIPMAP = 0x400000,
+                DDSCAPS_TEXTURE = 0x1000
+            };
+
+            enum DDS_HEADER_CAPS2_FLAGS {
+                DDSCAPS2_CUBEMAP = 0x200,
+                DDSCAPS2_CUBEMAP_POSITIVEX = 0x400,
+                DDSCAPS2_CUBEMAP_NEGATIVEX = 0x800,
+                DDSCAPS2_CUBEMAP_POSITIVEY = 0x1000,
+                DDSCAPS2_CUBEMAP_NEGATIVEY = 0x2000,
+                DDSCAPS2_CUBEMAP_POSITIVEZ = 0x4000,
+                DDSCAPS2_CUBEMAP_NEGATIVEZ = 0x8000,
+                DDSCAPS2_VOLUME = 0x200000
+            };
+
+            enum DDS_HEADER_DXT10_MISC_FLAGS {
+                DDS_RESOURCE_MISC_TEXTURECUBE
+            };
+
+            enum DDS_HEADER_DXT10_MISC_FLAGS2 {
+                DDS_ALPHA_MODE_UNKNOWN = 0x0,
+                DDS_ALPHA_MODE_STRAIGHT = 0x1,
+                DDS_ALPHA_MODE_PREMULTIPLIED = 0x2,
+                DDS_ALPHA_MODE_OPAQUE = 0x3,
+                DDS_ALPHA_MODE_CUSTOM = 0x4
+            };
+
             struct DDSPixelFormat {
                 unsigned int size;
                 unsigned int flags;
-                char fourCC[4];
+                unsigned int fourCC;
                 unsigned int RGBBitCount;
                 unsigned int RBitMask;
                 unsigned int GBitMask;
@@ -195,20 +238,37 @@ namespace p3d {
             static const unsigned int BASIC_HEADER_SIZE_BYTES = MAGIC_SIZE_BYTES + sizeof(DDSHeader);
             static const unsigned int DX10_HEADER_SIZE_BYTES = BASIC_HEADER_SIZE_BYTES + sizeof(DDSHeaderDxt10);
 
+            static bool compareFourCC(unsigned int fourCC, char ch1, char ch2, char ch3, char ch4);
+            static bool getSurfaceSizes(
+                unsigned int width, 
+                unsigned int height, 
+                Format format, 
+                unsigned int& rowSize, 
+                unsigned int& surfaceSize
+            );
+
             static bool readDDSFile(
                 const std::string& path,
                 DDSHeader& ddsHeader,
                 DDSHeaderDxt10& dx10Header,
                 bool& dxt10,
                 void*& data,
-                unsigned int& dataSize);
+                unsigned int& dataSize
+            );
 
             static bool loadDDSData(
                 const DDSHeader& ddsHeader,
                 const DDSHeaderDxt10& ddsHeaderDxt10,
                 bool dtx10,
                 const void* data,
-                unsigned int dataSize);
+                unsigned int dataSize,
+                TextureDesc& texDesc
+            );
+
+            static bool convertFormat(DXGI_FORMAT dxgiFormat, Format& format);
+
+            // this code is taken from https://github.com/Microsoft/DirectXTex/blob/master/DDSTextureLoader/DDSTextureLoader.cpp
+            static DXGI_FORMAT getDxgiFormat(const DDSPixelFormat& ddpf);
         };
     }
 }

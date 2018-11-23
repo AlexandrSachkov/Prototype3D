@@ -6,27 +6,21 @@
 #include <string>
 
 namespace p3d {
-    struct Texture1dArrayDesc {
-
-    };
-
-    struct Texture2dArrayDesc {
+    struct TextureDesc {
         struct SurfaceDesc {
-            unsigned int surfaceDim[2];
-            void* data;
-            unsigned int dataSizeBytes;
-            unsigned int rowSizeBytes;
+            unsigned int surfaceDim[3];     // width/height/depth
+            unsigned int rowSizeBytes;      // size of a single row
+            unsigned int slice2DSizeBytes;  // size of a 2d surface 
+            unsigned int surfaceSizeBytes;  // full mipmap size (including depth)
         };
 
         std::vector<std::vector<SurfaceDesc>> surfaceMatrix; // Texture[MipMap[]]
+        char* data;
+        unsigned int dataSize;
         Format format;
         P3D_USAGE usageFlag;
         std::vector<P3D_BIND_FLAG> bindFlags;
         bool generateMipMaps;
-    };
-
-    struct Texture3dDesc {
-        
     };
 
     struct VertexShaderDesc {

@@ -67,17 +67,17 @@ namespace p3d {
             void presentFrame();
 
             bool createTexture1dArray(
-                const Texture1dArrayDesc& desc,
+                const TextureDesc& desc,
                 std::unique_ptr <p3d::Texture1dArrayI>& tex
             );
 
             bool createTexture2dArray(
-                const Texture2dArrayDesc& desc,
+                const TextureDesc& desc,
                 std::unique_ptr <p3d::Texture2dArrayI>& tex
             );
 
             bool createTexture3d(
-                const Texture3dDesc& desc,
+                const TextureDesc& desc,
                 std::unique_ptr <p3d::Texture3dI>& tex
             );
 
@@ -113,6 +113,18 @@ namespace p3d {
                 ComPtr<ID3D11InputLayout>& inputLayout
             );
 
+            bool convertBindFlags(const std::vector<P3D_BIND_FLAG>& bindFlags, unsigned int& combinedBindFlags);
+            bool fillSubresourceData(const TextureDesc& desc, std::vector<D3D11_SUBRESOURCE_DATA>& subresData);
+
+            bool createResourceViews(
+                const std::vector<P3D_BIND_FLAG>& bindFlags,
+                const ComPtr<ID3D11Resource> resource,
+                ComPtr<ID3D11DepthStencilView>& depthStencilView,
+                ComPtr<ID3D11RenderTargetView>& renderTargetView,
+                ComPtr<ID3D11ShaderResourceView>& shaderResourceView,
+                ComPtr<ID3D11UnorderedAccessView>& unorderedAccessView
+            );
+
             ComPtr<ID3D11Device> _device = nullptr;
             ComPtr<ID3D11DeviceContext> _deviceContext = nullptr;
             ComPtr<IDXGISwapChain> _swapChain = nullptr;
@@ -120,6 +132,7 @@ namespace p3d {
             Texture2dArray _renderTargetBuff;
             Texture2dArray _depthStencilBuff;
 
+            unsigned int _msaaLevel = 0;
             unsigned int _msaaQualityLevel = 0;
         };
     }

@@ -12,6 +12,8 @@
 #include "d3d11_Buffer.h"
 #include "d3d11_Rasterizer.h"
 
+//#include "DDSTextureLoader.h"
+
 #include <Windows.h>
 
 #include <algorithm>
@@ -40,19 +42,22 @@ namespace p3d {
 
             if (msaaLevel < 1) msaaLevel = 1; //anything less than 1 is considered off. So we set the sampling count to 1
 
-            unsigned int maxMsaaQualityLvl = 0;
+            unsigned int msaaQualityLevel = 0;
             if (msaaLevel > 1) {
+                unsigned int maxMsaaQualityLvl;
                 P3D_ASSERT_R(Utility::getMSAAQualityLevel(_device, msaaLevel, maxMsaaQualityLvl), "Failed to retrieve MSAA quality level");
+                msaaQualityLevel = maxMsaaQualityLvl - 1;
             }
 
-            _msaaQualityLevel = maxMsaaQualityLvl - 1;
+            _msaaLevel = msaaLevel;
+            _msaaQualityLevel = msaaQualityLevel;
 
             P3D_ASSERT_R(Utility::createSwapChain(
                 windowHandle,
                 screenDim,
                 screenRefreshRate,
                 msaaLevel,
-                _msaaQualityLevel,
+                msaaQualityLevel,
                 numBackBuffers,
                 fullscreen,
                 _device,
@@ -60,13 +65,15 @@ namespace p3d {
             ), "Failed to create swap chain");
 
             ComPtr<ID3D11Texture2D> backBuffRenderTarget = nullptr;
+            P3D_ASSERT_R(Utility::getBackBuffer(_swapChain, backBuffRenderTarget), 
+                "Failed to get back buffer");
             ComPtr<ID3D11RenderTargetView> backBuffRenderTargetView = nullptr;
-            P3D_ASSERT_R(Utility::createBackBufferRenderTargetView(
+            P3D_ASSERT_R(Utility::createRenderTargetView(
                 _device,
-                _swapChain,
                 backBuffRenderTarget,
                 backBuffRenderTargetView
             ), "Failed to create back buffer render target view");
+
             _renderTargetBuff = Texture2dArray(
                 backBuffRenderTarget,
                 nullptr,
@@ -76,17 +83,29 @@ namespace p3d {
                 {} //TODO: add a description
             );
 
-
             ComPtr<ID3D11Texture2D> depthStencilBuff = nullptr;
+            P3D_ASSERT_R(Utility::createTexture2DArray(_device,
+                screenDim,
+                1,
+                1,
+                false,
+                msaaLevel,
+                msaaQualityLevel,
+                DXGI_FORMAT_D24_UNORM_S8_UINT,
+                D3D11_USAGE_DEFAULT,
+                0,
+                D3D11_BIND_DEPTH_STENCIL,
+                {},
+                depthStencilBuff
+            ), "Failed to create depth stencil buffer");
+
             ComPtr<ID3D11DepthStencilView> depthStencilView = nullptr;
             P3D_ASSERT_R(Utility::createDepthStencilView(
                 _device,
-                screenDim,
-                msaaLevel,
-                _msaaQualityLevel,
                 depthStencilBuff,
                 depthStencilView
             ), "Failed to create depth stencil view");
+
             _depthStencilBuff = Texture2dArray(
                 depthStencilBuff,
                 depthStencilView,
@@ -230,43 +249,92 @@ namespace p3d {
         }
 
         bool RenderingDevice::createTexture1dArray(
-            const Texture1dArrayDesc& desc,
-            std::unique_ptr <p3d::Texture1dArrayI>& tex) {
-            //TODO: create GPU texture
-            tex.reset(new Texture1dArray({ nullptr }, desc));
+            const TextureDesc& desc,
+            std::unique_ptr <p3d::Texture1dArrayI>& tex
+        ) {
+            unsigned int bindFlags = 0;
+            P3D_ASSERT_R(convertBindFlags(desc.bindFlags, bindFlags),
+                "Failed to convert bind flags");
+
+            UsageDesc usageDesc;
+            P3D_ASSERT_R(convertUsageFlag(desc.usageFlag, usageDesc),
+                "Failed to convert usage flag to d3d11 equivalent");
+
+            DXGI_FORMAT format;
+            P3D_ASSERT_R(dx::convertFormat(desc.format, format),
+                "Failed to convert format to d3d11 equivalent");
+
+            std::vector<D3D11_SUBRESOURCE_DATA> subresData;
+            P3D_ASSERT_R(fillSubresourceData(desc, subresData),
+                "Failed to fill subresource data");
+
+            ComPtr<ID3D11Texture1D> textureArr = nullptr;
+            P3D_ASSERT_R(Utility::createTexture1DArray(
+                _device,
+                desc.surfaceMatrix[0][0].surfaceDim[0],
+                (unsigned int)desc.surfaceMatrix.size(),
+                (unsigned int)desc.surfaceMatrix[0].size(),
+                desc.generateMipMaps,
+                format,
+                usageDesc.usage,
+                usageDesc.cpuAccessFlag,
+                (D3D11_BIND_FLAG)bindFlags,
+                subresData,
+                textureArr
+            ), "Failed to create Texture1D array");
+
+            ComPtr<ID3D11DepthStencilView> depthStencilView = nullptr;
+            ComPtr<ID3D11RenderTargetView> renderTargetView = nullptr;
+            ComPtr<ID3D11ShaderResourceView> shaderResourceView = nullptr;
+            ComPtr<ID3D11UnorderedAccessView> unorderedAccessView = nullptr;
+            P3D_ASSERT_R(createResourceViews(
+                desc.bindFlags,
+                textureArr,
+                depthStencilView,
+                renderTargetView,
+                shaderResourceView,
+                unorderedAccessView
+            ), "Failed to create resource views");
+
+            tex.reset(new Texture1dArray(
+                textureArr, 
+                depthStencilView,
+                renderTargetView,
+                shaderResourceView,
+                desc
+            ));
+
             return true;
         }
 
         bool RenderingDevice::createTexture2dArray(
-            const Texture2dArrayDesc& desc,
+            const TextureDesc& desc,
             std::unique_ptr <p3d::Texture2dArrayI>& tex) {
 
+            /*ID3D11Resource* texture;
+            ID3D11ShaderResourceView* srView;
+            wchar_t* path = L"D:\\Repositories\\Prototype3D\\resources\\crytek-sponza\\textures\\background.dds";
+            DirectX::CreateDDSTextureFromFile(
+                _device.Get(),
+                path,
+                &texture,
+                &srView
+            );*/
             unsigned int bindFlags = 0;
-            for (auto bindFlag : desc.bindFlags) {
-                D3D11_BIND_FLAG d3dBindFlag;
-                P3D_ASSERT_R(convertBindFlag(bindFlag, d3dBindFlag),
-                    "Failed to convert bind flag to d3d11 equivalent");
+            P3D_ASSERT_R(convertBindFlags(desc.bindFlags, bindFlags), 
+                "Failed to convert bind flags");
 
-                bindFlags |= d3dBindFlag;
-            }
             UsageDesc usageDesc;
             P3D_ASSERT_R(convertUsageFlag(desc.usageFlag, usageDesc),
                 "Failed to convert usage flag to d3d11 equivalent");
 
             DXGI_FORMAT format;
             P3D_ASSERT_R(dx::convertFormat(desc.format, format), 
-                L"Failed to convert format to d3d11 equivalent");
+                "Failed to convert format to d3d11 equivalent");
 
             std::vector<D3D11_SUBRESOURCE_DATA> subresData;
-            for (auto& texMipMaps : desc.surfaceMatrix) {
-                for (auto& surface : texMipMaps) {
-                    subresData.push_back({
-                            surface.data,
-                            surface.rowSizeBytes,
-                            0
-                    });
-                }
-            }
+            P3D_ASSERT_R(fillSubresourceData(desc, subresData), 
+                "Failed to fill subresource data");
 
             ComPtr<ID3D11Texture2D> textureArr = nullptr;
             P3D_ASSERT_R(Utility::createTexture2DArray(
@@ -275,6 +343,7 @@ namespace p3d {
                 (unsigned int)desc.surfaceMatrix.size(),
                 (unsigned int)desc.surfaceMatrix[0].size(),
                 desc.generateMipMaps,
+                _msaaLevel,
                 _msaaQualityLevel,
                 format,
                 usageDesc.usage,
@@ -282,26 +351,87 @@ namespace p3d {
                 (D3D11_BIND_FLAG)bindFlags,
                 subresData,
                 textureArr
-            ), L"Failed to create Texture2D array");
+            ), "Failed to create Texture2D array");
 
-            //TODO: create texture views
+            ComPtr<ID3D11DepthStencilView> depthStencilView = nullptr;
+            ComPtr<ID3D11RenderTargetView> renderTargetView = nullptr;
+            ComPtr<ID3D11ShaderResourceView> shaderResourceView = nullptr;
+            ComPtr<ID3D11UnorderedAccessView> unorderedAccessView = nullptr;
+            P3D_ASSERT_R(createResourceViews(
+                desc.bindFlags,
+                textureArr,
+                depthStencilView,
+                renderTargetView,
+                shaderResourceView,
+                unorderedAccessView
+            ), "Failed to create resource views");
 
             tex.reset(new Texture2dArray(
                 textureArr,
-                nullptr,
-                nullptr,
-                nullptr,
-                nullptr,
+                depthStencilView,
+                renderTargetView,
+                shaderResourceView,
+                unorderedAccessView,
                 desc
             ));
             return true;
         }
 
         bool RenderingDevice::createTexture3d(
-            const Texture3dDesc& desc,
-            std::unique_ptr <p3d::Texture3dI>& tex) {
-            //TODO: create GPU texture array
-            tex.reset(new Texture3d({ nullptr }, desc));
+            const TextureDesc& desc,
+            std::unique_ptr <p3d::Texture3dI>& tex
+        ) {
+            unsigned int bindFlags = 0;
+            P3D_ASSERT_R(convertBindFlags(desc.bindFlags, bindFlags),
+                "Failed to convert bind flags");
+
+            UsageDesc usageDesc;
+            P3D_ASSERT_R(convertUsageFlag(desc.usageFlag, usageDesc),
+                "Failed to convert usage flag to d3d11 equivalent");
+
+            DXGI_FORMAT format;
+            P3D_ASSERT_R(dx::convertFormat(desc.format, format),
+                "Failed to convert format to d3d11 equivalent");
+
+            std::vector<D3D11_SUBRESOURCE_DATA> subresData;
+            P3D_ASSERT_R(fillSubresourceData(desc, subresData),
+                "Failed to fill subresource data");
+
+            ComPtr<ID3D11Texture3D> texture = nullptr;
+            P3D_ASSERT_R(Utility::createTexture3D(
+                _device,
+                desc.surfaceMatrix[0][0].surfaceDim,
+                (unsigned int)desc.surfaceMatrix[0].size(),
+                desc.generateMipMaps,
+                format,
+                usageDesc.usage,
+                usageDesc.cpuAccessFlag,
+                (D3D11_BIND_FLAG)bindFlags,
+                subresData,
+                texture
+            ), "Failed to create Texture3D");
+            
+            ComPtr<ID3D11DepthStencilView> depthStencilView = nullptr;
+            ComPtr<ID3D11RenderTargetView> renderTargetView = nullptr;
+            ComPtr<ID3D11ShaderResourceView> shaderResourceView = nullptr;
+            ComPtr<ID3D11UnorderedAccessView> unorderedAccessView = nullptr;
+            P3D_ASSERT_R(createResourceViews(
+                desc.bindFlags,
+                texture,
+                depthStencilView,
+                renderTargetView,
+                shaderResourceView,
+                unorderedAccessView
+            ), "Failed to create resource views");
+
+            tex.reset(new Texture3d(
+                texture,
+                depthStencilView,
+                renderTargetView,
+                shaderResourceView,
+                unorderedAccessView,
+                desc
+            ));
             return true;
         }
 
@@ -347,13 +477,8 @@ namespace p3d {
             std::unique_ptr <p3d::BufferI>& buffer
         ) {
             unsigned int bindFlags = 0;
-            for (auto bindFlag : desc.bindFlags) {
-                D3D11_BIND_FLAG d3dBindFlag;
-                P3D_ASSERT_R(convertBindFlag(bindFlag, d3dBindFlag),
-                    "Failed to convert bind flag to d3d11 equivalent");
+            P3D_ASSERT_R(convertBindFlags(desc.bindFlags, bindFlags), "Failed to convert bind flags");
 
-                bindFlags |= d3dBindFlag;
-            }
             UsageDesc usageDesc;
             P3D_ASSERT_R(convertUsageFlag(desc.usageFlag, usageDesc),
                 "Failed to convert usage flag to d3d11 equivalent");
@@ -446,6 +571,77 @@ namespace p3d {
             }
 
             return Utility::createInputLayout(_device, vsBlob, elementDesc, inputLayout);
+        }
+
+        bool RenderingDevice::convertBindFlags(
+            const std::vector<P3D_BIND_FLAG>& bindFlags, 
+            unsigned int& combinedBindFlags
+        ) {
+            unsigned int cBindFlags = 0;
+            for (auto bindFlag : bindFlags) {
+                D3D11_BIND_FLAG d3dBindFlag;
+                P3D_ASSERT_R(convertBindFlag(bindFlag, d3dBindFlag),
+                    "Failed to convert bind flag to d3d11 equivalent");
+
+                cBindFlags |= d3dBindFlag;
+            }
+            combinedBindFlags = cBindFlags;
+            return true;
+        }
+
+        bool RenderingDevice::fillSubresourceData(
+            const TextureDesc& desc, 
+            std::vector<D3D11_SUBRESOURCE_DATA>& subresData
+        ) {
+            unsigned int dataOffset = 0;
+            for (auto& texMipMaps : desc.surfaceMatrix) {
+                for (auto& surface : texMipMaps) {
+                    P3D_ASSERT_R(dataOffset + surface.surfaceSizeBytes <= desc.dataSize,
+                        "Data array out of bounds");
+
+                    subresData.push_back({
+                            desc.data + dataOffset,
+                            surface.rowSizeBytes,
+                            surface.slice2DSizeBytes
+                        });
+                    dataOffset += surface.surfaceSizeBytes;
+                }
+            }
+            return true;
+        }
+
+        bool RenderingDevice::createResourceViews(
+            const std::vector<P3D_BIND_FLAG>& bindFlags,
+            const ComPtr<ID3D11Resource> resource,
+            ComPtr<ID3D11DepthStencilView>& depthStencilView,
+            ComPtr<ID3D11RenderTargetView>& renderTargetView,
+            ComPtr<ID3D11ShaderResourceView>& shaderResourceView,
+            ComPtr<ID3D11UnorderedAccessView>& unorderedAccessView
+        ) {
+            for (auto bindFlag : bindFlags) {
+                switch (bindFlag) {
+                case P3D_BIND_DEPTH_STENCIL:
+                    P3D_ASSERT_R(Utility::createDepthStencilView(_device, resource, depthStencilView), 
+                        "Failed to create depth stencil view");
+                    break;
+                case P3D_BIND_RENDER_TARGET:
+                    P3D_ASSERT_R(Utility::createRenderTargetView(_device, resource, renderTargetView),
+                        "Failed to create render target view");
+                    break;
+                case P3D_BIND_SHADER_RESOURCE:
+                    P3D_ASSERT_R(Utility::createShaderResourceView(_device, resource, shaderResourceView),
+                        "Failed to create shader resource view");
+                    break;
+                case P3D_BIND_UNORDERED_ACCESS:
+                    P3D_ASSERT_R(Utility::createUnorderedAccessView(_device, resource, unorderedAccessView),
+                        "Failed to create unordered access view");
+                    break;
+                default:
+                    //do nothing
+                    break;
+                }
+            }
+            return true;
         }
     }
 }
