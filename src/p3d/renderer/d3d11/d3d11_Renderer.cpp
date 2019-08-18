@@ -1,4 +1,4 @@
-#include "d3d11_RenderingDevice.h"
+#include "d3d11_Renderer.h"
 #include "../../assert.h"
 #include "../dx/dx_ConstConvert.h"
 #include "d3d11_ConstConvert.h"
@@ -18,9 +18,9 @@
 
 namespace p3d {
     namespace d3d11 {
-        RenderingDevice::RenderingDevice() {}
+        Renderer::Renderer() {}
 
-        RenderingDevice::~RenderingDevice() {
+        Renderer::~Renderer() {
             if (_swapChain) Utility::setFullScreen(_swapChain, false);
 
             _swapChain = nullptr;
@@ -28,7 +28,7 @@ namespace p3d {
             _device = nullptr;
         }
 
-        bool RenderingDevice::initialize(
+        bool Renderer::initialize(
             HWND windowHandle,
             const unsigned int screenDim[2],
             unsigned int screenRefreshRate,
@@ -116,15 +116,15 @@ namespace p3d {
             return true;
         }
 
-        p3d::Texture2dArrayI& RenderingDevice::getRenderTargetBuff() {
+        p3d::Texture2dArrayI& Renderer::getRenderTargetBuff() {
             return _renderTargetBuff;
         }
 
-        p3d::Texture2dArrayI& RenderingDevice::getDepthStencilBuff() {
+        p3d::Texture2dArrayI& Renderer::getDepthStencilBuff() {
             return _depthStencilBuff;
         }
 
-        bool RenderingDevice::clearRenderTargetBuff(const p3d::Texture2dArrayI* renderTargetBuff, const float color[4]) {
+        bool Renderer::clearRenderTargetBuff(const p3d::Texture2dArrayI* renderTargetBuff, const float color[4]) {
             const d3d11::Texture2dArray* rtBuff = static_cast<const d3d11::Texture2dArray*>(renderTargetBuff);
             P3D_ASSERT_R(rtBuff->getRenderTargetView(), "Render target view is NULL");
 
@@ -132,7 +132,7 @@ namespace p3d {
             return true;
         }
 
-        bool RenderingDevice::clearDepthBuff(const p3d::Texture2dArrayI* depthStencilBuff, float depth) {
+        bool Renderer::clearDepthBuff(const p3d::Texture2dArrayI* depthStencilBuff, float depth) {
             const d3d11::Texture2dArray* dsBuff = static_cast<const d3d11::Texture2dArray*>(depthStencilBuff);
             P3D_ASSERT_R(dsBuff->getDepthStencilView(), "Depth stencil view is NULL");
 
@@ -140,7 +140,7 @@ namespace p3d {
             return true;
         }
 
-        bool RenderingDevice::clearStencilBuff(const p3d::Texture2dArrayI* depthStencilBuff, unsigned int stencil) {
+        bool Renderer::clearStencilBuff(const p3d::Texture2dArrayI* depthStencilBuff, unsigned int stencil) {
             const d3d11::Texture2dArray* dsBuff = static_cast<const d3d11::Texture2dArray*>(depthStencilBuff);
             P3D_ASSERT_R(dsBuff->getDepthStencilView(), "Depth stencil view is NULL");
 
@@ -150,7 +150,7 @@ namespace p3d {
             return true;
         }
 
-        bool RenderingDevice::clearDepthStencilBuff(
+        bool Renderer::clearDepthStencilBuff(
             const p3d::Texture2dArrayI* depthStencilBuff,
             float depth,
             unsigned int stencil) {
@@ -164,7 +164,7 @@ namespace p3d {
             return true;
         }
 
-        bool RenderingDevice::OMSetRenderTargets(
+        bool Renderer::OMSetRenderTargets(
             const p3d::Texture2dArrayI* renderTargetBuff,
             const p3d::Texture2dArrayI* depthStencilBuff
         ) {
@@ -178,19 +178,19 @@ namespace p3d {
             return true;
         }
 
-        bool RenderingDevice::IASetPrimitiveTopology(P3D_PRIMITIVE_TOPOLOGY tp) {
+        bool Renderer::IASetPrimitiveTopology(P3D_PRIMITIVE_TOPOLOGY tp) {
             _deviceContext->IASetPrimitiveTopology(convertPrimitiveTopology(tp));
             return true;
         }
 
-        bool RenderingDevice::VSSetShader(const p3d::VertexShaderI* vs) {
+        bool Renderer::VSSetShader(const p3d::VertexShaderI* vs) {
             const d3d11::VertexShader* d3d11vs = static_cast<const d3d11::VertexShader*>(vs);
             _deviceContext->VSSetShader(const_cast<ID3D11VertexShader*>(d3d11vs->getShader().Get()), nullptr, 0);
             _deviceContext->IASetInputLayout(const_cast<ID3D11InputLayout*>(d3d11vs->getInputLayout().Get()));
             return true;
         }
 
-        bool RenderingDevice::PSSetShader(const p3d::PixelShaderI* ps) {
+        bool Renderer::PSSetShader(const p3d::PixelShaderI* ps) {
             const d3d11::PixelShader* d3d11ps = static_cast<const d3d11::PixelShader*>(ps);
             _deviceContext->PSSetShader(const_cast<ID3D11PixelShader*>(d3d11ps->getShader().Get()), nullptr, 0);
             return true;
@@ -202,7 +202,7 @@ namespace p3d {
             return true;
         }*/
 
-        void RenderingDevice::RSSetViewport(const float topLeft[2], const float dimensions[2], const float minMaxDepth[2]) {
+        void Renderer::RSSetViewport(const float topLeft[2], const float dimensions[2], const float minMaxDepth[2]) {
             Utility::setViewPort(_deviceContext, topLeft, dimensions, minMaxDepth);
         }
 
@@ -234,19 +234,19 @@ namespace p3d {
             return true;
         }*/
 
-        void RenderingDevice::drawIndexed(unsigned int numIndices, unsigned int startIndex, unsigned int startVertex) {
+        void Renderer::drawIndexed(unsigned int numIndices, unsigned int startIndex, unsigned int startVertex) {
             _deviceContext->DrawIndexed(numIndices, startIndex, startVertex);
         }
 
-        void RenderingDevice::draw(unsigned int vertexCount, unsigned int vertexStartLocation) {
+        void Renderer::draw(unsigned int vertexCount, unsigned int vertexStartLocation) {
             _deviceContext->Draw(vertexCount, vertexStartLocation);
         }
 
-        void RenderingDevice::renderFrame() {
+        void Renderer::renderFrame() {
             _swapChain->Present(0, 0);
         }
 
-        bool RenderingDevice::createTexture1dArray(
+        bool Renderer::createTexture1dArray(
             const TextureDesc& desc,
             std::unique_ptr <p3d::Texture1dArrayI>& tex
         ) {
@@ -305,7 +305,7 @@ namespace p3d {
             return true;
         }
 
-        bool RenderingDevice::createTexture2dArray(
+        bool Renderer::createTexture2dArray(
             const TextureDesc& desc,
             std::unique_ptr <p3d::Texture2dArrayI>& tex) {
 
@@ -375,7 +375,7 @@ namespace p3d {
             return true;
         }
 
-        bool RenderingDevice::createTexture3d(
+        bool Renderer::createTexture3d(
             const TextureDesc& desc,
             std::unique_ptr <p3d::Texture3dI>& tex
         ) {
@@ -433,7 +433,7 @@ namespace p3d {
             return true;
         }
 
-        bool RenderingDevice::createVertexShader(
+        bool Renderer::createVertexShader(
             const VertexShaderDesc& desc,
             std::unique_ptr <p3d::VertexShaderI>& vs) {
 
@@ -453,7 +453,7 @@ namespace p3d {
             return true;
         }
 
-        bool RenderingDevice::createPixelShader(
+        bool Renderer::createPixelShader(
             const PixelShaderDesc& desc,
             std::unique_ptr <p3d::PixelShaderI>& ps) {
 
@@ -528,7 +528,7 @@ namespace p3d {
             return true;
         }*/
 
-        bool RenderingDevice::createInputLayout(
+        bool Renderer::createInputLayout(
             const std::vector<VertexShaderDesc::InputElementDesc>& inputDesc,
             ComPtr<ID3DBlob> vsBlob,
             ComPtr<ID3D11InputLayout>& inputLayout
@@ -571,7 +571,7 @@ namespace p3d {
             return Utility::createInputLayout(_device, vsBlob, elementDesc, inputLayout);
         }
 
-        bool RenderingDevice::convertBindFlags(
+        bool Renderer::convertBindFlags(
             const std::vector<P3D_BIND_FLAG>& bindFlags, 
             unsigned int& combinedBindFlags
         ) {
@@ -587,7 +587,7 @@ namespace p3d {
             return true;
         }
 
-        bool RenderingDevice::fillSubresourceData(
+        bool Renderer::fillSubresourceData(
             const TextureDesc& desc, 
             std::vector<D3D11_SUBRESOURCE_DATA>& subresData
         ) {
@@ -608,7 +608,7 @@ namespace p3d {
             return true;
         }
 
-        bool RenderingDevice::createResourceViews(
+        bool Renderer::createResourceViews(
             const std::vector<P3D_BIND_FLAG>& bindFlags,
             const ComPtr<ID3D11Resource> resource,
             ComPtr<ID3D11DepthStencilView>& depthStencilView,

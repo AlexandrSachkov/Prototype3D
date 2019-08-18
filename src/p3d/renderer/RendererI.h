@@ -10,7 +10,7 @@
 #include <memory>
 
 namespace p3d {
-    class RenderingDeviceI {
+    class RendererI {
     public:
         virtual void renderFrame() = 0;
 

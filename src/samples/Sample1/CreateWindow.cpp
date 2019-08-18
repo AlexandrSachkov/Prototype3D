@@ -1,13 +1,13 @@
 #include "p3d/util/util_DefaultSampleRunner.h"
 
 #include "p3d/assert.h"
-#include "p3d/device/d3d11/d3d11_RenderingDevice.h"
-#include "p3d/device/RenderingDeviceI.h"
-#include "p3d/device/Texture1dArrayI.h"
-#include "p3d/device/Texture2dArrayI.h"
-#include "p3d/device/Texture3dI.h"
-#include "p3d/device/VertexShaderI.h"
-#include "p3d/device/PixelShaderI.h"
+#include "p3d/renderer/d3d11/d3d11_Renderer.h"
+#include "p3d/renderer/RendererI.h"
+#include "p3d/renderer/Texture1dArrayI.h"
+#include "p3d/renderer/Texture2dArrayI.h"
+#include "p3d/renderer/Texture3dI.h"
+#include "p3d/renderer/VertexShaderI.h"
+#include "p3d/renderer/PixelShaderI.h"
 #include "p3d/Constants.h"
 
 #include "glm/vec3.hpp"
@@ -24,9 +24,8 @@ bool run() {
     P3D_ASSERT_R(sampleRunner.initialize(winTitle, windowDim, fullscreen, true, false, true),
         "Failed to initialize window manager");
 
-    std::unique_ptr<p3d::RenderingDeviceI> device = nullptr;
-    p3d::d3d11::RenderingDevice* d3d11_device = new p3d::d3d11::RenderingDevice();
-    P3D_ASSERT_R(d3d11_device->initialize(
+    std::unique_ptr <p3d::d3d11::Renderer> d3d11Renderer(new p3d::d3d11::Renderer());
+    P3D_ASSERT_R(d3d11Renderer->initialize(
         sampleRunner.getWindowHandle(),
         windowDim,
         60, // refresh rate
@@ -34,8 +33,8 @@ bool run() {
         1,  // number of back buffers (1 for double buffering, 2 for tripple)
         fullscreen
     ), "Failed to initialize D3D11 device");
-    device.reset(d3d11_device);
 
+    std::unique_ptr<p3d::RendererI> device(d3d11Renderer.release());
     sampleRunner.setRunProcedure([&]() {
         device->renderFrame();
     });

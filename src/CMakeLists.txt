@@ -27,24 +27,24 @@ SET(HEADERS
     p3d/util/util_DefaultSampleRunner.h
     p3d/util/util_DDSTextureLoader.h
     
-    p3d/device/d3d11/d3d11_ConstConvert.h
-    p3d/device/d3d11/d3d11_PixelShader.h
-    p3d/device/d3d11/d3d11_RenderingDevice.h
-    p3d/device/d3d11/d3d11_Texture1dArray.h
-    p3d/device/d3d11/d3d11_Texture2dArray.h
-    p3d/device/d3d11/d3d11_Texture3d.h
-    p3d/device/d3d11/d3d11_Utility.h
-    p3d/device/d3d11/d3d11_VertexShader.h
+    p3d/renderer/d3d11/d3d11_ConstConvert.h
+    p3d/renderer/d3d11/d3d11_PixelShader.h
+    p3d/renderer/d3d11/d3d11_Renderer.h
+    p3d/renderer/d3d11/d3d11_Texture1dArray.h
+    p3d/renderer/d3d11/d3d11_Texture2dArray.h
+    p3d/renderer/d3d11/d3d11_Texture3d.h
+    p3d/renderer/d3d11/d3d11_Utility.h
+    p3d/renderer/d3d11/d3d11_VertexShader.h
     
-    p3d/device/dx/dx_ComPtr.h
-    p3d/device/dx/dx_ConstConvert.h
+    p3d/renderer/dx/dx_ComPtr.h
+    p3d/renderer/dx/dx_ConstConvert.h
     
-    p3d/device/PixelShaderI.h
-    p3d/device/RenderingDeviceI.h
-    p3d/device/Texture1dArrayI.h
-    p3d/device/Texture2dArrayI.h
-    p3d/device/Texture3dI.h
-    p3d/device/VertexShaderI.h
+    p3d/renderer/PixelShaderI.h
+    p3d/renderer/RendererI.h
+    p3d/renderer/Texture1dArrayI.h
+    p3d/renderer/Texture2dArrayI.h
+    p3d/renderer/Texture3dI.h
+    p3d/renderer/VertexShaderI.h
     
     p3d/Constants.h
     p3d/ResourceDescriptions.h
@@ -56,16 +56,16 @@ SET(SOURCES
     p3d/util/util_DefaultSampleRunner.cpp
     p3d/util/util_DDSTextureLoader.cpp
     
-    p3d/device/d3d11/d3d11_ConstConvert.cpp
-    p3d/device/d3d11/d3d11_PixelShader.cpp
-    p3d/device/d3d11/d3d11_RenderingDevice.cpp
-    p3d/device/d3d11/d3d11_Texture1dArray.cpp
-    p3d/device/d3d11/d3d11_Texture2dArray.cpp
-    p3d/device/d3d11/d3d11_Texture3d.cpp
-    p3d/device/d3d11/d3d11_Utility.cpp
-    p3d/device/d3d11/d3d11_VertexShader.cpp
+    p3d/renderer/d3d11/d3d11_ConstConvert.cpp
+    p3d/renderer/d3d11/d3d11_PixelShader.cpp
+    p3d/renderer/d3d11/d3d11_Renderer.cpp
+    p3d/renderer/d3d11/d3d11_Texture1dArray.cpp
+    p3d/renderer/d3d11/d3d11_Texture2dArray.cpp
+    p3d/renderer/d3d11/d3d11_Texture3d.cpp
+    p3d/renderer/d3d11/d3d11_Utility.cpp
+    p3d/renderer/d3d11/d3d11_VertexShader.cpp
 
-    p3d/device/dx/dx_ConstConvert.cpp
+    p3d/renderer/dx/dx_ConstConvert.cpp
 
     p3d/Constants.cpp
     )

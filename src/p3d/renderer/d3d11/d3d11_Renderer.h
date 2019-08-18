@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../RenderingDeviceI.h"
+#include "../RendererI.h"
 #include "../../ResourceDescriptions.h"
 #include "../Texture1dArrayI.h"
 #include "../Texture2dArrayI.h"
@@ -16,10 +16,10 @@
 
 namespace p3d {
     namespace d3d11 {
-        class RenderingDevice : public p3d::RenderingDeviceI {
+        class Renderer : public p3d::RendererI {
         public:
-            RenderingDevice();
-            ~RenderingDevice();
+            Renderer();
+            ~Renderer();
 
             bool initialize(
                 HWND windowHandle,
@@ -84,10 +84,10 @@ namespace p3d {
             void drawIndexed(unsigned int numIndices, unsigned int startIndex, unsigned int startVertex);
             void draw(unsigned int vertexCount, unsigned int vertexStartLocation);
 
-            RenderingDevice(RenderingDevice const&) = delete;
-            RenderingDevice(RenderingDevice&&) = delete;
-            RenderingDevice& operator=(RenderingDevice const&) = delete;
-            RenderingDevice& operator=(RenderingDevice &&) = delete;
+            Renderer(Renderer const&) = delete;
+            Renderer(Renderer&&) = delete;
+            Renderer& operator=(Renderer const&) = delete;
+            Renderer& operator=(Renderer &&) = delete;
 
             bool createInputLayout(
                 const std::vector<VertexShaderDesc::InputElementDesc>& inputDesc,
