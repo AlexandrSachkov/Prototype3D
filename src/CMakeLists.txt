@@ -27,10 +27,8 @@ SET(HEADERS
     p3d/util/util_DefaultSampleRunner.h
     p3d/util/util_DDSTextureLoader.h
     
-    p3d/device/d3d11/d3d11_Buffer.h
     p3d/device/d3d11/d3d11_ConstConvert.h
     p3d/device/d3d11/d3d11_PixelShader.h
-    p3d/device/d3d11/d3d11_Rasterizer.h
     p3d/device/d3d11/d3d11_RenderingDevice.h
     p3d/device/d3d11/d3d11_Texture1dArray.h
     p3d/device/d3d11/d3d11_Texture2dArray.h
@@ -41,10 +39,7 @@ SET(HEADERS
     p3d/device/dx/dx_ComPtr.h
     p3d/device/dx/dx_ConstConvert.h
     
-    p3d/device/BufferI.h
     p3d/device/PixelShaderI.h
-    p3d/device/RasterizerI.h
-    p3d/device/RenderingDevice.h
     p3d/device/RenderingDeviceI.h
     p3d/device/Texture1dArrayI.h
     p3d/device/Texture2dArrayI.h
@@ -61,10 +56,8 @@ SET(SOURCES
     p3d/util/util_DefaultSampleRunner.cpp
     p3d/util/util_DDSTextureLoader.cpp
     
-    p3d/device/d3d11/d3d11_Buffer.cpp
     p3d/device/d3d11/d3d11_ConstConvert.cpp
     p3d/device/d3d11/d3d11_PixelShader.cpp
-    p3d/device/d3d11/d3d11_Rasterizer.cpp
     p3d/device/d3d11/d3d11_RenderingDevice.cpp
     p3d/device/d3d11/d3d11_Texture1dArray.cpp
     p3d/device/d3d11/d3d11_Texture2dArray.cpp
@@ -79,50 +72,50 @@ SET(SOURCES
 
 
 # GLFW
-SET(NLE_GLFW_INCLUDE_PATH
-    "" CACHE PATH "NLE GLFW include path")
+SET(P3D_GLFW_INCLUDE_PATH
+    "" CACHE PATH "P3D GLFW include path")
 
-IF(NLE_GLFW_INCLUDE_PATH STREQUAL "")
-    MESSAGE(SEND_ERROR "NLE GLFW include path must be specified")
-ENDIF(NLE_GLFW_INCLUDE_PATH STREQUAL "")
+IF(P3D_GLFW_INCLUDE_PATH STREQUAL "")
+    MESSAGE(SEND_ERROR "P3D GLFW include path must be specified")
+ENDIF(P3D_GLFW_INCLUDE_PATH STREQUAL "")
 
-SET(NLE_GLFW_LIBRARY_DEBUG_PATH
-    "" CACHE PATH "NLE GLFW library debug path")
+SET(P3D_GLFW_LIBRARY_DEBUG_PATH
+    "" CACHE PATH "P3D GLFW library debug path")
 
-IF(NLE_GLFW_LIBRARY_DEBUG_PATH STREQUAL "")
-    MESSAGE(SEND_ERROR "NLE GLFW library debug path must be specified")
-ENDIF(NLE_GLFW_LIBRARY_DEBUG_PATH STREQUAL "")
+IF(P3D_GLFW_LIBRARY_DEBUG_PATH STREQUAL "")
+    MESSAGE(SEND_ERROR "P3D GLFW library debug path must be specified")
+ENDIF(P3D_GLFW_LIBRARY_DEBUG_PATH STREQUAL "")
 
-SET(NLE_GLFW_LIBRARY_RELEASE_PATH
-    "" CACHE PATH "NLE GLFW library release path")
+SET(P3D_GLFW_LIBRARY_RELEASE_PATH
+    "" CACHE PATH "P3D GLFW library release path")
 
-IF(NLE_GLFW_LIBRARY_RELEASE_PATH STREQUAL "")
-    MESSAGE(SEND_ERROR "NLE GLFW library release path must be specified")
-ENDIF(NLE_GLFW_LIBRARY_RELEASE_PATH STREQUAL "")
+IF(P3D_GLFW_LIBRARY_RELEASE_PATH STREQUAL "")
+    MESSAGE(SEND_ERROR "P3D GLFW library release path must be specified")
+ENDIF(P3D_GLFW_LIBRARY_RELEASE_PATH STREQUAL "")
 
 
 
 # D3D11
-SET(NLE_D3D11_INCLUDE_PATH
-"" CACHE PATH "NLE D3D11 include path")
+SET(P3D_D3D11_INCLUDE_PATH
+"" CACHE PATH "P3D D3D11 include path")
 
-IF(NLE_D3D11_INCLUDE_PATH STREQUAL "")
-    MESSAGE(SEND_ERROR "NLE D3D11 include path must be specified")
-ENDIF(NLE_D3D11_INCLUDE_PATH STREQUAL "")
+IF(P3D_D3D11_INCLUDE_PATH STREQUAL "")
+    MESSAGE(SEND_ERROR "P3D D3D11 include path must be specified")
+ENDIF(P3D_D3D11_INCLUDE_PATH STREQUAL "")
 
-SET(NLE_D3D11_LIBRARY_DEBUG_PATH
-    "" CACHE PATH "NLE D3D11 library debug path")
+SET(P3D_D3D11_LIBRARY_DEBUG_PATH
+    "" CACHE PATH "P3D D3D11 library debug path")
 
-IF(NLE_D3D11_LIBRARY_DEBUG_PATH STREQUAL "")
-    MESSAGE(SEND_ERROR "NLE D3D11 library debug path must be specified")
-ENDIF(NLE_D3D11_LIBRARY_DEBUG_PATH STREQUAL "")
+IF(P3D_D3D11_LIBRARY_DEBUG_PATH STREQUAL "")
+    MESSAGE(SEND_ERROR "P3D D3D11 library debug path must be specified")
+ENDIF(P3D_D3D11_LIBRARY_DEBUG_PATH STREQUAL "")
 
-SET(NLE_D3D11_LIBRARY_RELEASE_PATH
-    "" CACHE PATH "NLE D3D11 library release path")
+SET(P3D_D3D11_LIBRARY_RELEASE_PATH
+    "" CACHE PATH "P3D D3D11 library release path")
 
-IF(NLE_D3D11_LIBRARY_RELEASE_PATH STREQUAL "")
-    MESSAGE(SEND_ERROR "NLE D3D11 library release path must be specified")
-ENDIF(NLE_D3D11_LIBRARY_RELEASE_PATH STREQUAL "")
+IF(P3D_D3D11_LIBRARY_RELEASE_PATH STREQUAL "")
+    MESSAGE(SEND_ERROR "P3D D3D11 library release path must be specified")
+ENDIF(P3D_D3D11_LIBRARY_RELEASE_PATH STREQUAL "")
 
 
 
@@ -158,22 +151,21 @@ SET(HEADERS
 
 
 INCLUDE_DIRECTORIES(
-    ${NLE_GLFW_INCLUDE_PATH}
-    ${NLE_D3D11_INCLUDE_PATH}
+    ${P3D_GLFW_INCLUDE_PATH}
+    ${P3D_D3D11_INCLUDE_PATH}
     ${P3D_GLM_INCLUDE_PATH}
     )
 
 ADD_DEFINITIONS(
-    -DP3D_API_D3D11
     -DP3D_ASSERT_ENABLE_DEBUG_BREAK
     -DP3D_ASSERT_ENABLE_ERROR_PRINT
     )
 
 LINK_DIRECTORIES(
-    ${NLE_GLFW_LIBRARY_DEBUG_PATH}
-    ${NLE_GLFW_LIBRARY_RELEASE_PATH}
-    ${NLE_D3D11_LIBRARY_DEBUG_PATH}
-    ${NLE_D3D11_LIBRARY_RELEASE_PATH}
+    ${P3D_GLFW_LIBRARY_DEBUG_PATH}
+    ${P3D_GLFW_LIBRARY_RELEASE_PATH}
+    ${P3D_D3D11_LIBRARY_DEBUG_PATH}
+    ${P3D_D3D11_LIBRARY_RELEASE_PATH}
     )
 
 add_library (P3D STATIC

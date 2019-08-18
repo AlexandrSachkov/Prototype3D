@@ -9,8 +9,6 @@
 #include "d3d11_Texture3d.h"
 #include "d3d11_VertexShader.h"
 #include "d3d11_PixelShader.h"
-#include "d3d11_Buffer.h"
-#include "d3d11_Rasterizer.h"
 
 //#include "DDSTextureLoader.h"
 
@@ -198,17 +196,17 @@ namespace p3d {
             return true;
         }
 
-        bool RenderingDevice::RSSetState(const p3d::RasterizerI* rast) {
+        /*bool RenderingDevice::RSSetState(const p3d::RasterizerI* rast) {
             const d3d11::Rasterizer* d3d11rast = static_cast<const d3d11::Rasterizer*>(rast);
             _deviceContext->RSSetState(const_cast<ID3D11RasterizerState*>(d3d11rast->getRasterizer().Get()));
             return true;
-        }
+        }*/
 
         void RenderingDevice::RSSetViewport(const float topLeft[2], const float dimensions[2], const float minMaxDepth[2]) {
             Utility::setViewPort(_deviceContext, topLeft, dimensions, minMaxDepth);
         }
 
-        bool RenderingDevice::IASetVertexBuffer(
+        /*bool RenderingDevice::IASetVertexBuffer(
             const p3d::BufferI* vBuff,
             unsigned int offset,
             unsigned int slot
@@ -234,7 +232,7 @@ namespace p3d {
                 elemSizeBits / 8 * offset
             );
             return true;
-        }
+        }*/
 
         void RenderingDevice::drawIndexed(unsigned int numIndices, unsigned int startIndex, unsigned int startVertex) {
             _deviceContext->DrawIndexed(numIndices, startIndex, startVertex);
@@ -244,7 +242,7 @@ namespace p3d {
             _deviceContext->Draw(vertexCount, vertexStartLocation);
         }
 
-        void RenderingDevice::presentFrame() {
+        void RenderingDevice::renderFrame() {
             _swapChain->Present(0, 0);
         }
 
@@ -472,7 +470,7 @@ namespace p3d {
             return true;
         }
 
-        bool RenderingDevice::createBuffer(
+        /*bool RenderingDevice::createBuffer(
             const BufferDesc& desc,
             std::unique_ptr <p3d::BufferI>& buffer
         ) {
@@ -528,7 +526,7 @@ namespace p3d {
 
             rasterizer.reset(new Rasterizer(rs, desc));
             return true;
-        }
+        }*/
 
         bool RenderingDevice::createInputLayout(
             const std::vector<VertexShaderDesc::InputElementDesc>& inputDesc,
