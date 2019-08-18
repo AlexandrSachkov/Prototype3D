@@ -1,14 +1,13 @@
 #include "p3d/util/util_DefaultSampleRunner.h"
 
 #include "p3d/assert.h"
+#include "p3d/device/d3d11/d3d11_RenderingDevice.h"
 #include "p3d/device/RenderingDeviceI.h"
 #include "p3d/device/Texture1dArrayI.h"
 #include "p3d/device/Texture2dArrayI.h"
 #include "p3d/device/Texture3dI.h"
 #include "p3d/device/VertexShaderI.h"
 #include "p3d/device/PixelShaderI.h"
-#include "p3d/device/BufferI.h"
-#include "p3d/device/RasterizerI.h"
 #include "p3d/Constants.h"
 
 #include "glm/vec3.hpp"
@@ -25,9 +24,7 @@ bool run() {
     P3D_ASSERT_R(sampleRunner.initialize(winTitle, windowDim, fullscreen, true, false, true),
         "Failed to initialize window manager");
 
-
     std::unique_ptr<p3d::RenderingDeviceI> device = nullptr;
-#ifdef P3D_API_D3D11 
     p3d::d3d11::RenderingDevice* d3d11_device = new p3d::d3d11::RenderingDevice();
     P3D_ASSERT_R(d3d11_device->initialize(
         sampleRunner.getWindowHandle(),
@@ -38,18 +35,9 @@ bool run() {
         fullscreen
     ), "Failed to initialize D3D11 device");
     device.reset(d3d11_device);
-#endif
-
-    p3d::Texture2dArrayI& renderTargetBuff = device->getRenderTargetBuff();
-    p3d::Texture2dArrayI& depthStencilBuff = device->getDepthStencilBuff();
-    device->OMSetRenderTargets(&renderTargetBuff, &depthStencilBuff);
 
     sampleRunner.setRunProcedure([&]() {
-        const float color[] = { 0.0f, 1.0f, 0.0f, 1.0f };
-        device->clearRenderTargetBuff(&renderTargetBuff, color);
-        device->clearDepthStencilBuff(&depthStencilBuff, 1.0f, 0);
-
-        device->presentFrame();
+        device->renderFrame();
     });
     sampleRunner.start();
 
