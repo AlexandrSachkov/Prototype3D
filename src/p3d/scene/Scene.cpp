@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include "../common/p3d_Uuid.h"
 
 namespace p3d {
     Scene::Scene(
@@ -25,15 +26,33 @@ namespace p3d {
     }
 
     HTexture2dArr Scene::create(const TextureDesc& desc) {
-        return HTexture2dArr();
+        auto tex2dArr = _resProvider->createTexture2dArray(desc);
+        if (nullptr == tex2dArr) {
+            return HTexture2dArr();
+        }
+
+        HResource hres = _textures2dArr.insert(tex2dArr, desc, genUUID());
+        return HTexture2dArr(hres.buffPosition, hres.uuid);
     }
 
     HVertexShader Scene::create(const VertexShaderDesc& desc) {
-        return HVertexShader();
+        auto vs = _resProvider->createVertexShader(desc);
+        if (nullptr == vs) {
+            return HVertexShader();
+        }
+
+        HResource hres = _vertexShaders.insert(vs, desc, genUUID());
+        return HVertexShader(hres.buffPosition, hres.uuid);
     }
 
     HPixelShader Scene::create(const PixelShaderDesc& desc) {
-        return HPixelShader();
+        auto ps = _resProvider->createPixelShader(desc);
+        if (nullptr == ps) {
+            return HPixelShader();
+        }
+
+        HResource hres = _pixelShaders.insert(ps, desc, genUUID());
+        return HPixelShader(hres.buffPosition, hres.uuid);
     }
 
     const ModelDesc* Scene::get(HModel handle) const {

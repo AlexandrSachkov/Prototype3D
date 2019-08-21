@@ -45,5 +45,9 @@ namespace p3d {
     private:
         GPUResourceProviderI* _resProvider;
         std::unique_ptr<SpacePartitionerI> _spacePartitioner;
+
+        ResourceBank<p3d::Texture2dArrayI*, TextureDesc> _textures2dArr;
+        ResourceBank<p3d::VertexShaderI*, VertexShaderDesc> _vertexShaders;
+        ResourceBank<p3d::PixelShaderI*, PixelShaderDesc> _pixelShaders;
     };
 }

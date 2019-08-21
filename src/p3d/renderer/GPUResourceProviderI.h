@@ -13,29 +13,24 @@ namespace p3d {
     public:
         virtual ~GPUResourceProviderI() {}
 
-        virtual bool createTexture1dArray(
-            const TextureDesc& desc,
-            std::unique_ptr <p3d::Texture1dArrayI>& tex
+        virtual p3d::Texture1dArrayI* createTexture1dArray(
+            const TextureDesc& desc
         ) = 0;
 
-        virtual bool createTexture2dArray(
-            const TextureDesc& desc,
-            std::unique_ptr <p3d::Texture2dArrayI>& tex
+        virtual p3d::Texture2dArrayI* createTexture2dArray(
+            const TextureDesc& desc
         ) = 0;
 
-        virtual bool createTexture3d(
-            const TextureDesc& desc,
-            std::unique_ptr <p3d::Texture3dI>& tex
+        virtual p3d::Texture3dI* createTexture3d(
+            const TextureDesc& desc
         ) = 0;
 
-        virtual bool createVertexShader(
-            const VertexShaderDesc& desc,
-            std::unique_ptr <p3d::VertexShaderI>& vs
+        virtual p3d::VertexShaderI* createVertexShader(
+            const VertexShaderDesc& desc
         ) = 0;
 
-        virtual bool createPixelShader(
-            const PixelShaderDesc& desc,
-            std::unique_ptr <p3d::PixelShaderI>& ps
+        virtual p3d::PixelShaderI* createPixelShader(
+            const PixelShaderDesc& desc
         ) = 0;
     };
 }

@@ -1,19 +1,21 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 #include "../ResourceHandles.h"
+#include "../common/p3d_Uuid.h"
 
 namespace p3d {
     template <typename Res, typename Desc>
     class ResourceBank {
     public:
-        bool insert(const Res& res, const Desc& desc, unsigned long long uuid) {
-            for (size_t i = 0; i < _uuids.size(); i++) {
+        HResource insert(const Res& res, const Desc& desc, UUID uuid) {
+            for (unsigned int i = 0; i < _uuids.size(); i++) {
                 if (_uuids[i] == 0) {
                     _resources[i] = res;
                     _descriptions[i] = desc;
                     _uuids[i] = uuid;
-                    return true;
+                    return HResource(i, uuid);
                 }
             }
 
@@ -21,10 +23,10 @@ namespace p3d {
                 _resources.emplace_back(res);
                 _descriptions.emplace_back(desc);
                 _uuids.emplace_back(uuid);
-            } catch (std::bad_alloc& e) {
-                return false;
+            } catch (std::bad_alloc&) {
+                return HResource();
             }
-            return true;
+            return HResource((unsigned int)(_uuids.size() - 1), uuid);
         }
 
         const Res* getResource(HResource handle) {
@@ -32,7 +34,7 @@ namespace p3d {
                 return false;
             }
 
-            return &_resources[handle.buffPosition];
+            return _resources[handle.buffPosition].get();
         }
 
         const Desc* getDesc(HResource handle) {
@@ -57,11 +59,12 @@ namespace p3d {
                 return false;
             }
 
+            _resources[handle.buffPosition].release();
             _uuids[handle.buffPosition] = 0;
         }
     private:
         std::vector<Res> _resources;
         std::vector<Desc> _descriptions;
-        std::vector<unsigned long long> _uuids;
+        std::vector<UUID> _uuids;
     };
 }
