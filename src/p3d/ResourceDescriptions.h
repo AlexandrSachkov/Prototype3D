@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Constants.h"
+#include "ResourceHandles.h"
 
 #include <vector>
 #include <string>
@@ -52,5 +53,18 @@ namespace p3d {
         P3D_FILL_MODE fillMode;
         P3D_CULL_MODE cullMode;
         bool frontCounterClockwise;
+    };
+
+    struct ModelDesc {
+        HMesh mesh;
+        HMaterial material;
+    };
+
+    struct MeshDesc {
+
+    };
+
+    struct MaterialDesc {
+
     };
 }
