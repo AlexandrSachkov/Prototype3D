@@ -15,12 +15,12 @@ namespace p3d {
         virtual HVertexShader create(const VertexShaderDesc& desc) = 0;
         virtual HPixelShader create(const PixelShaderDesc& desc) = 0;
 
-        virtual bool get(HModel handle, ModelDesc& desc) const = 0;
-        virtual bool get(HMesh handle, MeshDesc& desc) const = 0;
-        virtual bool get(HMaterial handle, MaterialDesc& desc) const = 0;
-        virtual bool get(HTexture2dArr handle, TextureDesc& desc) const = 0;
-        virtual bool get(HVertexShader handle, VertexShaderDesc& desc) const = 0;
-        virtual bool get(HPixelShader handle, PixelShaderDesc& desc) const = 0;
+        virtual const ModelDesc* get(HModel handle) const = 0;
+        virtual const MeshDesc* get(HMesh handle) const = 0;
+        virtual const MaterialDesc* get(HMaterial handle) const = 0;
+        virtual const TextureDesc* get(HTexture2dArr handle) const = 0;
+        virtual const VertexShaderDesc* get(HVertexShader handle) const = 0;
+        virtual const PixelShaderDesc* get(HPixelShader handle) const = 0;
 
         virtual bool update(HModel handle, const ModelDesc& desc) = 0;
         virtual bool update(HMesh handle, const MeshDesc& desc) = 0;

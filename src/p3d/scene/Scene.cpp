@@ -36,28 +36,28 @@ namespace p3d {
         return HPixelShader();
     }
 
-    bool Scene::get(HModel handle, ModelDesc& desc) const {
-        return false;
+    const ModelDesc* Scene::get(HModel handle) const {
+        return nullptr;
     }
 
-    bool Scene::get(HMesh handle, MeshDesc& desc) const {
-        return false;
+    const MeshDesc* Scene::get(HMesh handle) const {
+        return nullptr;
     }
 
-    bool Scene::get(HMaterial handle, MaterialDesc& desc) const {
-        return false;
+    const MaterialDesc* Scene::get(HMaterial handle) const {
+        return nullptr;
     }
 
-    bool Scene::get(HTexture2dArr handle, TextureDesc& desc) const {
-        return false;
+    const TextureDesc* Scene::get(HTexture2dArr handle) const {
+        return nullptr;
     }
 
-    bool Scene::get(HVertexShader handle, VertexShaderDesc& desc) const {
-        return false;
+    const VertexShaderDesc* Scene::get(HVertexShader handle) const {
+        return nullptr;
     }
 
-    bool Scene::get(HPixelShader handle, PixelShaderDesc& desc) const {
-        return false;
+    const PixelShaderDesc* Scene::get(HPixelShader handle) const {
+        return nullptr;
     }
 
     bool Scene::update(HModel handle, const ModelDesc& desc) {

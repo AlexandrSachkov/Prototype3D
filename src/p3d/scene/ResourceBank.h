@@ -27,22 +27,20 @@ namespace p3d {
             return true;
         }
 
-        bool getResource(HResource handle, Res& res) {
+        const Res* getResource(HResource handle) {
             if (handle.uuid != _uuids[handle.buffPosition]) {
                 return false;
             }
 
-            res = _resources[handle.buffPosition];
-            return true;
+            return &_resources[handle.buffPosition];
         }
 
-        bool getDesc(HResource handle, Desc& desc) {
+        const Desc* getDesc(HResource handle) {
             if (handle.uuid != _uuids[handle.buffPosition]) {
                 return false;
             }
 
-            desc = _descriptions[handle.buffPosition];
-            return true;
+            return &_descriptions[handle.buffPosition];
         }
 
         bool update(HResource handle, const Res& res, const Desc& desc) {

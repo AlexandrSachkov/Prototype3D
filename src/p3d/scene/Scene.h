@@ -21,12 +21,12 @@ namespace p3d {
         HVertexShader create(const VertexShaderDesc& desc) override;
         HPixelShader create(const PixelShaderDesc& desc) override;
 
-        bool get(HModel handle, ModelDesc& desc) const override;
-        bool get(HMesh handle, MeshDesc& desc) const override;
-        bool get(HMaterial handle, MaterialDesc& desc) const override;
-        bool get(HTexture2dArr handle, TextureDesc& desc) const override;
-        bool get(HVertexShader handle, VertexShaderDesc& desc) const override;
-        bool get(HPixelShader handle, PixelShaderDesc& desc) const override;
+        const ModelDesc* get(HModel handle) const override;
+        const MeshDesc* get(HMesh handle) const override;
+        const MaterialDesc* get(HMaterial handle) const override;
+        const TextureDesc* get(HTexture2dArr handle) const override;
+        const VertexShaderDesc* get(HVertexShader handle) const override;
+        const PixelShaderDesc* get(HPixelShader handle) const override;
 
         bool update(HModel handle, const ModelDesc& desc) override;
         bool update(HMesh handle, const MeshDesc& desc) override;
