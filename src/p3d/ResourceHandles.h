@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common/p3d_Uuid.h"
+#include "common/Uuid.h"
 
 namespace p3d {
     enum class SCENE_OBJECT_TYPE {

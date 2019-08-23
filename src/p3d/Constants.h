@@ -163,6 +163,22 @@ namespace p3d {
         P3D_CULL_BACK
     };
 
+    enum P3D_BLEND_MODE {
+        P3D_BLEND_ADD,
+        P3D_BLEND_SUBTRACT,
+        P3D_BLEND_MULTIPLY,
+        P3D_BLEND_DIVIDE,
+        P3D_BLEND_SMOOTH_ADD,
+        P3D_BLEND_SIGNED_ADD
+    };
+
+    enum TEX_MAP_MODE {
+        TEX_MAP_WRAP,
+        TEX_MAP_CLAMP,
+        TEX_MAP_DECAL,
+        TEX_MAP_MIRROR
+    };
+
     enum P3D_PRIMITIVE_TOPOLOGY {
         P3D_PRIMITIVE_TOPOLOGY_UNDEFINED,
         P3D_PRIMITIVE_TOPOLOGY_POINTLIST,

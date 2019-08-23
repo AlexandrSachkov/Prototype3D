@@ -3,6 +3,9 @@
 #include "Constants.h"
 #include "ResourceHandles.h"
 
+#include "glm/vec3.hpp"
+#include "glm/vec4.hpp"
+
 #include <vector>
 #include <string>
 
@@ -61,10 +64,47 @@ namespace p3d {
     };
 
     struct MeshDesc {
+        glm::vec3* positions = nullptr;
+        unsigned int positionsSize = 0;
 
+        glm::vec3* indexes = nullptr;
+        unsigned int indexesSize = 0;
+        P3D_PRIMITIVE_TOPOLOGY topology = P3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
+
+        glm::vec4* colors = nullptr;
+        unsigned int colorsSize = 0;
+
+        glm::vec3* texCoords = nullptr;
+        unsigned int texCoordsSize = 0;
+
+        glm::vec3* normals = nullptr;
+        unsigned int normalsSize = 0;
+
+        glm::vec3* tangents = nullptr;
+        unsigned int tangentsSize = 0;
     };
 
     struct MaterialDesc {
+        glm::vec3 diffuseColor = {0.0f,0.0f,0.0f};
+        HTexture2dArr diffuseTex;
+        TEX_MAP_MODE diffuseMapMode = TEX_MAP_CLAMP;
 
+        glm::vec3 normalColor = { 0.0f,0.0f,0.0f };
+        HTexture2dArr normalTex;
+        TEX_MAP_MODE normalMapMode = TEX_MAP_CLAMP;
+
+        glm::vec3 transparencyColor = { 0.0f,0.0f,0.0f };
+        HTexture2dArr transparencyTex;
+        TEX_MAP_MODE transparencyMapMode = TEX_MAP_CLAMP;
+
+        glm::vec3 ambientColor = { 0.0f,0.0f,0.0f };
+        glm::vec3 specularColor = { 0.0f,0.0f,0.0f };
+
+        float shininess = 0.0f;
+        float shininessStrength = 0.0f;
+        float opacity = 1.0f;
+        bool wireframe = false;
+
+        //P3D_BLEND_MODE blendMode; since only 1 texture of each type is allowed, we might not need it
     };
 }

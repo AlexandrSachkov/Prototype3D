@@ -1,5 +1,5 @@
 #include "Scene.h"
-#include "../common/p3d_Uuid.h"
+#include "../common/Uuid.h"
 
 namespace p3d {
     Scene::Scene(
@@ -55,31 +55,51 @@ namespace p3d {
         return HPixelShader(hres.buffPosition, hres.uuid);
     }
 
-    const ModelDesc* Scene::get(HModel handle) const {
+    const MeshI* Scene::get(HMesh handle) const {
         return nullptr;
     }
 
-    const MeshDesc* Scene::get(HMesh handle) const {
+    const MaterialI* Scene::get(HMaterial handle) const {
         return nullptr;
     }
 
-    const MaterialDesc* Scene::get(HMaterial handle) const {
+    const Texture2dArrayI* Scene::get(HTexture2dArr handle) const {
         return nullptr;
     }
 
-    const TextureDesc* Scene::get(HTexture2dArr handle) const {
+    const VertexShaderI* Scene::get(HVertexShader handle) const {
         return nullptr;
     }
 
-    const VertexShaderDesc* Scene::get(HVertexShader handle) const {
+    const PixelShaderI* Scene::get(HPixelShader handle) const {
         return nullptr;
     }
 
-    const PixelShaderDesc* Scene::get(HPixelShader handle) const {
-        return nullptr;
+    const ModelDesc* Scene::getDesc(HModel handle) const {
+        return _models.getDesc(handle);
     }
 
-    bool Scene::update(HModel handle, const ModelDesc& desc) {
+    const MeshDesc* Scene::getDesc(HMesh handle) const {
+        return _meshes.getDesc(handle);
+    }
+
+    const MaterialDesc* Scene::getDesc(HMaterial handle) const {
+        return _materials.getDesc(handle);
+    }
+
+    const TextureDesc* Scene::getDesc(HTexture2dArr handle) const {
+        return _textures2dArr.getDesc(handle);
+    }
+
+    const VertexShaderDesc* Scene::getDesc(HVertexShader handle) const {
+        return _vertexShaders.getDesc(handle);
+    }
+
+    const PixelShaderDesc* Scene::getDesc(HPixelShader handle) const {
+        return _pixelShaders.getDesc(handle);
+    }
+
+    /*bool Scene::update(HModel handle, const ModelDesc& desc) {
         return false;
     }
 
@@ -101,29 +121,29 @@ namespace p3d {
 
     bool Scene::update(HPixelShader handle, const PixelShaderDesc& desc) {
         return false;
-    }
+    }*/
 
     bool Scene::remove(HModel handle) {
-        return false;
+        return _models.remove(handle);
     }
 
     bool Scene::remove(HMesh handle) {
-        return false;
+        return _meshes.remove(handle);
     }
 
     bool Scene::remove(HMaterial handle) {
-        return false;
+        return _materials.remove(handle);
     }
 
     bool Scene::remove(HTexture2dArr handle) {
-        return false;
+        return _textures2dArr.remove(handle);
     }
 
     bool Scene::remove(HVertexShader handle) {
-        return false;
+        return _vertexShaders.remove(handle);
     }
 
     bool Scene::remove(HPixelShader handle) {
-        return false;
+        return _pixelShaders.remove(handle);
     }
 }
