@@ -30,38 +30,38 @@ namespace p3d {
         }
 
         const Res* getResource(HResource handle) const {
-            if (handle.uuid != _uuids[handle.buffPosition]) {
+            if (handle.getUUID() != _uuids[handle.getBuffPosition()]) {
                 return false;
             }
 
-            return _resources[handle.buffPosition].get();
+            return _resources[handle.getBuffPosition()].get();
         }
 
         const Desc* getDesc(HResource handle) const {
-            if (handle.uuid != _uuids[handle.buffPosition]) {
+            if (handle.getUUID() != _uuids[handle.getBuffPosition()]) {
                 return false;
             }
 
-            return &_descriptions[handle.buffPosition];
+            return &_descriptions[handle.getBuffPosition()];
         }
 
         bool update(HResource handle, std::unique_ptr<Res>& res, const Desc& desc) {
-            if (handle.uuid != _uuids[handle.buffPosition]) {
+            if (handle.getUUID() != _uuids[handle.getBuffPosition()]) {
                 return false;
             }
 
-            _resources[handle.buffPosition] = std::move(res);
-            _descriptions[handle.buffPosition] = desc;
+            _resources[handle.getBuffPosition()] = std::move(res);
+            _descriptions[handle.getBuffPosition()] = desc;
             return true;
         }
 
         bool remove(HResource handle) {
-            if (handle.uuid != _uuids[handle.buffPosition]) {
+            if (handle.getUUID() != _uuids[handle.getBuffPosition()]) {
                 return false;
             }
 
-            _resources[handle.buffPosition].release();
-            _uuids[handle.buffPosition] = 0;
+            _resources[handle.getBuffPosition()].release();
+            _uuids[handle.getBuffPosition()] = 0;
             return true;
         }
     private:

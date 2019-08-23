@@ -11,7 +11,8 @@ namespace p3d {
         SIZE
     };
 
-    struct HResource {
+    class HResource {
+    public:
         HResource() : buffPosition(0), uuid(0) {}
         HResource(unsigned int buffPosition, UUID uuid)
             : buffPosition(buffPosition), uuid(uuid) {}
@@ -20,17 +21,32 @@ namespace p3d {
             return uuid != 0;
         }
 
-        const unsigned int buffPosition;
-        const UUID uuid;
+        unsigned int getBuffPosition() {
+            return buffPosition;
+        }
+
+        UUID getUUID() {
+            return uuid;
+        }
+
+    private:
+        unsigned int buffPosition;
+        UUID uuid;
     };
 
     // Scene objects
-    struct HSceneObject : public HResource {
+    class HSceneObject : public HResource {
+    public:
         HSceneObject(SCENE_OBJECT_TYPE type) : type(type) {}
         HSceneObject(SCENE_OBJECT_TYPE type, unsigned int buffPosition, UUID uuid)
             : type(type), HResource(buffPosition, uuid) {}
 
-        const SCENE_OBJECT_TYPE type;
+        SCENE_OBJECT_TYPE getObjectType() {
+            return type;
+        }
+
+    private:
+        SCENE_OBJECT_TYPE type;
     };
 
     struct HModel : public HSceneObject {

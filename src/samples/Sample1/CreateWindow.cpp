@@ -9,6 +9,8 @@
 #include "p3d/renderer/VertexShaderI.h"
 #include "p3d/renderer/PixelShaderI.h"
 #include "p3d/Constants.h"
+#include "p3d/scene/Scene.h"
+#include "p3d/scene/NullSpacePartitioner.h"
 
 #include "glm/vec3.hpp"
 
@@ -34,9 +36,14 @@ bool run() {
         fullscreen
     ), "Failed to initialize D3D11 device");
 
-    std::unique_ptr<p3d::RendererI> device(d3d11Renderer.release());
+    std::unique_ptr<p3d::RendererI> renderer(d3d11Renderer.release());
+    std::unique_ptr<p3d::SceneI> scene(new p3d::Scene(
+        std::unique_ptr<p3d::SpacePartitionerI>(new p3d::NullSpacePartitioner()), 
+        renderer.get()
+    ));
+
     sampleRunner.setRunProcedure([&]() {
-        device->renderFrame();
+        renderer->renderFrame();
     });
     sampleRunner.start();
 

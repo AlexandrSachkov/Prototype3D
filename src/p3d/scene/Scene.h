@@ -9,8 +9,8 @@ namespace p3d {
     class Scene : public SceneI {
     public:
         Scene(
-            GPUResourceProviderI* resProvider,
-            std::unique_ptr<SpacePartitionerI> spacePartitioner
+            std::unique_ptr<SpacePartitionerI>& spacePartitioner,
+            GPUResourceProviderI* resProvider
         );
         ~Scene();
 

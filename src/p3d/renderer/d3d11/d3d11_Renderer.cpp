@@ -246,9 +246,20 @@ namespace p3d {
             _swapChain->Present(0, 0);
         }
 
-        bool Renderer::createTexture1dArray(
-            const TextureDesc& desc,
-            std::unique_ptr <p3d::Texture1dArrayI>& tex
+        std::unique_ptr<p3d::MeshI> Renderer::createMesh(
+            const MeshDesc& desc
+        ) {
+            return nullptr;
+        }
+
+        std::unique_ptr<p3d::MaterialI> Renderer::createMaterial(
+            const MaterialDesc& desc
+        ) {
+            return nullptr;
+        }
+
+        std::unique_ptr <p3d::Texture1dArrayI> Renderer::createTexture1dArray(
+            const TextureDesc& desc
         ) {
             unsigned int bindFlags = 0;
             P3D_ASSERT_R(convertBindFlags(desc.bindFlags, bindFlags),
@@ -294,20 +305,18 @@ namespace p3d {
                 unorderedAccessView
             ), "Failed to create resource views");
 
-            tex.reset(new Texture1dArray(
-                textureArr, 
+            return std::unique_ptr<p3d::Texture1dArrayI>(new Texture1dArray(
+                textureArr,
                 depthStencilView,
                 renderTargetView,
                 shaderResourceView,
                 desc
             ));
-
-            return true;
         }
 
-        bool Renderer::createTexture2dArray(
-            const TextureDesc& desc,
-            std::unique_ptr <p3d::Texture2dArrayI>& tex) {
+        std::unique_ptr<p3d::Texture2dArrayI> Renderer::createTexture2dArray(
+            const TextureDesc& desc
+        ) {
 
             /*ID3D11Resource* texture;
             ID3D11ShaderResourceView* srView;
@@ -364,7 +373,7 @@ namespace p3d {
                 unorderedAccessView
             ), "Failed to create resource views");
 
-            tex.reset(new Texture2dArray(
+            return std::unique_ptr <p3d::Texture2dArrayI>(new Texture2dArray(
                 textureArr,
                 depthStencilView,
                 renderTargetView,
@@ -372,12 +381,10 @@ namespace p3d {
                 unorderedAccessView,
                 desc
             ));
-            return true;
         }
 
-        bool Renderer::createTexture3d(
-            const TextureDesc& desc,
-            std::unique_ptr <p3d::Texture3dI>& tex
+        std::unique_ptr<p3d::Texture3dI> Renderer::createTexture3d(
+            const TextureDesc& desc
         ) {
             unsigned int bindFlags = 0;
             P3D_ASSERT_R(convertBindFlags(desc.bindFlags, bindFlags),
@@ -422,7 +429,7 @@ namespace p3d {
                 unorderedAccessView
             ), "Failed to create resource views");
 
-            tex.reset(new Texture3d(
+            return std::unique_ptr<p3d::Texture3dI>( new Texture3d(
                 texture,
                 depthStencilView,
                 renderTargetView,
@@ -430,12 +437,11 @@ namespace p3d {
                 unorderedAccessView,
                 desc
             ));
-            return true;
         }
 
-        bool Renderer::createVertexShader(
-            const VertexShaderDesc& desc,
-            std::unique_ptr <p3d::VertexShaderI>& vs) {
+        std::unique_ptr<p3d::VertexShaderI> Renderer::createVertexShader(
+            const VertexShaderDesc& desc
+        ) {
 
             ComPtr<ID3DBlob> blob = nullptr;
             ComPtr<ID3DBlob> errBlob = nullptr;
@@ -449,13 +455,14 @@ namespace p3d {
             ComPtr<ID3D11InputLayout> inputLayout = nullptr;
             P3D_ASSERT_R(createInputLayout(desc.inputDesc, blob, inputLayout), "Failed to create input layout");
 
-            vs.reset(new VertexShader(shader, blob, inputLayout, desc));
-            return true;
+            return std::unique_ptr<p3d::VertexShaderI>( new VertexShader(
+                shader, blob, inputLayout, desc
+            ));
         }
 
-        bool Renderer::createPixelShader(
-            const PixelShaderDesc& desc,
-            std::unique_ptr <p3d::PixelShaderI>& ps) {
+        std::unique_ptr<p3d::PixelShaderI> Renderer::createPixelShader(
+            const PixelShaderDesc& desc
+        ) {
 
             ComPtr<ID3DBlob> blob = nullptr;
             ComPtr<ID3DBlob> errBlob = nullptr;
@@ -466,8 +473,9 @@ namespace p3d {
             ComPtr<ID3D11PixelShader> shader = nullptr;
             P3D_ASSERT_R(Utility::createPixelShader(_device, blob, shader), "Failed to create pixel shader");
 
-            ps.reset(new PixelShader(shader, blob, desc));
-            return true;
+            return std::unique_ptr<p3d::PixelShaderI>( new PixelShader(
+                shader, blob, desc
+            ));
         }
 
         /*bool RenderingDevice::createBuffer(

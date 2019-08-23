@@ -3,8 +3,8 @@
 
 namespace p3d {
     Scene::Scene(
-        GPUResourceProviderI* resProvider,
-        std::unique_ptr<SpacePartitionerI> spacePartitioner
+        std::unique_ptr<SpacePartitionerI>& spacePartitioner,
+        GPUResourceProviderI* resProvider
     ) : _resProvider(resProvider), _spacePartitioner(std::move(spacePartitioner)){
 
     }
@@ -14,15 +14,28 @@ namespace p3d {
     }
 
     HModel Scene::create(const ModelDesc& desc) {
-        return HModel();
+        HResource hres = _models.insert(std::unique_ptr<void*>(), desc, genUUID());
+        return HModel(hres.getBuffPosition(), hres.getUUID());
     }
 
     HMesh Scene::create(const MeshDesc& desc) {
-        return HMesh();
+        auto mesh = _resProvider->createMesh(desc);
+        if (nullptr == mesh) {
+            return HMesh();
+        }
+
+        HResource hres = _meshes.insert(mesh, desc, genUUID());
+        return HMesh(hres.getBuffPosition(), hres.getUUID());
     }
 
     HMaterial Scene::create(const MaterialDesc& desc) {
-        return HMaterial();
+        auto material = _resProvider->createMaterial(desc);
+        if (nullptr == material) {
+            return HMaterial();
+        }
+
+        HResource hres = _materials.insert(material, desc, genUUID());
+        return HMaterial(hres.getBuffPosition(), hres.getUUID());
     }
 
     HTexture2dArr Scene::create(const TextureDesc& desc) {
@@ -32,7 +45,7 @@ namespace p3d {
         }
 
         HResource hres = _textures2dArr.insert(tex2dArr, desc, genUUID());
-        return HTexture2dArr(hres.buffPosition, hres.uuid);
+        return HTexture2dArr(hres.getBuffPosition(), hres.getUUID());
     }
 
     HVertexShader Scene::create(const VertexShaderDesc& desc) {
@@ -42,7 +55,7 @@ namespace p3d {
         }
 
         HResource hres = _vertexShaders.insert(vs, desc, genUUID());
-        return HVertexShader(hres.buffPosition, hres.uuid);
+        return HVertexShader(hres.getBuffPosition(), hres.getUUID());
     }
 
     HPixelShader Scene::create(const PixelShaderDesc& desc) {
@@ -52,27 +65,27 @@ namespace p3d {
         }
 
         HResource hres = _pixelShaders.insert(ps, desc, genUUID());
-        return HPixelShader(hres.buffPosition, hres.uuid);
+        return HPixelShader(hres.getBuffPosition(), hres.getUUID());
     }
 
     const MeshI* Scene::get(HMesh handle) const {
-        return nullptr;
+        return _meshes.getResource(handle);
     }
 
     const MaterialI* Scene::get(HMaterial handle) const {
-        return nullptr;
+        return _materials.getResource(handle);
     }
 
     const Texture2dArrayI* Scene::get(HTexture2dArr handle) const {
-        return nullptr;
+        return _textures2dArr.getResource(handle);
     }
 
     const VertexShaderI* Scene::get(HVertexShader handle) const {
-        return nullptr;
+        return _vertexShaders.getResource(handle);
     }
 
     const PixelShaderI* Scene::get(HPixelShader handle) const {
-        return nullptr;
+        return _pixelShaders.getResource(handle);
     }
 
     const ModelDesc* Scene::getDesc(HModel handle) const {

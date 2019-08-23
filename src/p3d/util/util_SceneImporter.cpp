@@ -1,5 +1,4 @@
-#include "p3d_SceneImporter.h"
-#include "../p3d_ResourceModel.h"
+#include "util_SceneImporter.h"
 
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>           // Output data structure
@@ -11,20 +10,14 @@
 
 namespace p3d {
 	namespace util {
-		SceneImporter::SceneImporter() {
-		}
-
-		SceneImporter::~SceneImporter() {
-		}
-
-		bool SceneImporter::import(std::string pathStr, model::Scene& out) {
-			std::experimental::filesystem::path scenePath(pathStr);
+		bool SceneImporter::import(const std::string& path, SceneI* scene, SceneGraphI* sceneGraph) {
+			std::experimental::filesystem::path scenePath(path);
 			if (!std::experimental::filesystem::exists(scenePath))
 				return false;
 			scenePath = scenePath.remove_filename();
 
 			Assimp::Importer importer;
-			const aiScene* scene = importer.ReadFile(pathStr,
+			const aiScene* scene = importer.ReadFile(path,
 				aiProcess_CalcTangentSpace
 				| aiProcess_Triangulate
 				| aiProcess_JoinIdenticalVertices

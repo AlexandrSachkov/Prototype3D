@@ -2,6 +2,8 @@
 
 #include "../RendererI.h"
 #include "../../ResourceDescriptions.h"
+#include "../MeshI.h"
+#include "../MaterialI.h"
 #include "../Texture1dArrayI.h"
 #include "../Texture2dArrayI.h"
 #include "../Texture3dI.h"
@@ -32,29 +34,32 @@ namespace p3d {
 
             void renderFrame() override;
 
-            bool createTexture1dArray(
-                const TextureDesc& desc,
-                std::unique_ptr <p3d::Texture1dArrayI>& tex
+            std::unique_ptr<p3d::MeshI> createMesh(
+                const MeshDesc& desc
             ) override;
 
-            bool createTexture2dArray(
-                const TextureDesc& desc,
-                std::unique_ptr <p3d::Texture2dArrayI>& tex
+            std::unique_ptr<p3d::MaterialI> createMaterial(
+                const MaterialDesc& desc
             ) override;
 
-            bool createTexture3d(
-                const TextureDesc& desc,
-                std::unique_ptr <p3d::Texture3dI>& tex
+            std::unique_ptr<p3d::Texture1dArrayI> createTexture1dArray(
+                const TextureDesc& desc
             ) override;
 
-            bool createVertexShader(
-                const VertexShaderDesc& desc,
-                std::unique_ptr <p3d::VertexShaderI>& vs
+            std::unique_ptr<p3d::Texture2dArrayI> createTexture2dArray(
+                const TextureDesc& desc
             ) override;
 
-            bool createPixelShader(
-                const PixelShaderDesc& desc,
-                std::unique_ptr <p3d::PixelShaderI>& ps
+            std::unique_ptr<p3d::Texture3dI> createTexture3d(
+                const TextureDesc& desc
+            ) override;
+
+            std::unique_ptr<p3d::VertexShaderI> createVertexShader(
+                const VertexShaderDesc& desc
+            ) override;
+
+            std::unique_ptr<p3d::PixelShaderI> createPixelShader(
+                const PixelShaderDesc& desc
             ) override;
         
         private:
