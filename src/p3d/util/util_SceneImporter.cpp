@@ -1,16 +1,19 @@
 #include "util_SceneImporter.h"
+#include "../assert.h"
 
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
 
 #include <glm/gtc/type_ptr.hpp>
+#include "glm/vec3.hpp"
+#include "glm/vec4.hpp"
 
 #include <experimental/filesystem>
 
 namespace p3d {
 	namespace util {
-		bool SceneImporter::import(const std::string& path, SceneI* scene, SceneGraphI* sceneGraph) {
+		bool SceneImporter::import(const std::string& path, SceneI* sceneOut, SceneGraphI* sceneGraph) {
 			std::experimental::filesystem::path scenePath(path);
 			if (!std::experimental::filesystem::exists(scenePath))
 				return false;
@@ -28,25 +31,24 @@ namespace p3d {
 				| aiProcess_RemoveRedundantMaterials
 			);
 
-			if (!scene) {
-				//importer.GetErrorString();
-				return false;
-			}
+            P3D_ASSERT_R(scene, importer.GetErrorString());
 			
-			aiMatrix4x4 identity;
-			if (!loadModels(scene->mRootNode, identity, scene->mMeshes, out.models))
+            std::vector<MeshDesc> meshes;
+			if (!scene->HasMeshes() || !loadMeshes(scene->mMeshes, scene->mNumMeshes, meshes))
 				return false;
-			if (!scene->HasMeshes() || !loadMeshes(scene->mMeshes, scene->mNumMeshes, out.meshs))
-				return false;
-			if (!scene->HasMaterials() || !loadMaterials(scene->mMaterials, scene->mNumMaterials, scenePath.string(), out.materials))
+			/*if (!scene->HasMaterials() || !loadMaterials(scene->mMaterials, scene->mNumMaterials, scenePath.string(), out.materials))
 				return false;
 			if (scene->HasLights() && !loadLights(scene->mLights, scene->mNumLights, out.lights))
 				return false;
 
+            aiMatrix4x4 identity;
+            if (!loadModels(scene->mRootNode, identity, scene->mMeshes, out.models))
+                return false;*/
+
 			return true;
 		}
 
-		bool SceneImporter::loadModels(aiNode* node, aiMatrix4x4 parentTransform, aiMesh** meshes, std::vector<model::Model>& out) {
+		/*bool SceneImporter::loadModels(aiNode* node, aiMatrix4x4 parentTransform, aiMesh** meshes, std::vector<model::Model>& out) {
 			aiMatrix4x4 transform = parentTransform * node->mTransformation;
 			for (unsigned int i = 0; i < node->mNumMeshes; i++) {
 				model::Model newModel = {};
@@ -63,85 +65,85 @@ namespace p3d {
 					return false;
 			}
 			return true;
-		}
+		}*/
 
-		bool SceneImporter::loadMeshes(aiMesh** meshes, unsigned int numMeshes, std::vector<model::Mesh>& out) {
+		bool SceneImporter::loadMeshes(aiMesh** meshes, unsigned int numMeshes, std::vector<MeshDesc>& meshesOut) {
+            meshesOut.clear();
+            meshesOut.resize(numMeshes);
+
+            P3D_ASSERT_R(sizeof(glm::vec3) == sizeof(aiVector3D), "Failed to load meshes. Vec3d sizes do not match");
+            P3D_ASSERT_R(sizeof(glm::vec4) == sizeof(aiColor4D), "Failed to load meshes. Vec4d sizes do not match");
+
 			for (unsigned int i = 0; i < numMeshes; i++) {
-				model::Mesh newMesh = {};
-				if (!meshes[i]->HasPositions() || !loadVertices(meshes[i], newMesh))
-					return false;
+                auto* mesh = meshes[i];
+                auto& meshOut = meshesOut[i];
 
-				if (!meshes[i]->HasFaces() || !loadIndices(meshes[i], newMesh))
-					return false;
+                if (mesh->mPrimitiveTypes != aiPrimitiveType_TRIANGLE) {
+                    //print warning (Mesh is not triangulated, skipping)
+                    break;
+                }
 
-				out.push_back(newMesh);
+                if (mesh->HasPositions()) {
+                    meshOut.vertices = new glm::vec3[mesh->mNumVertices];
+                    meshOut.verticesSize = mesh->mNumVertices;
+                    memcpy(meshOut.vertices, mesh->mVertices, sizeof(glm::vec3) * mesh->mNumVertices);
+                }
+
+                if (mesh->HasFaces()) {
+                    //ensure aiProcess_Triangulate flag is set. Otherwise, faces are not guaranteed to have 3 indices
+                    meshOut.indicesSize = mesh->mNumFaces * 3;
+                    meshOut.indices = new unsigned int[meshOut.indicesSize];
+
+                    unsigned int ii = 0;
+                    for (unsigned int f = 0; f < mesh->mNumFaces; f++) {
+                        const aiFace& tempFace = mesh->mFaces[f];
+                        for (unsigned int i = 0; i < 3; i++) {
+                            meshOut.indices[ii] = tempFace.mIndices[i];
+                            ii++;
+                        }
+                    }
+                }
+
+                if (mesh->HasNormals()) {
+                    meshOut.normals = new glm::vec3[mesh->mNumVertices];
+                    memcpy(meshOut.normals, mesh->mNormals, sizeof(glm::vec3) * mesh->mNumVertices);
+                }
+
+                if (mesh->GetNumUVChannels() > 1) {
+                    //print warning (multiple UV channels detected, can only load channel #1)
+                }
+                if (mesh->HasTextureCoords(0) && mesh->mNumUVComponents[0] == 2) {
+                    meshOut.texCoords = new glm::vec2[mesh->mNumVertices];
+                    for (unsigned int tc = 0; tc < mesh->mNumVertices; tc++) {
+                        //only load UV components
+                        meshOut.texCoords[tc] = { mesh->mTextureCoords[0]->x, mesh->mTextureCoords[0]->y };
+                    }
+                } else if (mesh->mNumUVComponents[0] != 2) {
+                    //print warning (texture is not 2d. Skipping)
+                }
+                
+                if (mesh->GetNumColorChannels() > 1) {
+                    //print warning (multiple UV channels detected, can only load channel #1)
+                }
+                if (mesh->HasVertexColors(0)) {
+                    meshOut.colors = new glm::vec4[mesh->mNumVertices];
+                    memcpy(meshOut.colors, mesh->mColors[0], sizeof(glm::vec4) * mesh->mNumVertices);
+                }
+
+                if (mesh->HasTangentsAndBitangents()) {
+                    meshOut.tangents = new glm::vec3[mesh->mNumVertices];
+                    memcpy(meshOut.tangents, mesh->mTangents, sizeof(glm::vec3) * mesh->mNumVertices);
+
+                    meshOut.bitangents = new glm::vec3[mesh->mNumVertices];
+                    memcpy(meshOut.bitangents, mesh->mBitangents, sizeof(glm::vec3) * mesh->mNumVertices);
+                }
+
+                //TODO load bones
 			}
 			return true;
 		}
 
-		bool SceneImporter::loadVertices(aiMesh* mesh, model::Mesh& out) {
-			if (mesh->HasTextureCoords(0)) {
-				out.vertexType = VERTEX_TYPE::TEXTURED;
-
-				std::vector<Vertex_Textured>* vertices = new std::vector<Vertex_Textured>();
-				for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
-					const aiVector3D pos = mesh->mVertices[i];
-					const aiVector3D normal = mesh->mNormals[i];
-					const aiVector3D texCoord = mesh->mTextureCoords[0][i];
-
-					Vertex_Textured v = {
-						{ pos.x, pos.y, pos.z },
-						{ normal.x, normal.y, normal.z },
-						{ texCoord.x, texCoord.y}
-					};
-					vertices->push_back(v);
-				}
-				out.vertices.textured = vertices;
-
-			} else {
-				out.vertexType = VERTEX_TYPE::UNTEXTURED;
-
-				std::vector<Vertex_Untextured>* vertices = new std::vector<Vertex_Untextured>();
-				for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
-					const aiVector3D pos = mesh->mVertices[i];
-
-					Vertex_Untextured v = {
-						{ pos.x, pos.y, pos.z }
-					};
-					vertices->push_back(v);
-				}
-				out.vertices.untextured = vertices;
-			}
-
-			return true;
-		}
-
-		bool SceneImporter::loadIndices(aiMesh* mesh, model::Mesh& out) {
-			out.indices = new std::vector<unsigned int>();
-
-			unsigned int numIndices = mesh->mFaces[0].mNumIndices;
-			switch (numIndices) {
-			case 2:
-				out.topology = PRIMITIVE_TOPOLOGY_TYPE::LINE_LIST;
-				break;
-			case 3:
-				out.topology = PRIMITIVE_TOPOLOGY_TYPE::TRIANGLE_LIST;
-				break;
-			default:
-				return false;
-			}
-
-			for (unsigned int f = 0; f < mesh->mNumFaces; f++) {
-				const aiFace& tempFace = mesh->mFaces[f];
-				for (unsigned int i = 0; i < numIndices; i++) {
-					out.indices->push_back(tempFace.mIndices[i]);
-				}
-			}
-
-			return true;
-		}
-
-		bool SceneImporter::loadMaterials(aiMaterial** materials, unsigned int numMaterials, std::string scenePath, std::vector<model::Material>& out) {
+		/*bool SceneImporter::loadMaterials(aiMaterial** materials, unsigned int numMaterials, std::string scenePath, std::vector<model::Material>& out) {
 			for (unsigned int i = 0; i < numMaterials; i++) {
 				model::Material newMaterial = {};
 				if (!loadMaterial(materials[i], scenePath, newMaterial))
@@ -324,6 +326,6 @@ namespace p3d {
 				return false;
 			}
 			return true;
-		}
+		}*/
 	}
 }
