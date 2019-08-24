@@ -26,6 +26,8 @@ namespace p3d {
         P3D_USAGE usageFlag;
         std::vector<P3D_BIND_FLAG> bindFlags;
         bool generateMipMaps;
+
+        std::string path; //used only as reference
     };
 
     struct VertexShaderDesc {
@@ -89,12 +91,9 @@ namespace p3d {
         HTexture2dArr normalTex;
         TEX_MAP_MODE normalMapMode = TEX_MAP_CLAMP;
 
-        glm::vec3 transparencyColor = { 0.0f,0.0f,0.0f };
-        HTexture2dArr transparencyTex;
-        TEX_MAP_MODE transparencyMapMode = TEX_MAP_CLAMP;
-
         glm::vec3 ambientColor = { 0.0f,0.0f,0.0f };
         glm::vec3 specularColor = { 0.0f,0.0f,0.0f };
+        glm::vec3 transparencyColor = { 0.0f,0.0f,0.0f };
 
         float shininess = 0.0f;
         float shininessStrength = 0.0f;

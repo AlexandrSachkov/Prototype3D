@@ -102,12 +102,45 @@ IF(P3D_GLM_INCLUDE_PATH STREQUAL "")
 ENDIF(P3D_GLM_INCLUDE_PATH STREQUAL "")
 
 
+# Assimp
+SET(P3D_ASSIMP_INCLUDE_PATH
+	"" CACHE PATH "P3D Assimp include path")
+
+IF(P3D_ASSIMP_INCLUDE_PATH STREQUAL "")
+	MESSAGE(SEND_ERROR "P3D Assimp include path must be specified")
+ENDIF(P3D_ASSIMP_INCLUDE_PATH STREQUAL "")
+
+SET(P3D_ASSIMP_LIBRARY_DEBUG_PATH
+	"" CACHE PATH "P3D Assimp library debug path")
+
+IF(P3D_ASSIMP_LIBRARY_DEBUG_PATH STREQUAL "")
+	MESSAGE(SEND_ERROR "P3D Assimp library debug path must be specified")
+ENDIF(P3D_ASSIMP_LIBRARY_DEBUG_PATH STREQUAL "")
+
+SET(P3D_ASSIMP_LIBRARY_RELEASE_PATH
+	"" CACHE PATH "P3D Assimp library release path")
+
+IF(P3D_ASSIMP_LIBRARY_RELEASE_PATH STREQUAL "")
+	MESSAGE(SEND_ERROR "P3D Assimp library release path must be specified")
+ENDIF(P3D_ASSIMP_LIBRARY_RELEASE_PATH STREQUAL "")
+
+
+# Cereal
+SET(P3D_CEREAL_INCLUDE_PATH
+	"" CACHE PATH "P3D Cereal include path")
+
+IF(P3D_CEREAL_INCLUDE_PATH STREQUAL "")
+	MESSAGE(SEND_ERROR "P3D Cereal include path must be specified")
+ENDIF(P3D_CEREAL_INCLUDE_PATH STREQUAL "")
+
 
 INCLUDE_DIRECTORIES(
     ${P3D_GLFW_INCLUDE_PATH}
     ${P3D_D3D11_INCLUDE_PATH}
     ${P3D_GLM_INCLUDE_PATH}
     ${P3D_INCLUDE_PATH}
+    ${P3D_ASSIMP_INCLUDE_PATH}
+	${P3D_CEREAL_INCLUDE_PATH}
     )
 
 ADD_DEFINITIONS(
@@ -122,6 +155,8 @@ LINK_DIRECTORIES(
     ${P3D_D3D11_LIBRARY_RELEASE_PATH}
     ${P3D_LIBRARY_DEBUG_PATH}
     ${P3D_LIBRARY_RELEASE_PATH}
+    ${P3D_ASSIMP_LIBRARY_DEBUG_PATH}
+	${P3D_ASSIMP_LIBRARY_RELEASE_PATH}
     )
 
 set(LIBS 
@@ -135,6 +170,9 @@ set(LIBS
 
     debug p3d_d.lib
     optimized p3d.lib
+    
+    debug assimp-vc140-mt
+	optimized assimp-vc140-mt
 )
 
 
@@ -142,10 +180,16 @@ add_executable (Sample1
   Sample1/CreateWindow.cpp
 )
 
+add_executable (Sample2
+  Sample2/ImportScene.cpp
+)
+
 TARGET_LINK_LIBRARIES(Sample1 ${LIBS})
+TARGET_LINK_LIBRARIES(Sample2 ${LIBS})
 
 set_target_properties(
     Sample1
+    Sample2
 
     PROPERTIES DEBUG_POSTFIX _d
 )
