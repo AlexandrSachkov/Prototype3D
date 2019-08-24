@@ -84,39 +84,39 @@ namespace p3d {
                 }
 
                 if (mesh->HasPositions()) {
-                    meshOut.vertices = new glm::vec3[mesh->mNumVertices];
+                    meshOut.vertices.reset(new glm::vec3[mesh->mNumVertices]);
                     meshOut.verticesSize = mesh->mNumVertices;
-                    memcpy(meshOut.vertices, mesh->mVertices, sizeof(glm::vec3) * mesh->mNumVertices);
+                    memcpy(meshOut.vertices.get(), mesh->mVertices, sizeof(glm::vec3) * mesh->mNumVertices);
                 }
 
                 if (mesh->HasFaces()) {
                     //ensure aiProcess_Triangulate flag is set. Otherwise, faces are not guaranteed to have 3 indices
                     meshOut.indicesSize = mesh->mNumFaces * 3;
-                    meshOut.indices = new unsigned int[meshOut.indicesSize];
+                    meshOut.indices.reset(new unsigned int[meshOut.indicesSize]);
 
                     unsigned int ii = 0;
                     for (unsigned int f = 0; f < mesh->mNumFaces; f++) {
                         const aiFace& tempFace = mesh->mFaces[f];
                         for (unsigned int i = 0; i < 3; i++) {
-                            meshOut.indices[ii] = tempFace.mIndices[i];
+                            meshOut.indices.get()[ii] = tempFace.mIndices[i];
                             ii++;
                         }
                     }
                 }
 
                 if (mesh->HasNormals()) {
-                    meshOut.normals = new glm::vec3[mesh->mNumVertices];
-                    memcpy(meshOut.normals, mesh->mNormals, sizeof(glm::vec3) * mesh->mNumVertices);
+                    meshOut.normals.reset(new glm::vec3[mesh->mNumVertices]);
+                    memcpy(meshOut.normals.get(), mesh->mNormals, sizeof(glm::vec3) * mesh->mNumVertices);
                 }
 
                 if (mesh->GetNumUVChannels() > 1) {
                     //print warning (multiple UV channels detected, can only load channel #1)
                 }
                 if (mesh->HasTextureCoords(0) && mesh->mNumUVComponents[0] == 2) {
-                    meshOut.texCoords = new glm::vec2[mesh->mNumVertices];
+                    meshOut.texCoords.reset(new glm::vec2[mesh->mNumVertices]);
                     for (unsigned int tc = 0; tc < mesh->mNumVertices; tc++) {
                         //only load UV components
-                        meshOut.texCoords[tc] = { mesh->mTextureCoords[0]->x, mesh->mTextureCoords[0]->y };
+                        meshOut.texCoords.get()[tc] = { mesh->mTextureCoords[0]->x, mesh->mTextureCoords[0]->y };
                     }
                 } else if (mesh->mNumUVComponents[0] != 2) {
                     //print warning (texture is not 2d. Skipping)
@@ -126,16 +126,16 @@ namespace p3d {
                     //print warning (multiple UV channels detected, can only load channel #1)
                 }
                 if (mesh->HasVertexColors(0)) {
-                    meshOut.colors = new glm::vec4[mesh->mNumVertices];
-                    memcpy(meshOut.colors, mesh->mColors[0], sizeof(glm::vec4) * mesh->mNumVertices);
+                    meshOut.colors.reset(new glm::vec4[mesh->mNumVertices]);
+                    memcpy(meshOut.colors.get(), mesh->mColors[0], sizeof(glm::vec4) * mesh->mNumVertices);
                 }
 
                 if (mesh->HasTangentsAndBitangents()) {
-                    meshOut.tangents = new glm::vec3[mesh->mNumVertices];
-                    memcpy(meshOut.tangents, mesh->mTangents, sizeof(glm::vec3) * mesh->mNumVertices);
+                    meshOut.tangents.reset(new glm::vec3[mesh->mNumVertices]);
+                    memcpy(meshOut.tangents.get(), mesh->mTangents, sizeof(glm::vec3) * mesh->mNumVertices);
 
-                    meshOut.bitangents = new glm::vec3[mesh->mNumVertices];
-                    memcpy(meshOut.bitangents, mesh->mBitangents, sizeof(glm::vec3) * mesh->mNumVertices);
+                    meshOut.bitangents.reset(new glm::vec3[mesh->mNumVertices]);
+                    memcpy(meshOut.bitangents.get(), mesh->mBitangents, sizeof(glm::vec3) * mesh->mNumVertices);
                 }
 
                 //TODO load bones

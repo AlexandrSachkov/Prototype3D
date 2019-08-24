@@ -66,18 +66,18 @@ namespace p3d {
     };
 
     struct MeshDesc {
-        glm::vec3* vertices = nullptr;
+        std::shared_ptr<glm::vec3> vertices = nullptr;
         unsigned int verticesSize = 0;
 
-        unsigned int* indices = nullptr;
+        std::shared_ptr<unsigned int> indices = nullptr;
         unsigned int indicesSize = 0;
         P3D_PRIMITIVE_TOPOLOGY topology = P3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
 
-        glm::vec4* colors = nullptr;
-        glm::vec2* texCoords = nullptr;
-        glm::vec3* normals = nullptr;
-        glm::vec3* tangents = nullptr;
-        glm::vec3* bitangents = nullptr;
+        std::shared_ptr<glm::vec4> colors = nullptr;
+        std::shared_ptr<glm::vec2> texCoords = nullptr;
+        std::shared_ptr<glm::vec3> normals = nullptr;
+        std::shared_ptr<glm::vec3> tangents = nullptr;
+        std::shared_ptr<glm::vec3> bitangents = nullptr;
     };
 
     struct MaterialDesc {
