@@ -47,7 +47,7 @@ namespace p3d {
         std::string shaderEntryPoint;
     };
 
-    struct BufferDesc {
+    /*struct BufferDesc {
         std::vector<P3D_BIND_FLAG> bindFlags;
         void* data = nullptr;
         P3D_USAGE usageFlag;
@@ -59,7 +59,7 @@ namespace p3d {
         P3D_FILL_MODE fillMode;
         P3D_CULL_MODE cullMode;
         bool frontCounterClockwise;
-    };
+    };*/
 
     struct ModelDesc {
         HMesh mesh;
@@ -75,11 +75,11 @@ namespace p3d {
         unsigned int indicesSize = 0;
         P3D_PRIMITIVE_TOPOLOGY topology = P3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
 
-        std::shared_ptr<glm::vec4> colors = nullptr;
         std::shared_ptr<glm::vec2> texCoords = nullptr;
         std::shared_ptr<glm::vec3> normals = nullptr;
         std::shared_ptr<glm::vec3> tangents = nullptr;
         std::shared_ptr<glm::vec3> bitangents = nullptr;
+        std::shared_ptr<glm::vec4> colors = nullptr;
     };
 
     struct MaterialDesc {

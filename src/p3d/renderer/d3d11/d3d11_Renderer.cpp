@@ -1,5 +1,6 @@
 #include "d3d11_Renderer.h"
 #include "../../assert.h"
+#include "../../common/Utils.h"
 #include "../dx/dx_ConstConvert.h"
 #include "../dx/dx_ProjectionMath.h"
 #include "d3d11_ConstConvert.h"
@@ -147,6 +148,29 @@ namespace p3d {
                     1, _samplerStates[i]), "Failed to create texture sampler");
             }
 
+            //TODO load state per material type
+            // loading material-specific stuff
+            VertexShaderDesc vsDesc;
+            vsDesc.shaderEntryPoint = "main";
+            vsDesc.inputDesc = { {"POSITION", P3D_VECTOR_FORMAT::P3D_FORMAT_R32G32B32_FLOAT, 0 } };
+            P3D_ASSERT_R(util::readFile("D:/Repositories/Prototype3D/src/p3d/renderer/shaders/hlsl/pos_vs.hlsl", vsDesc.hlslSource),
+                "Failed to read vertex shader source");
+            
+            _vertexShader = createVertexShader(vsDesc);
+            P3D_ASSERT_R(_vertexShader, "Failed to create vertex shader");
+
+            PixelShaderDesc psSource;
+            psSource.shaderEntryPoint = "main";
+            P3D_ASSERT_R(util::readFile("D:/Repositories/Prototype3D/src/p3d/renderer/shaders/hlsl/pos_ps.hlsl", psSource.hlslSource),
+                "Failed to read pixel shader source");
+
+            _pixelShader = createPixelShader(psSource);
+            P3D_ASSERT_R(_pixelShader, "Failed to create pixel shader");
+
+            //This should not be done here but for every object material type during rendering
+            P3D_ASSERT_R(VSSetShader(_vertexShader.get()), "Failed to set vertex shader");
+            P3D_ASSERT_R(PSSetShader(_pixelShader.get()), "Failed to set pixel shader");
+            _deviceContext->RSSetState(_backFaceCull.Get());
             return true;
         }
 
@@ -243,8 +267,107 @@ namespace p3d {
         std::unique_ptr<p3d::MeshI> Renderer::createMesh(
             const MeshDesc& desc
         ) {
-            //TODO implement mesh
-            return std::unique_ptr<MeshI>(new Mesh());
+            P3D_ASSERT_R(desc.vertices != nullptr && desc.verticesSize > 0, "No vertex data");
+
+            ComPtr<ID3D11Buffer> vertexBuff = nullptr;
+            ComPtr<ID3D11Buffer> indexBuff = nullptr;
+            ComPtr<ID3D11Buffer> texCoordBuff = nullptr;
+            ComPtr<ID3D11Buffer> normalBuff = nullptr;
+            ComPtr<ID3D11Buffer> tangentBuff = nullptr;
+            ComPtr<ID3D11Buffer> bitangentBuff = nullptr;
+            ComPtr<ID3D11Buffer> colorBuff = nullptr;
+
+            P3D_ASSERT_R(Utility::createBuffer(
+                _device,
+                D3D11_BIND_VERTEX_BUFFER,
+                D3D11_USAGE_IMMUTABLE,
+                (D3D11_CPU_ACCESS_FLAG)0,
+                desc.vertices.get(),
+                desc.verticesSize * sizeof(glm::vec3),
+                vertexBuff
+            ), "Failed to create vertex buffer");
+
+            if (desc.indices) {
+                P3D_ASSERT_R(Utility::createBuffer(
+                    _device,
+                    D3D11_BIND_INDEX_BUFFER,
+                    D3D11_USAGE_IMMUTABLE,
+                    (D3D11_CPU_ACCESS_FLAG)0,
+                    desc.indices.get(),
+                    desc.indicesSize * sizeof(unsigned int),
+                    indexBuff
+                ), "Failed to create index buffer");
+            }
+
+            if (desc.texCoords) {
+                P3D_ASSERT_R(Utility::createBuffer(
+                    _device,
+                    D3D11_BIND_VERTEX_BUFFER,
+                    D3D11_USAGE_IMMUTABLE,
+                    (D3D11_CPU_ACCESS_FLAG)0,
+                    desc.texCoords.get(),
+                    desc.verticesSize * sizeof(glm::vec2),
+                    texCoordBuff
+                ), "Failed to create texture coords buffer");
+            }
+
+            if (desc.normals) {
+                P3D_ASSERT_R(Utility::createBuffer(
+                    _device,
+                    D3D11_BIND_VERTEX_BUFFER,
+                    D3D11_USAGE_IMMUTABLE,
+                    (D3D11_CPU_ACCESS_FLAG)0,
+                    desc.normals.get(),
+                    desc.verticesSize * sizeof(glm::vec3),
+                    normalBuff
+                ), "Failed to create normal buffer");
+            }
+
+            if (desc.tangents) {
+                P3D_ASSERT_R(Utility::createBuffer(
+                    _device,
+                    D3D11_BIND_VERTEX_BUFFER,
+                    D3D11_USAGE_IMMUTABLE,
+                    (D3D11_CPU_ACCESS_FLAG)0,
+                    desc.tangents.get(),
+                    desc.verticesSize * sizeof(glm::vec3),
+                    tangentBuff
+                ), "Failed to create tangent buffer");
+            }
+
+            if (desc.bitangents) {
+                P3D_ASSERT_R(Utility::createBuffer(
+                    _device,
+                    D3D11_BIND_VERTEX_BUFFER,
+                    D3D11_USAGE_IMMUTABLE,
+                    (D3D11_CPU_ACCESS_FLAG)0,
+                    desc.bitangents.get(),
+                    desc.verticesSize * sizeof(glm::vec3),
+                    bitangentBuff
+                ), "Failed to create bitangent buffer");
+            }
+
+            if (desc.colors) {
+                P3D_ASSERT_R(Utility::createBuffer(
+                    _device,
+                    D3D11_BIND_VERTEX_BUFFER,
+                    D3D11_USAGE_IMMUTABLE,
+                    (D3D11_CPU_ACCESS_FLAG)0,
+                    desc.colors.get(),
+                    desc.verticesSize * sizeof(glm::vec4),
+                    bitangentBuff
+                ), "Failed to create color buffer");
+            }
+
+            return std::unique_ptr<MeshI>(new Mesh(
+                vertexBuff,
+                indexBuff,
+                texCoordBuff,
+                normalBuff,
+                tangentBuff,
+                bitangentBuff,
+                colorBuff
+            ));
         }
 
         std::unique_ptr<p3d::MaterialI> Renderer::createMaterial(
@@ -655,7 +778,29 @@ namespace p3d {
             _deviceContext->ClearRenderTargetView(_renderTargetBuff.getRenderTargetView().Get(), backgroundColor);
             _deviceContext->ClearDepthStencilView(_depthStencilBuff.getDepthStencilView().Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
+            auto& models = scene->getVisibleModels();
+            for (HModel hmodel : models) {
+                const ModelDesc* modelDesc = scene->getDesc(hmodel);
+                const MeshDesc* meshDesc = scene->getDesc(modelDesc->mesh);
+                const d3d11::Mesh* mesh = static_cast<const d3d11::Mesh*>(scene->get(modelDesc->mesh));
 
+                auto* vertexBuff = mesh->getVertexBuffer().Get();
+                unsigned int stride = sizeof(glm::vec3);
+                unsigned int offset = 0;
+                _deviceContext->IASetVertexBuffers(0, 1, &vertexBuff, &stride, &offset);
+                _deviceContext->IASetPrimitiveTopology(convertPrimitiveTopology(meshDesc->topology));
+
+                auto* indexBuff = mesh->getIndexBuffer().Get();
+                if (indexBuff) {
+                    _deviceContext->IASetIndexBuffer(indexBuff, DXGI_FORMAT_R32_UINT, 0);
+                }
+
+                if (indexBuff) {
+                    _deviceContext->DrawIndexed(meshDesc->indicesSize, 0, 0);
+                } else {
+                    _deviceContext->Draw(meshDesc->verticesSize, 0);
+                }
+            }
 
             _swapChain->Present(0, 0);
         }

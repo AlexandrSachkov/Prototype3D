@@ -183,12 +183,18 @@ add_executable (Sample2
   Sample2/ImportScene.cpp
 )
 
+add_executable (Sample3
+  Sample3/DrawTriangle.cpp
+)
+
 TARGET_LINK_LIBRARIES(Sample1 ${LIBS})
 TARGET_LINK_LIBRARIES(Sample2 ${LIBS})
+TARGET_LINK_LIBRARIES(Sample3 ${LIBS})
 
 set_target_properties(
     Sample1
     Sample2
+    Sample3
 
     PROPERTIES DEBUG_POSTFIX _d
 )

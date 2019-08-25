@@ -23,6 +23,7 @@ namespace p3d {
 				| aiProcess_Triangulate
 				| aiProcess_JoinIdenticalVertices
 				| aiProcess_SortByPType
+                | aiProcess_OptimizeMeshes
 				| aiProcess_GenSmoothNormals
 				| aiProcess_ValidateDataStructure
 				| aiProcess_RemoveRedundantMaterials

@@ -33,8 +33,6 @@ namespace p3d {
                 bool fullscreen
             );
 
-            bool initializeRendering(const unsigned int screenDim[2]);
-
             void renderFrame() override;
             void renderFrame(const SceneI* scene, const CameraI* camera) override;
 
@@ -67,6 +65,7 @@ namespace p3d {
             ) override;
         
         private:
+            bool initializeRendering(const unsigned int screenDim[2]);
 
             p3d::Texture2dArrayI& getRenderTargetBuff();
             p3d::Texture2dArrayI& getDepthStencilBuff();
@@ -128,6 +127,10 @@ namespace p3d {
             ComPtr<ID3D11RasterizerState> _frontFaceCull = nullptr;
             ComPtr<ID3D11RasterizerState> _wireframeMode = nullptr;
             std::array<ComPtr<ID3D11SamplerState>, P3D_TEX_MAP_MODE_SIZE> _samplerStates;
+
+
+            std::unique_ptr<VertexShaderI> _vertexShader = nullptr;
+            std::unique_ptr<PixelShaderI> _pixelShader = nullptr;
         };
     }
 }

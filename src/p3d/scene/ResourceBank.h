@@ -22,7 +22,7 @@ namespace p3d {
             try {
                 _resources.emplace_back(std::move(res));
                 _descriptions.emplace_back(desc);
-                _handles.emplace_back(H((unsigned int)(_handles.size() - 1), uuid));
+                _handles.emplace_back(H((unsigned int)(_resources.size() - 1), uuid));
             } catch (std::bad_alloc&) {
                 return H();
             }
