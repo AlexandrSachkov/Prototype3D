@@ -17,15 +17,15 @@ namespace p3d {
         HResource(unsigned int buffPosition, UUID uuid)
             : buffPosition(buffPosition), uuid(uuid) {}
 
-        bool isValid() {
+        bool isValid() const {
             return uuid != 0;
         }
 
-        unsigned int getBuffPosition() {
+        unsigned int getBuffPosition() const {
             return buffPosition;
         }
 
-        UUID getUUID() {
+        UUID getUUID() const {
             return uuid;
         }
 

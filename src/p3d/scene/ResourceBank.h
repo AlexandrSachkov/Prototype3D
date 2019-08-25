@@ -6,47 +6,51 @@
 #include "../common/Uuid.h"
 
 namespace p3d {
-    template <typename Res, typename Desc>
+    template <typename Res, typename Desc, typename H>
     class ResourceBank {
     public:
-        HResource insert(std::unique_ptr<Res>& res, const Desc& desc, UUID uuid) {
-            for (unsigned int i = 0; i < _uuids.size(); i++) {
-                if (_uuids[i] == 0) {
+        H insert(std::unique_ptr<Res>& res, const Desc& desc, UUID uuid) {
+            for (unsigned int i = 0; i < _handles.size(); i++) {
+                if (_handles[i].getUUID() == 0) {
                     _resources[i] = std::move(res);
                     _descriptions[i] = desc;
-                    _uuids[i] = uuid;
-                    return HResource(i, uuid);
+                    _handles[i] = H(i, uuid);
+                    return _handles[i];
                 }
             }
 
             try {
                 _resources.emplace_back(std::move(res));
                 _descriptions.emplace_back(desc);
-                _uuids.emplace_back(uuid);
+                _handles.emplace_back(H((unsigned int)(_handles.size() - 1), uuid));
             } catch (std::bad_alloc&) {
-                return HResource();
+                return H();
             }
-            return HResource((unsigned int)(_uuids.size() - 1), uuid);
+            return _handles[_handles.size() - 1];
         }
 
-        const Res* getResource(HResource handle) const {
-            if (handle.getUUID() != _uuids[handle.getBuffPosition()]) {
+        const Res* getResource(H handle) const {
+            if (handle.getUUID() != _handles[handle.getBuffPosition()].getUUID()) {
                 return false;
             }
 
             return _resources[handle.getBuffPosition()].get();
         }
 
-        const Desc* getDesc(HResource handle) const {
-            if (handle.getUUID() != _uuids[handle.getBuffPosition()]) {
+        const Desc* getDesc(H handle) const {
+            if (handle.getUUID() != _handles[handle.getBuffPosition()].getUUID()) {
                 return false;
             }
 
             return &_descriptions[handle.getBuffPosition()];
         }
 
-        bool update(HResource handle, std::unique_ptr<Res>& res, const Desc& desc) {
-            if (handle.getUUID() != _uuids[handle.getBuffPosition()]) {
+        const std::vector<H>& getAllHandles() const {
+            return _handles;
+        }
+
+        bool update(H handle, std::unique_ptr<Res>& res, const Desc& desc) {
+            if (handle.getUUID() != _handles[handle.getBuffPosition()].getUUID()) {
                 return false;
             }
 
@@ -55,18 +59,18 @@ namespace p3d {
             return true;
         }
 
-        bool remove(HResource handle) {
-            if (handle.getUUID() != _uuids[handle.getBuffPosition()]) {
+        bool remove(H handle) {
+            if (handle.getUUID() != _handles[handle.getBuffPosition()].getUUID()) {
                 return false;
             }
 
             _resources[handle.getBuffPosition()].release();
-            _uuids[handle.getBuffPosition()] = 0;
+            _handles[handle.getBuffPosition()] = H();
             return true;
         }
     private:
         std::vector<std::unique_ptr<Res>> _resources;
         std::vector<Desc> _descriptions;
-        std::vector<UUID> _uuids;
+        std::vector<H> _handles;
     };
 }

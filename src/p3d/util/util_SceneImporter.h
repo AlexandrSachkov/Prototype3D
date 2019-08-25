@@ -59,9 +59,9 @@ namespace p3d {
                 const std::string& scenePath,
                 const std::string& texDir,
                 HTexture2dArr& out, 
-                TEX_MAP_MODE& mapMode
+                P3D_TEX_MAP_MODE& mapMode
             );
-            static bool loadTextureMapMode(aiTextureMapMode in, TEX_MAP_MODE& out);
+            static bool loadTextureMapMode(aiTextureMapMode in, P3D_TEX_MAP_MODE& out);
             static bool findTexturePath(
                 const std::string& scenePath,
                 const std::string& userTexDir,

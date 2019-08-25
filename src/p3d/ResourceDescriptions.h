@@ -85,19 +85,17 @@ namespace p3d {
     struct MaterialDesc {
         glm::vec3 diffuseColor = {0.0f,0.0f,0.0f};
         HTexture2dArr diffuseTex;
-        TEX_MAP_MODE diffuseMapMode = TEX_MAP_CLAMP;
+        P3D_TEX_MAP_MODE diffuseMapMode = P3D_TEX_MAP_CLAMP;
 
         glm::vec3 normalColor = { 0.0f,0.0f,0.0f };
         HTexture2dArr normalTex;
-        TEX_MAP_MODE normalMapMode = TEX_MAP_CLAMP;
+        P3D_TEX_MAP_MODE normalMapMode = P3D_TEX_MAP_CLAMP;
 
         glm::vec3 ambientColor = { 0.0f,0.0f,0.0f };
         glm::vec3 specularColor = { 0.0f,0.0f,0.0f };
-        glm::vec3 transparencyColor = { 0.0f,0.0f,0.0f };
 
         float shininess = 0.0f;
         float shininessStrength = 0.0f;
-        float opacity = 1.0f;
         bool wireframe = false;
 
         //P3D_BLEND_MODE blendMode; since only 1 texture of each type is allowed, we might not need it

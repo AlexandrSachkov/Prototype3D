@@ -34,6 +34,15 @@ namespace p3d {
         const VertexShaderDesc* getDesc(HVertexShader handle) const override;
         const PixelShaderDesc* getDesc(HPixelShader handle) const override;
 
+        const std::vector<HModel>& getAllModels() const override;
+        const std::vector<HMesh>& getAllMeshes() const override;
+        const std::vector<HMaterial>& getAllMaterials() const override;
+        const std::vector<HTexture2dArr>& getAllTexture2dArr() const override;
+        const std::vector<HVertexShader>& getAllVertexShaders() const override;
+        const std::vector<HPixelShader>& getAllPixelShaders() const override;
+
+        const std::vector<HModel>& getVisibleModels() const override;
+
         /*bool update(HModel handle, const ModelDesc& desc) override;
         bool update(HMesh handle, const MeshDesc& desc) override;
         bool update(HMaterial handle, const MaterialDesc& desc) override;
@@ -52,11 +61,11 @@ namespace p3d {
         GPUResourceProviderI* _resProvider;
         std::unique_ptr<SpacePartitionerI> _spacePartitioner;
 
-        ResourceBank<void*, ModelDesc> _models;
-        ResourceBank<p3d::MeshI, MeshDesc> _meshes;
-        ResourceBank<p3d::MaterialI, MaterialDesc> _materials;
-        ResourceBank<p3d::Texture2dArrayI, TextureDesc> _textures2dArr;
-        ResourceBank<p3d::VertexShaderI, VertexShaderDesc> _vertexShaders;
-        ResourceBank<p3d::PixelShaderI, PixelShaderDesc> _pixelShaders;
+        ResourceBank<void*, ModelDesc, HModel> _models;
+        ResourceBank<p3d::MeshI, MeshDesc, HMesh> _meshes;
+        ResourceBank<p3d::MaterialI, MaterialDesc, HMaterial> _materials;
+        ResourceBank<p3d::Texture2dArrayI, TextureDesc, HTexture2dArr> _textures2dArr;
+        ResourceBank<p3d::VertexShaderI, VertexShaderDesc, HVertexShader> _vertexShaders;
+        ResourceBank<p3d::PixelShaderI, PixelShaderDesc, HPixelShader> _pixelShaders;
     };
 }

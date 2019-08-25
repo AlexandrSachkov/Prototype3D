@@ -123,13 +123,11 @@ namespace p3d {
                 ComPtr <ID3D11RasterizerState>& rasterizerState
             );
 
-            static bool createBlendStates(
+            static bool createBlendState(
                 ID3D11Device* device,
                 bool enableBlend,
-                bool enableIndependentBlending,
-                uint_fast32_t numRenderTargets,
                 bool enableAlphaToCoverage,
-                ID3D11BlendState*& blendState
+                ComPtr<ID3D11BlendState>& blendState
             );
 
             static bool createShaderResourceViewFromTexture2D(
@@ -149,7 +147,7 @@ namespace p3d {
                 unsigned int cpuAccessFlag,
                 D3D11_BIND_FLAG bindFlags,
                 const std::vector<D3D11_SUBRESOURCE_DATA>& subresDesc,
-                ComPtr <ID3D11Texture1D>& texture
+                ComPtr<ID3D11Texture1D>& texture
             );
 
             static bool createTexture2DArray(
@@ -165,7 +163,7 @@ namespace p3d {
                 unsigned int cpuAccessFlag,
                 D3D11_BIND_FLAG bindFlags,
                 const std::vector<D3D11_SUBRESOURCE_DATA>& subresDesc,
-                ComPtr <ID3D11Texture2D>& texture
+                ComPtr<ID3D11Texture2D>& texture
             );
 
             static bool createTexture3D(
@@ -178,10 +176,16 @@ namespace p3d {
                 unsigned int cpuAccessFlag,
                 D3D11_BIND_FLAG bindFlags,
                 const std::vector<D3D11_SUBRESOURCE_DATA>& subresDesc,
-                ComPtr <ID3D11Texture3D>& texture
+                ComPtr<ID3D11Texture3D>& texture
             );
 
-            static bool createTextureSamplerState(ID3D11Device* device, ID3D11SamplerState*& samplerState);
+            static bool createTextureSamplerState(
+                const ComPtr<ID3D11Device> device,
+                D3D11_TEXTURE_ADDRESS_MODE mode,
+                D3D11_FILTER filter,
+                unsigned int maxAntisotropy,
+                ComPtr<ID3D11SamplerState> samplerState
+            );
 
             static void setViewPort(
                 const ComPtr<ID3D11DeviceContext> deviceContext,

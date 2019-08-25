@@ -12,6 +12,7 @@
 #include "p3d/scene/Scene.h"
 #include "p3d/scene/NullSpacePartitioner.h"
 #include "p3d/util/util_SceneImporter.h"
+#include "p3d/scene/Camera.h"
 
 #include "glm/vec3.hpp"
 
@@ -56,8 +57,10 @@ bool run() {
         p3d::util::SceneImporter::import("D:/Repositories/Prototype3D/resources/sponza/sponza.obj", "", sponzaScene.get(), nullptr),
         "Failed to import sponza.obj");
 
+    std::unique_ptr<p3d::CameraI> camera(new p3d::Camera({ 0,0,0 }));
+
     sampleRunner.setRunProcedure([&]() {
-        renderer->renderFrame();
+        renderer->renderFrame(landlordScene.get(), camera.get());
     });
     sampleRunner.start();
 

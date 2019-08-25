@@ -172,11 +172,12 @@ namespace p3d {
         P3D_BLEND_SIGNED_ADD
     };
 
-    enum TEX_MAP_MODE {
-        TEX_MAP_WRAP,
-        TEX_MAP_CLAMP,
-        TEX_MAP_DECAL,
-        TEX_MAP_MIRROR
+    enum P3D_TEX_MAP_MODE {
+        P3D_TEX_MAP_WRAP,
+        P3D_TEX_MAP_CLAMP,
+        P3D_TEX_MAP_MIRROR,
+
+        P3D_TEX_MAP_MODE_SIZE
     };
 
     enum P3D_PRIMITIVE_TOPOLOGY {

@@ -1,6 +1,7 @@
 #include "d3d11_Renderer.h"
 #include "../../assert.h"
 #include "../dx/dx_ConstConvert.h"
+#include "../dx/dx_ProjectionMath.h"
 #include "d3d11_ConstConvert.h"
 #include "d3d11_Utility.h"
 
@@ -115,6 +116,37 @@ namespace p3d {
                 {} //TODO: add a description
             );
 
+            P3D_ASSERT_R(initializeRendering(screenDim), "Failed to initialize rendering");
+
+            return true;
+        }
+
+        bool Renderer::initializeRendering(const unsigned int screenDim[2]) {
+            auto renderTargetView = _renderTargetBuff.getRenderTargetView().Get();
+            _deviceContext->OMSetRenderTargets(1, &renderTargetView, _depthStencilBuff.getDepthStencilView().Get());
+
+            float topLeft[2] = { 0.0f, 0.0f };
+            float fScreenDim[2] = { (float)screenDim[0], (float)screenDim[1] };
+            float minMaxDepth[2] = { 0.0f, 1.0f };
+            Utility::setViewPort(_deviceContext, topLeft, fScreenDim, minMaxDepth);
+            _projection = math::perspectiveDX(glm::radians(/*45.0f*/90.0f), fScreenDim[0] / fScreenDim[1], 0.05f, 1000.f);
+
+            P3D_ASSERT_R(Utility::createBlendState(_device.Get(), false, false, _noBlendState), 
+                "Failed to create no-blend state");
+            P3D_ASSERT_R(Utility::createRasterizerState(_device.Get(), D3D11_CULL_BACK, D3D11_FILL_SOLID, true, _backFaceCull), 
+                "Failed to create back face cull state");
+            P3D_ASSERT_R(Utility::createRasterizerState(_device.Get(), D3D11_CULL_FRONT, D3D11_FILL_SOLID, true, _frontFaceCull), 
+                "Failed to create front face cull state");
+            P3D_ASSERT_R(Utility::createRasterizerState(_device.Get(), D3D11_CULL_NONE, D3D11_FILL_WIREFRAME, true, _wireframeMode), 
+                "Failed to create wireframe mode");
+
+            for (unsigned int i = 0; i < P3D_TEX_MAP_MODE_SIZE; i++) {
+                D3D11_TEXTURE_ADDRESS_MODE dx11MapMode;
+                P3D_ASSERT_R(convertTextureMapMode((P3D_TEX_MAP_MODE)i, dx11MapMode), "Failed to convert texture map mode");
+                P3D_ASSERT_R(Utility::createTextureSamplerState(_device.Get(), dx11MapMode, D3D11_FILTER_MIN_MAG_MIP_LINEAR /*D3D11_FILTER_ANISOTROPIC*/,
+                    1, _samplerStates[i]), "Failed to create texture sampler");
+            }
+
             return true;
         }
 
@@ -124,46 +156,6 @@ namespace p3d {
 
         p3d::Texture2dArrayI& Renderer::getDepthStencilBuff() {
             return _depthStencilBuff;
-        }
-
-        bool Renderer::clearRenderTargetBuff(const p3d::Texture2dArrayI* renderTargetBuff, const float color[4]) {
-            const d3d11::Texture2dArray* rtBuff = static_cast<const d3d11::Texture2dArray*>(renderTargetBuff);
-            P3D_ASSERT_R(rtBuff->getRenderTargetView(), "Render target view is NULL");
-
-            _deviceContext->ClearRenderTargetView(rtBuff->getRenderTargetView().Get(), color);
-            return true;
-        }
-
-        bool Renderer::clearDepthBuff(const p3d::Texture2dArrayI* depthStencilBuff, float depth) {
-            const d3d11::Texture2dArray* dsBuff = static_cast<const d3d11::Texture2dArray*>(depthStencilBuff);
-            P3D_ASSERT_R(dsBuff->getDepthStencilView(), "Depth stencil view is NULL");
-
-            _deviceContext->ClearDepthStencilView(dsBuff->getDepthStencilView().Get(), D3D11_CLEAR_DEPTH, depth, 0);
-            return true;
-        }
-
-        bool Renderer::clearStencilBuff(const p3d::Texture2dArrayI* depthStencilBuff, unsigned int stencil) {
-            const d3d11::Texture2dArray* dsBuff = static_cast<const d3d11::Texture2dArray*>(depthStencilBuff);
-            P3D_ASSERT_R(dsBuff->getDepthStencilView(), "Depth stencil view is NULL");
-
-            _deviceContext->ClearDepthStencilView(
-                dsBuff->getDepthStencilView().Get(), D3D11_CLEAR_STENCIL, 0.0f, stencil
-            );
-            return true;
-        }
-
-        bool Renderer::clearDepthStencilBuff(
-            const p3d::Texture2dArrayI* depthStencilBuff,
-            float depth,
-            unsigned int stencil) {
-
-            const d3d11::Texture2dArray* dsBuff = static_cast<const d3d11::Texture2dArray*>(depthStencilBuff);
-            P3D_ASSERT_R(dsBuff->getDepthStencilView(), "Depth stencil view is NULL");
-
-            _deviceContext->ClearDepthStencilView(
-                dsBuff->getDepthStencilView().Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, depth, stencil
-            );
-            return true;
         }
 
         bool Renderer::OMSetRenderTargets(
@@ -652,6 +644,20 @@ namespace p3d {
                 }
             }
             return true;
+        }
+
+        void Renderer::renderFrame(const SceneI* scene, const CameraI* camera) {
+            if (scene == nullptr || camera == nullptr) {
+                return;
+            }
+
+            float backgroundColor[] = { 0.0f, 0.0f, 255.0f };
+            _deviceContext->ClearRenderTargetView(_renderTargetBuff.getRenderTargetView().Get(), backgroundColor);
+            _deviceContext->ClearDepthStencilView(_depthStencilBuff.getDepthStencilView().Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+
+
+            _swapChain->Present(0, 0);
         }
     }
 }

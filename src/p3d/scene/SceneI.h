@@ -34,6 +34,15 @@ namespace p3d {
         virtual const VertexShaderDesc* getDesc(HVertexShader handle) const = 0;
         virtual const PixelShaderDesc* getDesc(HPixelShader handle) const = 0;
 
+        virtual const std::vector<HModel>& getAllModels() const = 0;
+        virtual const std::vector<HMesh>& getAllMeshes() const = 0;
+        virtual const std::vector<HMaterial>& getAllMaterials() const = 0;
+        virtual const std::vector<HTexture2dArr>& getAllTexture2dArr() const = 0;
+        virtual const std::vector<HVertexShader>& getAllVertexShaders() const = 0;
+        virtual const std::vector<HPixelShader>& getAllPixelShaders() const = 0;
+
+        virtual const std::vector<HModel>& getVisibleModels() const = 0;
+
         /*virtual bool update(HModel handle, const ModelDesc& desc) = 0;
         virtual bool update(HMesh handle, const MeshDesc& desc) = 0;
         virtual bool update(HMaterial handle, const MaterialDesc& desc) = 0;

@@ -200,9 +200,9 @@ namespace p3d {
                 if (material->Get(AI_MATKEY_COLOR_SPECULAR, val) == AI_SUCCESS) {
                     out.specularColor = { val.r, val.g, val.b };
                 }
-                if (material->Get(AI_MATKEY_COLOR_TRANSPARENT, val) == AI_SUCCESS) {
+                /*if (material->Get(AI_MATKEY_COLOR_TRANSPARENT, val) == AI_SUCCESS) {
                     out.transparencyColor = { val.r, val.g, val.b };
-                }
+                }*/
 
                 // TODO load emission and other params
                 /*if (material->Get(AI_MATKEY_COLOR_EMISSIVE, val) == AI_SUCCESS) {
@@ -218,9 +218,9 @@ namespace p3d {
                 if (material->Get(AI_MATKEY_SHININESS_STRENGTH, val) == AI_SUCCESS) {
                     out.shininessStrength = val;
                 }
-                if (material->Get(AI_MATKEY_OPACITY, val) == AI_SUCCESS) {
+                /*if (material->Get(AI_MATKEY_OPACITY, val) == AI_SUCCESS) {
                     out.opacity = val;
-                }
+                }*/
 			}
 
 			{
@@ -279,7 +279,7 @@ namespace p3d {
             const std::string& scenePath,
             const std::string& userTexDir,
             HTexture2dArr& texOut,
-            TEX_MAP_MODE& mapModeOut
+            P3D_TEX_MAP_MODE& mapModeOut
         ) {
             aiString texPathStr;
             aiTextureMapMode mapMode[3];
@@ -320,20 +320,17 @@ namespace p3d {
 			return true;
 		}
 
-		bool SceneImporter::loadTextureMapMode(aiTextureMapMode in, TEX_MAP_MODE& out) {
+		bool SceneImporter::loadTextureMapMode(aiTextureMapMode in, P3D_TEX_MAP_MODE& out) {
 			switch (in) {
 			case aiTextureMapMode_Wrap:
-				out = TEX_MAP_MODE::TEX_MAP_WRAP;
+				out = P3D_TEX_MAP_MODE::P3D_TEX_MAP_WRAP;
 				break;
 			case aiTextureMapMode_Clamp:
-				out = TEX_MAP_MODE::TEX_MAP_CLAMP;
+				out = P3D_TEX_MAP_MODE::P3D_TEX_MAP_CLAMP;
 				break;
 			case aiTextureMapMode_Mirror:
-				out = TEX_MAP_MODE::TEX_MAP_MIRROR;
+				out = P3D_TEX_MAP_MODE::P3D_TEX_MAP_MIRROR;
 				break;
-            case aiTextureMapMode_Decal:
-                out = TEX_MAP_MODE::TEX_MAP_DECAL;
-                break;
 			default:
 				return false;
 			}

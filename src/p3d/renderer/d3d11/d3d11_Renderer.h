@@ -15,6 +15,7 @@
 #include <d3d11.h>
 
 #include <memory>
+#include <array>
 
 namespace p3d {
     namespace d3d11 {
@@ -32,7 +33,10 @@ namespace p3d {
                 bool fullscreen
             );
 
+            bool initializeRendering(const unsigned int screenDim[2]);
+
             void renderFrame() override;
+            void renderFrame(const SceneI* scene, const CameraI* camera) override;
 
             std::unique_ptr<p3d::MeshI> createMesh(
                 const MeshDesc& desc
@@ -66,11 +70,6 @@ namespace p3d {
 
             p3d::Texture2dArrayI& getRenderTargetBuff();
             p3d::Texture2dArrayI& getDepthStencilBuff();
-
-            bool clearRenderTargetBuff(const p3d::Texture2dArrayI* renderTargetBuff, const float color[4]);
-            bool clearDepthBuff(const p3d::Texture2dArrayI* depthStencilBuff, float depth);
-            bool clearStencilBuff(const p3d::Texture2dArrayI* depthStencilBuff, unsigned int stencil);
-            bool clearDepthStencilBuff(const p3d::Texture2dArrayI* depthStencilBuff, float depth, unsigned int stencil);
 
             bool OMSetRenderTargets(
                 const p3d::Texture2dArrayI* renderTargetBuff,
@@ -121,6 +120,14 @@ namespace p3d {
 
             unsigned int _msaaLevel = 0;
             unsigned int _msaaQualityLevel = 0;
+            glm::mat4x4 _projection;
+
+            //pipeline state object components
+            ComPtr<ID3D11BlendState> _noBlendState = nullptr;
+            ComPtr<ID3D11RasterizerState> _backFaceCull = nullptr;
+            ComPtr<ID3D11RasterizerState> _frontFaceCull = nullptr;
+            ComPtr<ID3D11RasterizerState> _wireframeMode = nullptr;
+            std::array<ComPtr<ID3D11SamplerState>, P3D_TEX_MAP_MODE_SIZE> _samplerStates;
         };
     }
 }

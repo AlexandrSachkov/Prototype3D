@@ -14,8 +14,7 @@ namespace p3d {
     }
 
     HModel Scene::create(const ModelDesc& desc) {
-        HResource hres = _models.insert(std::unique_ptr<void*>(), desc, genUUID());
-        return HModel(hres.getBuffPosition(), hres.getUUID());
+        return _models.insert(std::unique_ptr<void*>(), desc, genUUID());
     }
 
     HMesh Scene::create(const MeshDesc& desc) {
@@ -24,8 +23,7 @@ namespace p3d {
             return HMesh();
         }
 
-        HResource hres = _meshes.insert(mesh, desc, genUUID());
-        return HMesh(hres.getBuffPosition(), hres.getUUID());
+        return _meshes.insert(mesh, desc, genUUID());
     }
 
     HMaterial Scene::create(const MaterialDesc& desc) {
@@ -34,8 +32,7 @@ namespace p3d {
             return HMaterial();
         }
 
-        HResource hres = _materials.insert(material, desc, genUUID());
-        return HMaterial(hres.getBuffPosition(), hres.getUUID());
+        return _materials.insert(material, desc, genUUID());
     }
 
     HTexture2dArr Scene::create(const TextureDesc& desc) {
@@ -44,8 +41,7 @@ namespace p3d {
             return HTexture2dArr();
         }
 
-        HResource hres = _textures2dArr.insert(tex2dArr, desc, genUUID());
-        return HTexture2dArr(hres.getBuffPosition(), hres.getUUID());
+        return _textures2dArr.insert(tex2dArr, desc, genUUID());
     }
 
     HVertexShader Scene::create(const VertexShaderDesc& desc) {
@@ -54,8 +50,7 @@ namespace p3d {
             return HVertexShader();
         }
 
-        HResource hres = _vertexShaders.insert(vs, desc, genUUID());
-        return HVertexShader(hres.getBuffPosition(), hres.getUUID());
+        return _vertexShaders.insert(vs, desc, genUUID());
     }
 
     HPixelShader Scene::create(const PixelShaderDesc& desc) {
@@ -64,8 +59,7 @@ namespace p3d {
             return HPixelShader();
         }
 
-        HResource hres = _pixelShaders.insert(ps, desc, genUUID());
-        return HPixelShader(hres.getBuffPosition(), hres.getUUID());
+        return _pixelShaders.insert(ps, desc, genUUID());
     }
 
     const MeshI* Scene::get(HMesh handle) const {
@@ -112,6 +106,34 @@ namespace p3d {
         return _pixelShaders.getDesc(handle);
     }
 
+    const std::vector<HModel>& Scene::getAllModels() const {
+        return _models.getAllHandles();
+    }
+
+    const std::vector<HMesh>& Scene::getAllMeshes() const {
+        return _meshes.getAllHandles();
+    }
+
+    const std::vector<HMaterial>& Scene::getAllMaterials() const {
+        return _materials.getAllHandles();
+    }
+
+    const std::vector<HTexture2dArr>& Scene::getAllTexture2dArr() const {
+        return _textures2dArr.getAllHandles();
+    }
+
+    const std::vector<HVertexShader>& Scene::getAllVertexShaders() const {
+        return _vertexShaders.getAllHandles();
+    }
+
+    const std::vector<HPixelShader>& Scene::getAllPixelShaders() const {
+        return _pixelShaders.getAllHandles();
+    }
+
+    const std::vector<HModel>& Scene::getVisibleModels() const {
+        //TODO reimplement using space partitioner
+        return _models.getAllHandles();
+    }
     /*bool Scene::update(HModel handle, const ModelDesc& desc) {
         return false;
     }

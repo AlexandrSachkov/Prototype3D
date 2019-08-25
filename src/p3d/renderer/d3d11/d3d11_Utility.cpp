@@ -245,17 +245,12 @@ namespace p3d {
             return true;
         }
 
-        bool Utility::createBlendStates(
+        bool Utility::createBlendState(
             ID3D11Device* device,
             bool enableBlend,
-            bool enableIndependentBlending,
-            uint_fast32_t numRenderTargets,
             bool enableAlphaToCoverage,
-            ID3D11BlendState*& blendState
+            ComPtr<ID3D11BlendState>& blendState
         ) {
-            assert(numRenderTargets > 0 && numRenderTargets <= 8);
-
-            HRESULT hr;
             D3D11_BLEND_DESC blendDesc;
             ZeroMemory(&blendDesc, sizeof(blendDesc));
 
@@ -271,23 +266,11 @@ namespace p3d {
             rtbd.BlendOpAlpha = D3D11_BLEND_OP_ADD;
             rtbd.RenderTargetWriteMask = D3D10_COLOR_WRITE_ENABLE_ALL;
 
-            blendDesc.IndependentBlendEnable = enableIndependentBlending;
+            blendDesc.RenderTarget[0] = rtbd;
+            blendDesc.IndependentBlendEnable = false;
             blendDesc.AlphaToCoverageEnable = enableAlphaToCoverage;
 
-            if (enableIndependentBlending) {
-                for (uint_fast32_t i = 0; i < numRenderTargets; i++) {
-                    blendDesc.RenderTarget[i] = rtbd;
-                }
-            } else {
-                blendDesc.RenderTarget[0] = rtbd;
-            }
-
-
-            hr = device->CreateBlendState(&blendDesc, &blendState);
-            if (FAILED(hr)) {
-                //CONSOLE::out(CONSOLE::ERR, L"Failed to create blend state");
-                return false;
-            }
+            P3D_ASSERT_R_DX11(device->CreateBlendState(&blendDesc, &blendState));
             return true;
         }
 
@@ -420,30 +403,29 @@ namespace p3d {
             return true;
         }
 
-        bool Utility::createTextureSamplerState(ID3D11Device* device, ID3D11SamplerState*& samplerState) {
-            HRESULT hr;
+        bool Utility::createTextureSamplerState(
+            const ComPtr<ID3D11Device> device,
+            D3D11_TEXTURE_ADDRESS_MODE mode,
+            D3D11_FILTER filter,
+            unsigned int maxAntisotropy,
+            ComPtr<ID3D11SamplerState> samplerState
+        ) {
+            P3D_ASSERT_R(maxAntisotropy <= 16, "Max antisotropy cannot be greater than 16");
 
             D3D11_SAMPLER_DESC sampDesc;
             ZeroMemory(&sampDesc, sizeof(sampDesc));
-            sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-            sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-            sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-            sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+            sampDesc.Filter = filter;
+            sampDesc.AddressU = mode;
+            sampDesc.AddressV = mode;
+            sampDesc.AddressW = mode;
+            sampDesc.MaxAnisotropy = maxAntisotropy;
             sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
             sampDesc.MinLOD = 0;
             sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-            //Create the Sample State
-            hr = device->CreateSamplerState(&sampDesc, &samplerState);
-            if (FAILED(hr)) {
-                //CONSOLE::out(CONSOLE::ERR, L"Failed to create texture sampler state");
-                return false;
-            }
-
+            P3D_ASSERT_R_DX11(device->CreateSamplerState(&sampDesc, &samplerState));
             return true;
         }
-
-
 
         bool Utility::createRasterizerState(
             const ComPtr<ID3D11Device> device,

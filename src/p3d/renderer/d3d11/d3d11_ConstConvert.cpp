@@ -108,5 +108,21 @@ namespace p3d {
                 return D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
             }
         }
+
+        bool convertTextureMapMode(P3D_TEX_MAP_MODE mode, D3D11_TEXTURE_ADDRESS_MODE& d3d11MapMode) {
+            switch (mode) {
+            case P3D_TEX_MAP_WRAP:
+                d3d11MapMode = D3D11_TEXTURE_ADDRESS_WRAP;
+                return true;
+            case P3D_TEX_MAP_CLAMP:
+                d3d11MapMode = D3D11_TEXTURE_ADDRESS_CLAMP;
+                return true;
+            case P3D_TEX_MAP_MIRROR:
+                d3d11MapMode = D3D11_TEXTURE_ADDRESS_MIRROR;
+                return true;
+            default:
+                return false;
+            }
+        }
     }
 }
