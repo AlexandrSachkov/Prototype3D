@@ -15,10 +15,7 @@
 namespace p3d {
 	namespace util {
 		bool SceneImporter::import(const std::string& path, const std::string& userTexDir, SceneI* sceneOut, SceneGraphI* sceneGraph) {
-			std::experimental::filesystem::path scenePath(path);
-			if (!std::experimental::filesystem::exists(scenePath))
-				return false;
-			scenePath = scenePath.remove_filename();
+            P3D_ASSERT_R(sceneOut, "Failed to import scene. Scene is null");
 
 			Assimp::Importer importer;
 			const aiScene* scene = importer.ReadFile(path,
@@ -33,47 +30,50 @@ namespace p3d {
 
             P3D_ASSERT_R(scene, importer.GetErrorString());
 			
-            std::vector<MeshDesc> meshes;
-            std::vector<MaterialDesc> materials;
-            std::vector<TextureDesc> textures;
+            std::vector<HMesh> meshes;
+            std::vector<HMaterial> materials;
 
             if (scene->HasMeshes()) {
-                loadMeshes(scene->mMeshes, scene->mNumMeshes, meshes);
+                loadMeshes(scene->mMeshes, scene->mNumMeshes, sceneOut, meshes);
             }
             if (scene->HasMaterials()) {
                 loadMaterials(scene->mMaterials, scene->mNumMaterials, sceneOut, path, userTexDir, materials);
             }
             
 			/*if (scene->HasLights() && !loadLights(scene->mLights, scene->mNumLights, out.lights))
-				return false;
+				return false;*/
 
-            aiMatrix4x4 identity;
-            if (!loadModels(scene->mRootNode, identity, scene->mMeshes, out.models))
-                return false;*/
+            loadModels(scene->mRootNode, aiMatrix4x4(), scene->mMeshes, meshes, materials, sceneOut);
 
 			return true;
 		}
 
-		/*bool SceneImporter::loadModels(aiNode* node, aiMatrix4x4 parentTransform, aiMesh** meshes, std::vector<model::Model>& out) {
-			aiMatrix4x4 transform = parentTransform * node->mTransformation;
-			for (unsigned int i = 0; i < node->mNumMeshes; i++) {
-				model::Model newModel = {};
-				newModel.transform = glm::make_mat4x4((const float*)(&transform));
-				unsigned int meshIndex = node->mMeshes[i];
-				newModel.meshIndex = meshIndex;
-				newModel.materialIndex = meshes[meshIndex]->mMaterialIndex;
-
-				out.push_back(newModel);
+		void SceneImporter::loadModels(
+            aiNode* srcNode,
+            aiMatrix4x4 parentTransform,
+            aiMesh** srcMeshes,
+            const std::vector<HMesh>& meshes,
+            const std::vector<HMaterial>& materials,
+            SceneI* scene
+        ) {
+			aiMatrix4x4 transform = parentTransform * srcNode->mTransformation;
+			for (unsigned int i = 0; i < srcNode->mNumMeshes; i++) {
+                ModelDesc desc;
+                desc.transform = glm::make_mat4x4((const float*)(&transform));
+                unsigned int srcMeshIndex = srcNode->mMeshes[i];
+                desc.mesh = meshes[srcMeshIndex];
+                desc.material = materials[srcMeshes[srcMeshIndex]->mMaterialIndex];
+				
+                HModel hmodel = scene->create(desc);
+                P3D_WARNING(!hmodel.isValid(), "Failed to create scene model");
 			}
 
-			for (unsigned int i = 0; i < node->mNumChildren; i++) {
-				if (!loadModels(node->mChildren[i], transform, meshes, out))
-					return false;
+			for (unsigned int i = 0; i < srcNode->mNumChildren; i++) {
+                loadModels(srcNode->mChildren[i], transform, srcMeshes, meshes, materials, scene);
 			}
-			return true;
-		}*/
+		}
 
-		bool SceneImporter::loadMeshes(aiMesh** meshes, unsigned int numMeshes, std::vector<MeshDesc>& meshesOut) {
+		bool SceneImporter::loadMeshes(aiMesh** meshes, unsigned int numMeshes, SceneI* scene, std::vector<HMesh>& meshesOut) {
             meshesOut.clear();
             meshesOut.resize(numMeshes);
 
@@ -81,7 +81,14 @@ namespace p3d {
             P3D_ASSERT_R(sizeof(glm::vec4) == sizeof(aiColor4D), "Failed to load meshes. Vec4d sizes do not match");
 
 			for (unsigned int i = 0; i < numMeshes; i++) {
-                P3D_WARNING(!loadMesh(meshes[i], meshesOut[i]), "Failed to load mesh #" + std::to_string(i));
+                MeshDesc desc;
+                if (!loadMesh(meshes[i], desc)) {
+                    P3D_ERROR_PRINT("Failed to load mesh #" + std::to_string(i));
+                    continue;
+                }
+                
+                meshesOut[i] = scene->create(desc);
+                P3D_WARNING(!meshesOut[i].isValid(), "Failed to create scene mesh");
 			}
 			return true;
 		}
@@ -152,16 +159,21 @@ namespace p3d {
             SceneI* scene,
             const std::string& scenePath,
             const std::string& userTexDir,
-            std::vector<MaterialDesc>& materialsOut
+            std::vector<HMaterial>& materialsOut
         ) {
             materialsOut.clear();
             materialsOut.resize(numMaterials);
 
             std::unordered_map<std::string, HTexture2dArr> texture2dMap; //for texture reuse
 			for (unsigned int i = 0; i < numMaterials; i++) {
-                P3D_WARNING(
-                    !loadMaterial(materials[i], texture2dMap, scene, scenePath, userTexDir, materialsOut[i]),
-                    "Failed to load material #" + std::to_string(i));
+                MaterialDesc desc;
+                if (!loadMaterial(materials[i], texture2dMap, scene, scenePath, userTexDir, desc)) {
+                    P3D_ERROR_PRINT("Failed to load material #" + std::to_string(i));
+                    continue;
+                }
+                
+                materialsOut[i] = scene->create(desc);
+                P3D_WARNING(!materialsOut[i].isValid(), "Failed to create scene material");
 			}
 			return true;
 		}
@@ -174,6 +186,9 @@ namespace p3d {
             const std::string& userTexDir,
             MaterialDesc& out
         ) {
+            aiString name;
+            material->Get(AI_MATKEY_NAME, name);
+
 			{
 				aiColor3D val;
                 if (material->Get(AI_MATKEY_COLOR_DIFFUSE, val) == AI_SUCCESS) {
@@ -232,10 +247,12 @@ namespace p3d {
 			}
 
             P3D_WARNING(!loadTexture2D(material, aiTextureType_DIFFUSE, texMap, scene, scenePath, userTexDir, out.diffuseTex, out.diffuseMapMode),
-                "Failed to load diffuse texture");
+                "Failed to load diffuse texture of " + std::string(name.C_Str()));
 
-            P3D_WARNING(!loadTexture2D(material, aiTextureType_NORMALS, texMap, scene, scenePath, userTexDir, out.normalTex, out.normalMapMode),
-                "Failed to load normal texture");
+            if (!loadTexture2D(material, aiTextureType_NORMALS, texMap, scene, scenePath, userTexDir, out.normalTex, out.normalMapMode)) {
+                P3D_WARNING(!loadTexture2D(material, aiTextureType_HEIGHT, texMap, scene, scenePath, userTexDir, out.normalTex, out.normalMapMode),
+                    "Failed to load normal texture of " + std::string(name.C_Str()));
+            }
                     
             //TODO load other textures
 			/*if (!loadTexture2D(material, aiTextureType_AMBIENT, scenePath, out.hasAmbientTex, out.ambientTex))
@@ -275,18 +292,11 @@ namespace p3d {
                 "Multiple texture of same type detected. Able to load only the first one");
 
             std::string texFinalPath;
-            P3D_ASSERT_R(findTexturePath(scenePath, userTexDir, texPathStr.C_Str(), texFinalPath),
-                "Unable to find texture");
+            P3D_ASSERT_R(findTexturePath(scenePath, userTexDir, texPathStr.C_Str(), texFinalPath), "Unable to find texture");
 
-            if (mapMode[0] != mapMode[1]) {
-                // only one texture mapping type is supported per texture
-                return false;
-            }
+            P3D_ASSERT_R(mapMode[0] == mapMode[1], "Different map modes per UV channels not supported");
 
-            if (!loadTextureMapMode(mapMode[0], mapModeOut)) {
-                // failed to load texture map mode
-                return false;
-            }
+            P3D_WARNING(!loadTextureMapMode(mapMode[0], mapModeOut), "Failed to load texture mode. Using default");
 
             auto texIt = texMap.find(texFinalPath);
             if (texIt != texMap.end()) {
@@ -297,21 +307,16 @@ namespace p3d {
                 
             TextureDesc texDesc;
             texDesc.path = texFinalPath;
-            if (!DDSTextureLoader::loadDDSTextureFromFile(texFinalPath, texDesc)) {
-                // failed to load texture
-                return false;
-            }
+            P3D_ASSERT_R(DDSTextureLoader::loadDDSTextureFromFile(texFinalPath, texDesc), "DDSTextureLoader failed to load texture");
+
             texDesc.usageFlag = P3D_USAGE::P3D_USAGE_GPU_R;
             texDesc.bindFlags = { P3D_BIND_SHADER_RESOURCE };
             texDesc.generateMipMaps = true;
 
             texOut = scene->create(texDesc);
-            if (!texOut.isValid()) {
-                // failed to create scene texture
-                return false;
-            }
-            texMap.emplace(texFinalPath, texOut);
+            P3D_ASSERT_R(texOut.isValid(), "Scene failed to create texture");
 
+            texMap.emplace(texFinalPath, texOut);
 			return true;
 		}
 
@@ -355,6 +360,15 @@ namespace p3d {
             if (std::experimental::filesystem::exists(bakedTexPath)) {
                 finalPath = bakedTexPath.string();
                 return true;
+            }
+
+            if (bakedTexPath.is_relative()) {
+                std::experimental::filesystem::path bakedRelativeToScenePath =
+                    std::experimental::filesystem::path(scenePathStr).parent_path().append(bakedTexPath);
+                if (std::experimental::filesystem::exists(bakedRelativeToScenePath)) {
+                    finalPath = bakedRelativeToScenePath.string();
+                    return true;
+                }
             }
 
             std::experimental::filesystem::path sceneTexPath = 

@@ -38,14 +38,23 @@ bool run() {
     ), "Failed to initialize D3D11 device");
 
     std::unique_ptr<p3d::RendererI> renderer(d3d11Renderer.release());
-    std::unique_ptr<p3d::SceneI> scene(new p3d::Scene(
+    std::unique_ptr<p3d::SceneI> landlordScene(new p3d::Scene(
         std::unique_ptr<p3d::SpacePartitionerI>(new p3d::NullSpacePartitioner()), 
         renderer.get()
     ));
 
     P3D_ASSERT_R(
-        p3d::util::SceneImporter::import("D:/Repositories/Prototype3D/resources/landlord/landlord.dae", "", scene.get(), nullptr), 
-        "Failed to initialize D3D11 device");
+        p3d::util::SceneImporter::import("D:/Repositories/Prototype3D/resources/landlord/landlord.dae", "", landlordScene.get(), nullptr),
+        "Failed to import landlord.dae");
+
+    std::unique_ptr<p3d::SceneI> sponzaScene(new p3d::Scene(
+        std::unique_ptr<p3d::SpacePartitionerI>(new p3d::NullSpacePartitioner()),
+        renderer.get()
+    ));
+
+    P3D_ASSERT_R(
+        p3d::util::SceneImporter::import("D:/Repositories/Prototype3D/resources/sponza/sponza.obj", "", sponzaScene.get(), nullptr),
+        "Failed to import sponza.obj");
 
     sampleRunner.setRunProcedure([&]() {
         renderer->renderFrame();

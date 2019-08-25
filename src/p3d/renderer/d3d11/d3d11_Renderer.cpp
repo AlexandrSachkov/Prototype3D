@@ -4,6 +4,8 @@
 #include "d3d11_ConstConvert.h"
 #include "d3d11_Utility.h"
 
+#include "d3d11_Mesh.h"
+#include "d3d11_Material.h"
 #include "d3d11_Texture1dArray.h"
 #include "d3d11_Texture2dArray.h"
 #include "d3d11_Texture3d.h"
@@ -249,13 +251,15 @@ namespace p3d {
         std::unique_ptr<p3d::MeshI> Renderer::createMesh(
             const MeshDesc& desc
         ) {
-            return nullptr;
+            //TODO implement mesh
+            return std::unique_ptr<MeshI>(new Mesh());
         }
 
         std::unique_ptr<p3d::MaterialI> Renderer::createMaterial(
             const MaterialDesc& desc
         ) {
-            return nullptr;
+            //TODO implement material
+            return std::unique_ptr<MaterialI>(new Material());;
         }
 
         std::unique_ptr <p3d::Texture1dArrayI> Renderer::createTexture1dArray(

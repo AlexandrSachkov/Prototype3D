@@ -26,6 +26,8 @@ SET(HEADERS
     p3d/common/Uuid.h   
 
     p3d/renderer/d3d11/d3d11_ConstConvert.h
+    p3d/renderer/d3d11/d3d11_Mesh.h
+    p3d/renderer/d3d11/d3d11_Material.h
     p3d/renderer/d3d11/d3d11_PixelShader.h
     p3d/renderer/d3d11/d3d11_Renderer.h
     p3d/renderer/d3d11/d3d11_Texture1dArray.h
@@ -58,6 +60,7 @@ SET(HEADERS
     p3d/util/util_DDSTextureLoader.h
     p3d/util/util_SceneImporter.h
     p3d/util/util_SceneGraphI.h
+    p3d/util/util_SceneGraph.h
     
     p3d/Constants.h
     p3d/ResourceDescriptions.h
@@ -82,6 +85,7 @@ SET(SOURCES
     p3d/util/util_GlfwWindowManager.cpp
     p3d/util/util_DefaultSampleRunner.cpp
     p3d/util/util_DDSTextureLoader.cpp
+    p3d/util/util_SceneGraph.cpp
     p3d/util/util_SceneImporter.cpp
 
     p3d/Constants.cpp
@@ -207,7 +211,7 @@ INCLUDE_DIRECTORIES(
     )
 
 ADD_DEFINITIONS(
-    -DP3D_ASSERT_ENABLE_DEBUG_BREAK
+    #-DP3D_ASSERT_ENABLE_DEBUG_BREAK
     -DP3D_ASSERT_ENABLE_ERROR_PRINT
     )
 

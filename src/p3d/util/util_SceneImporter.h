@@ -25,8 +25,15 @@ namespace p3d {
 			static bool import(const std::string& path, const std::string& texDir, SceneI* scene, SceneGraphI* sceneGraph);
 
 		private:
-            //static bool loadModels(aiNode* node, aiMatrix4x4 transform, aiMesh** meshes, std::vector<model::Model>& out);
-            static bool loadMeshes(aiMesh** meshes, unsigned int numMeshes, std::vector<MeshDesc>& meshesOut);
+            static void loadModels(
+                aiNode* srcNode, 
+                aiMatrix4x4 transform, 
+                aiMesh** srcMeshes, 
+                const std::vector<HMesh>& meshes,
+                const std::vector<HMaterial>& materials,
+                SceneI* scene
+            );
+            static bool loadMeshes(aiMesh** meshes, unsigned int numMeshes, SceneI* scene, std::vector<HMesh>& meshesOut);
             static bool loadMesh(aiMesh* mesh, MeshDesc& out);
             static bool loadMaterials(
                 aiMaterial** materials, 
@@ -34,7 +41,7 @@ namespace p3d {
                 SceneI* scene,
                 const std::string& scenePath,
                 const std::string& texDir,
-                std::vector<MaterialDesc>& out
+                std::vector<HMaterial>& out
             );
             static bool loadMaterial(
                 aiMaterial* material, 
