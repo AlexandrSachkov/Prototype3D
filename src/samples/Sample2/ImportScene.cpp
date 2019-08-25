@@ -39,28 +39,19 @@ bool run() {
     ), "Failed to initialize D3D11 device");
 
     std::unique_ptr<p3d::RendererI> renderer(d3d11Renderer.release());
-    std::unique_ptr<p3d::SceneI> landlordScene(new p3d::Scene(
+    std::unique_ptr<p3d::SceneI> cubeScene(new p3d::Scene(
         std::unique_ptr<p3d::SpacePartitionerI>(new p3d::NullSpacePartitioner()), 
         renderer.get()
     ));
 
     P3D_ASSERT_R(
-        p3d::util::SceneImporter::import("D:/Repositories/Prototype3D/resources/landlord/landlord.dae", "", landlordScene.get(), nullptr),
+        p3d::util::SceneImporter::import("D:/Repositories/Prototype3D/resources/cube/cube.obj", "", cubeScene.get(), nullptr),
         "Failed to import landlord.dae");
-
-    std::unique_ptr<p3d::SceneI> sponzaScene(new p3d::Scene(
-        std::unique_ptr<p3d::SpacePartitionerI>(new p3d::NullSpacePartitioner()),
-        renderer.get()
-    ));
-
-    P3D_ASSERT_R(
-        p3d::util::SceneImporter::import("D:/Repositories/Prototype3D/resources/sponza/sponza.obj", "", sponzaScene.get(), nullptr),
-        "Failed to import sponza.obj");
 
     std::unique_ptr<p3d::CameraI> camera(new p3d::Camera({ 0,0,0 }));
 
     sampleRunner.setRunProcedure([&]() {
-        renderer->renderFrame(landlordScene.get(), camera.get());
+        renderer->renderFrame(cubeScene.get(), camera.get());
     });
     sampleRunner.start();
 
