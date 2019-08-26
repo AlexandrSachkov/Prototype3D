@@ -134,7 +134,7 @@ namespace p3d {
                 meshOut.texCoords.reset(new glm::vec2[mesh->mNumVertices]);
                 for (unsigned int tc = 0; tc < mesh->mNumVertices; tc++) {
                     //only load UV components
-                    meshOut.texCoords.get()[tc] = { mesh->mTextureCoords[0]->x, mesh->mTextureCoords[0]->y };
+                    meshOut.texCoords.get()[tc] = { mesh->mTextureCoords[0][tc].x, mesh->mTextureCoords[0][tc].y };
                 }
             }
 

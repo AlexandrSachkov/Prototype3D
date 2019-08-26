@@ -166,7 +166,7 @@ namespace p3d {
             vsDesc.shaderEntryPoint = "main";
             vsDesc.inputDesc = { 
                 {"POSITION", P3D_VECTOR_FORMAT::P3D_FORMAT_R32G32B32_FLOAT, 0 },
-                {"TEXCOORD", P3D_VECTOR_FORMAT::P3D_FORMAT_R32G32_FLOAT, 0 } 
+                {"TEXCOORD", P3D_VECTOR_FORMAT::P3D_FORMAT_R32G32_FLOAT, 1 } 
             };
             P3D_ASSERT_R(util::readFile("D:/Repositories/Prototype3D/src/p3d/renderer/shaders/hlsl/diffuse_vs.hlsl", vsDesc.hlslSource),
                 "Failed to read vertex shader source");
