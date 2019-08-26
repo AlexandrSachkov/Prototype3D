@@ -45,7 +45,7 @@ bool run() {
     ));
 
     P3D_ASSERT_R(
-        p3d::util::SceneImporter::import("D:/Repositories/Prototype3D/resources/cube/cube.obj", "", cubeScene.get(), nullptr),
+        p3d::util::SceneImporter::import("D:/Repositories/Prototype3D/resources/textured-cube/Cube_obj.obj", "", cubeScene.get(), nullptr),
         "Failed to import landlord.dae");
 
     std::unique_ptr<p3d::CameraI> camera(new p3d::Camera({ 0,0,0 }));

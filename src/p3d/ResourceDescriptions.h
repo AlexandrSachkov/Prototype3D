@@ -85,11 +85,11 @@ namespace p3d {
     struct MaterialDesc {
         glm::vec3 diffuseColor = {0.0f,0.0f,0.0f};
         HTexture2dArr diffuseTex;
-        P3D_TEX_MAP_MODE diffuseMapMode = P3D_TEX_MAP_CLAMP;
+        P3D_TEX_MAP_MODE diffuseMapMode = P3D_TEX_MAP_WRAP;
 
         glm::vec3 normalColor = { 0.0f,0.0f,0.0f };
         HTexture2dArr normalTex;
-        P3D_TEX_MAP_MODE normalMapMode = P3D_TEX_MAP_CLAMP;
+        P3D_TEX_MAP_MODE normalMapMode = P3D_TEX_MAP_WRAP;
 
         glm::vec3 ambientColor = { 0.0f,0.0f,0.0f };
         glm::vec3 specularColor = { 0.0f,0.0f,0.0f };

@@ -150,20 +150,34 @@ namespace p3d {
 
             //TODO load state per material type
             // loading material-specific stuff
-            VertexShaderDesc vsDesc;
+
+            /*VertexShaderDesc vsDesc;
             vsDesc.shaderEntryPoint = "main";
             vsDesc.inputDesc = { {"POSITION", P3D_VECTOR_FORMAT::P3D_FORMAT_R32G32B32_FLOAT, 0 } };
             P3D_ASSERT_R(util::readFile("D:/Repositories/Prototype3D/src/p3d/renderer/shaders/hlsl/pos_vs.hlsl", vsDesc.hlslSource),
                 "Failed to read vertex shader source");
             
-            _vertexShader = createVertexShader(vsDesc);
-            P3D_ASSERT_R(_vertexShader, "Failed to create vertex shader");
-
             PixelShaderDesc psSource;
             psSource.shaderEntryPoint = "main";
             P3D_ASSERT_R(util::readFile("D:/Repositories/Prototype3D/src/p3d/renderer/shaders/hlsl/pos_ps.hlsl", psSource.hlslSource),
-                "Failed to read pixel shader source");
+                "Failed to read pixel shader source");*/
 
+            VertexShaderDesc vsDesc;
+            vsDesc.shaderEntryPoint = "main";
+            vsDesc.inputDesc = { 
+                {"POSITION", P3D_VECTOR_FORMAT::P3D_FORMAT_R32G32B32_FLOAT, 0 },
+                {"TEXCOORD", P3D_VECTOR_FORMAT::P3D_FORMAT_R32G32_FLOAT, 0 } 
+            };
+            P3D_ASSERT_R(util::readFile("D:/Repositories/Prototype3D/src/p3d/renderer/shaders/hlsl/diffuse_vs.hlsl", vsDesc.hlslSource),
+                "Failed to read vertex shader source");
+
+            PixelShaderDesc psSource;
+            psSource.shaderEntryPoint = "main";
+            P3D_ASSERT_R(util::readFile("D:/Repositories/Prototype3D/src/p3d/renderer/shaders/hlsl/diffuse_ps.hlsl", psSource.hlslSource),
+                "Failed to read pixel shader source");
+            
+            _vertexShader = createVertexShader(vsDesc);
+            P3D_ASSERT_R(_vertexShader, "Failed to create vertex shader");
             _pixelShader = createPixelShader(psSource);
             P3D_ASSERT_R(_pixelShader, "Failed to create pixel shader");
 
@@ -785,8 +799,10 @@ namespace p3d {
             for (HModel hmodel : models) {
                 const ModelDesc* modelDesc = scene->getDesc(hmodel);
                 const MeshDesc* meshDesc = scene->getDesc(modelDesc->mesh);
+                const MaterialDesc* materialDesc = scene->getDesc(modelDesc->material);
                 const d3d11::Mesh* mesh = static_cast<const d3d11::Mesh*>(scene->get(modelDesc->mesh));
 
+                // apply mesh
                 auto* vertexBuff = mesh->getVertexBuffer().Get();
                 unsigned int stride = sizeof(glm::vec3);
                 unsigned int offset = 0;
@@ -833,6 +849,17 @@ namespace p3d {
                     _deviceContext->IASetVertexBuffers(5, 1, &colorBuff, &stride, &offset);
                 }
 
+                //apply material
+                if (materialDesc->diffuseTex.isValid()) {
+                    auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->diffuseTex));
+                    auto* textureView = p3dTexture2d->getShaderResourceView().Get();
+                    _deviceContext->PSSetShaderResources(0, 1, &textureView);
+
+                    auto* sampler = _samplerStates[materialDesc->diffuseMapMode].Get();
+                    _deviceContext->PSSetSamplers(0, 1, &sampler);
+                }
+
+                //draw
                 if (indexBuff) {
                     _deviceContext->DrawIndexed(meshDesc->indicesSize, 0, 0);
                 } else {

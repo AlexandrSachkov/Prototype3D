@@ -184,7 +184,7 @@ namespace p3d {
                 D3D11_TEXTURE_ADDRESS_MODE mode,
                 D3D11_FILTER filter,
                 unsigned int maxAntisotropy,
-                ComPtr<ID3D11SamplerState> samplerState
+                ComPtr<ID3D11SamplerState>& samplerState
             );
 
             static void setViewPort(

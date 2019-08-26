@@ -25,6 +25,7 @@ namespace p3d {
 				| aiProcess_SortByPType
                 | aiProcess_OptimizeMeshes
 				| aiProcess_GenSmoothNormals
+                | aiProcess_GenUVCoords
 				| aiProcess_ValidateDataStructure
 				| aiProcess_RemoveRedundantMaterials
 			);
@@ -287,9 +288,10 @@ namespace p3d {
         ) {
             aiString texPathStr;
             aiTextureMapMode mapMode[3];
+            aiTextureMapping mapping;
 
             P3D_ASSERT_R(material->GetTextureCount(type) > 0 &&
-                material->GetTexture(type, 0, &texPathStr, nullptr, nullptr, nullptr, nullptr, mapMode) == AI_SUCCESS,
+                material->GetTexture(type, 0, &texPathStr, &mapping, nullptr, nullptr, nullptr, mapMode) == AI_SUCCESS,
                 "Unable to retrieve texture info");
 
             P3D_WARNING(material->GetTextureCount(type) > 1,
