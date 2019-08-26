@@ -171,6 +171,9 @@ namespace p3d {
             P3D_ASSERT_R(VSSetShader(_vertexShader.get()), "Failed to set vertex shader");
             P3D_ASSERT_R(PSSetShader(_pixelShader.get()), "Failed to set pixel shader");
             _deviceContext->RSSetState(_backFaceCull.Get());
+
+            float blendFactor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+            _deviceContext->OMSetBlendState(_noBlendState.Get(), blendFactor, 0xffffffff);
             return true;
         }
 

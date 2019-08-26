@@ -97,6 +97,9 @@ namespace p3d {
         bool SceneImporter::loadMesh(aiMesh* mesh, MeshDesc& meshOut) {
             P3D_ASSERT_R(mesh->mPrimitiveTypes == aiPrimitiveType_TRIANGLE, "Mesh is not triangulated");
 
+            //assimp converts to triangle list upon import
+            meshOut.topology = P3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
             if (mesh->HasPositions()) {
                 meshOut.vertices.reset(new glm::vec3[mesh->mNumVertices]);
                 meshOut.verticesSize = mesh->mNumVertices;
