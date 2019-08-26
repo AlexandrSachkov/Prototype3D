@@ -798,6 +798,41 @@ namespace p3d {
                     _deviceContext->IASetIndexBuffer(indexBuff, DXGI_FORMAT_R32_UINT, 0);
                 }
 
+                auto* texCoordBuff = mesh->getTextCoordBuffer().Get();
+                if (texCoordBuff) {
+                    stride = sizeof(glm::vec2);
+                    offset = 0;
+                    _deviceContext->IASetVertexBuffers(1, 1, &texCoordBuff, &stride, &offset);
+                }
+
+                auto* normalBuff = mesh->getNormalBuffer().Get();
+                if (normalBuff) {
+                    stride = sizeof(glm::vec3);
+                    offset = 0;
+                    _deviceContext->IASetVertexBuffers(2, 1, &normalBuff, &stride, &offset);
+                }
+
+                auto* tangentBuff = mesh->getTangentBuffer().Get();
+                if (tangentBuff) {
+                    stride = sizeof(glm::vec3);
+                    offset = 0;
+                    _deviceContext->IASetVertexBuffers(3, 1, &tangentBuff, &stride, &offset);
+                }
+
+                auto* bitangentBuff = mesh->getBitangentBuffer().Get();
+                if (bitangentBuff) {
+                    stride = sizeof(glm::vec3);
+                    offset = 0;
+                    _deviceContext->IASetVertexBuffers(4, 1, &bitangentBuff, &stride, &offset);
+                }
+
+                auto* colorBuff = mesh->getColorBuffer().Get();
+                if (colorBuff) {
+                    stride = sizeof(glm::vec4);
+                    offset = 0;
+                    _deviceContext->IASetVertexBuffers(5, 1, &colorBuff, &stride, &offset);
+                }
+
                 if (indexBuff) {
                     _deviceContext->DrawIndexed(meshDesc->indicesSize, 0, 0);
                 } else {
