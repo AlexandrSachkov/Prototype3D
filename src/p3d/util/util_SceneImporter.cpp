@@ -251,10 +251,15 @@ namespace p3d {
 				}*/
 			}
 
-            P3D_WARNING(!loadTexture2D(material, aiTextureType_DIFFUSE, texMap, scene, scenePath, userTexDir, out.diffuseTex, out.diffuseMapMode),
-                "Failed to load diffuse texture of " + std::string(name.C_Str()));
+            if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+                P3D_WARNING(!loadTexture2D(material, aiTextureType_DIFFUSE, texMap, scene, scenePath, userTexDir, out.diffuseTex, out.diffuseMapMode),
+                    "Failed to load diffuse texture of " + std::string(name.C_Str()));
+            }
 
-            if (!loadTexture2D(material, aiTextureType_NORMALS, texMap, scene, scenePath, userTexDir, out.normalTex, out.normalMapMode)) {
+            if (material->GetTextureCount(aiTextureType_NORMALS) > 0) {
+                P3D_WARNING(!loadTexture2D(material, aiTextureType_NORMALS, texMap, scene, scenePath, userTexDir, out.normalTex, out.normalMapMode),
+                    "Failed to load normal texture of " + std::string(name.C_Str()));
+            } else if ((material->GetTextureCount(aiTextureType_HEIGHT) > 0)) {
                 P3D_WARNING(!loadTexture2D(material, aiTextureType_HEIGHT, texMap, scene, scenePath, userTexDir, out.normalTex, out.normalMapMode),
                     "Failed to load normal texture of " + std::string(name.C_Str()));
             }
@@ -290,8 +295,7 @@ namespace p3d {
             aiTextureMapMode mapMode[3];
             aiTextureMapping mapping;
 
-            P3D_ASSERT_R(material->GetTextureCount(type) > 0 &&
-                material->GetTexture(type, 0, &texPathStr, &mapping, nullptr, nullptr, nullptr, mapMode) == AI_SUCCESS,
+            P3D_ASSERT_R(material->GetTexture(type, 0, &texPathStr, &mapping, nullptr, nullptr, nullptr, mapMode) == AI_SUCCESS,
                 "Unable to retrieve texture info");
 
             P3D_WARNING(material->GetTextureCount(type) > 1,
