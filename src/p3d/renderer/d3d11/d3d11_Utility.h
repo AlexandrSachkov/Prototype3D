@@ -115,6 +115,13 @@ namespace p3d {
                 ComPtr<ID3D11Buffer>& buffer
             );
 
+            static void updateConstBuffer(
+                const ComPtr<ID3D11DeviceContext> deviceContext,
+                const ComPtr<ID3D11Buffer> buffer,
+                void* data,
+                size_t dataSize
+            );
+
             static bool createRasterizerState(
                 const ComPtr <ID3D11Device> device,
                 D3D11_CULL_MODE cullMode,

@@ -3,6 +3,7 @@
 #include "../../common/Utils.h"
 #include "../dx/dx_ConstConvert.h"
 #include "../dx/dx_ProjectionMath.h"
+#include "../dx/dx_BufferDescriptions.h"
 #include "d3d11_ConstConvert.h"
 #include "d3d11_Utility.h"
 
@@ -14,9 +15,12 @@
 #include "d3d11_VertexShader.h"
 #include "d3d11_PixelShader.h"
 
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 //#include "DDSTextureLoader.h"
 
 #include <Windows.h>
+#include "DirectXMath.h"
 
 #include <algorithm>
 
@@ -132,13 +136,20 @@ namespace p3d {
             Utility::setViewPort(_deviceContext, topLeft, fScreenDim, minMaxDepth);
             _projection = math::perspectiveDX(glm::radians(/*45.0f*/90.0f), fScreenDim[0] / fScreenDim[1], 0.05f, 1000.f);
 
+            // transforms z-coords from -1 to 1 range (OpenGl) to 0 to 1 for DirectX
+            glm::mat4x4 scale = glm::scale(glm::mat4x4(), glm::vec3(1.0f, 1.0f, 0.5f));
+            glm::mat4x4 trans = glm::translate(glm::mat4x4(), glm::vec3(0, 0, 0.5f));
+            _dxClipTransform = trans * scale;
+
             P3D_ASSERT_R(Utility::createBlendState(_device.Get(), false, false, _noBlendState), 
                 "Failed to create no-blend state");
-            P3D_ASSERT_R(Utility::createRasterizerState(_device.Get(), D3D11_CULL_BACK, D3D11_FILL_SOLID, true, _backFaceCull), 
+
+            bool fontCCW = true; //this is to enable OpenGL compatibility
+            P3D_ASSERT_R(Utility::createRasterizerState(_device.Get(), D3D11_CULL_BACK, D3D11_FILL_SOLID, fontCCW, _backFaceCull),
                 "Failed to create back face cull state");
-            P3D_ASSERT_R(Utility::createRasterizerState(_device.Get(), D3D11_CULL_FRONT, D3D11_FILL_SOLID, true, _frontFaceCull), 
+            P3D_ASSERT_R(Utility::createRasterizerState(_device.Get(), D3D11_CULL_FRONT, D3D11_FILL_SOLID, fontCCW, _frontFaceCull),
                 "Failed to create front face cull state");
-            P3D_ASSERT_R(Utility::createRasterizerState(_device.Get(), D3D11_CULL_NONE, D3D11_FILL_WIREFRAME, true, _wireframeMode), 
+            P3D_ASSERT_R(Utility::createRasterizerState(_device.Get(), D3D11_CULL_NONE, D3D11_FILL_WIREFRAME, fontCCW, _wireframeMode),
                 "Failed to create wireframe mode");
 
             for (unsigned int i = 0; i < P3D_TEX_MAP_MODE_SIZE; i++) {
@@ -147,6 +158,17 @@ namespace p3d {
                 P3D_ASSERT_R(Utility::createTextureSamplerState(_device.Get(), dx11MapMode, D3D11_FILTER_MIN_MAG_MIP_LINEAR /*D3D11_FILTER_ANISOTROPIC*/,
                     1, _samplerStates[i]), "Failed to create texture sampler");
             }
+
+            dx::TransformData transform;
+            P3D_ASSERT_R(Utility::createBuffer(
+                _device.Get(),
+                D3D11_BIND_CONSTANT_BUFFER,
+                D3D11_USAGE_DYNAMIC,
+                D3D11_CPU_ACCESS_WRITE,
+                &transform,
+                sizeof(dx::TransformData),
+                _perObjBuff
+            ),"Failed to create per object buffer");
 
             //TODO load state per material type
             // loading material-specific stuff
@@ -188,6 +210,9 @@ namespace p3d {
 
             float blendFactor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
             _deviceContext->OMSetBlendState(_noBlendState.Get(), blendFactor, 0xffffffff);
+
+            auto* perObjBuff = _perObjBuff.Get();
+            _deviceContext->VSSetConstantBuffers(0, 1, &perObjBuff);
             return true;
         }
 
@@ -801,6 +826,14 @@ namespace p3d {
                 const MeshDesc* meshDesc = scene->getDesc(modelDesc->mesh);
                 const MaterialDesc* materialDesc = scene->getDesc(modelDesc->material);
                 const d3d11::Mesh* mesh = static_cast<const d3d11::Mesh*>(scene->get(modelDesc->mesh));
+
+                // apply transformation
+                glm::mat4x4 projection = glm::perspective(90.0f, (float)800 / (float)600, 0.05f, 1000.f);
+                glm::mat4x4 world = modelDesc->transform;
+                //glm::mat4x4 world = glm::translate(glm::mat4x4(), glm::vec3(0, 0, -2));
+                glm::mat4x4 wvp = _dxClipTransform * projection * world;
+
+                Utility::updateConstBuffer(_deviceContext, _perObjBuff, &wvp, sizeof(dx::TransformData));
 
                 // apply mesh
                 auto* vertexBuff = mesh->getVertexBuffer().Get();

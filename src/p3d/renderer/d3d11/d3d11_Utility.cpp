@@ -245,6 +245,20 @@ namespace p3d {
             return true;
         }
 
+        void Utility::updateConstBuffer(
+            const ComPtr<ID3D11DeviceContext> deviceContext,
+            const ComPtr<ID3D11Buffer> buffer,
+            void* data,
+            size_t dataSize
+        ) {
+            D3D11_MAPPED_SUBRESOURCE mappedResource;
+            ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+
+            deviceContext->Map(buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+            memcpy(mappedResource.pData, data, dataSize);
+            deviceContext->Unmap(buffer.Get(), 0);
+        }
+
         bool Utility::createBlendState(
             ID3D11Device* device,
             bool enableBlend,

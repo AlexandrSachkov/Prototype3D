@@ -24,6 +24,8 @@ namespace p3d {
 				| aiProcess_JoinIdenticalVertices
 				| aiProcess_SortByPType
                 | aiProcess_OptimizeMeshes
+                | aiProcess_FindInstances
+                | aiProcess_ImproveCacheLocality
 				| aiProcess_GenSmoothNormals
                 | aiProcess_GenUVCoords
 				| aiProcess_ValidateDataStructure
@@ -193,6 +195,7 @@ namespace p3d {
         ) {
             aiString name;
             material->Get(AI_MATKEY_NAME, name);
+            P3D_ERROR_PRINT("Loading material: \"" + std::string(name.C_Str()) + "\"");
 
 			{
 				aiColor3D val;

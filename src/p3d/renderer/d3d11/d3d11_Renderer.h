@@ -12,6 +12,7 @@
 #include "../dx/dx_ComPtr.h"
 #include "d3d11_Texture2dArray.h"
 
+#include "glm/mat4x4.hpp"
 #include <d3d11.h>
 
 #include <memory>
@@ -120,6 +121,7 @@ namespace p3d {
             unsigned int _msaaLevel = 0;
             unsigned int _msaaQualityLevel = 0;
             glm::mat4x4 _projection;
+            glm::mat4x4 _dxClipTransform;
 
             //pipeline state object components
             ComPtr<ID3D11BlendState> _noBlendState = nullptr;
@@ -127,6 +129,7 @@ namespace p3d {
             ComPtr<ID3D11RasterizerState> _frontFaceCull = nullptr;
             ComPtr<ID3D11RasterizerState> _wireframeMode = nullptr;
             std::array<ComPtr<ID3D11SamplerState>, P3D_TEX_MAP_MODE_SIZE> _samplerStates;
+            ComPtr<ID3D11Buffer> _perObjBuff = nullptr;
 
 
             std::unique_ptr<VertexShaderI> _vertexShader = nullptr;
