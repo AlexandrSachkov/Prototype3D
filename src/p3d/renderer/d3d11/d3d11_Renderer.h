@@ -120,7 +120,6 @@ namespace p3d {
 
             unsigned int _msaaLevel = 0;
             unsigned int _msaaQualityLevel = 0;
-            glm::mat4x4 _projection;
             glm::mat4x4 _dxClipTransform;
 
             //pipeline state object components

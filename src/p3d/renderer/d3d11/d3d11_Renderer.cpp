@@ -2,7 +2,6 @@
 #include "../../assert.h"
 #include "../../common/Utils.h"
 #include "../dx/dx_ConstConvert.h"
-#include "../dx/dx_ProjectionMath.h"
 #include "../dx/dx_BufferDescriptions.h"
 #include "d3d11_ConstConvert.h"
 #include "d3d11_Utility.h"
@@ -134,7 +133,6 @@ namespace p3d {
             float fScreenDim[2] = { (float)screenDim[0], (float)screenDim[1] };
             float minMaxDepth[2] = { 0.0f, 1.0f };
             Utility::setViewPort(_deviceContext, topLeft, fScreenDim, minMaxDepth);
-            _projection = math::perspectiveDX(glm::radians(/*45.0f*/90.0f), fScreenDim[0] / fScreenDim[1], 0.05f, 1000.f);
 
             // transforms z-coords from -1 to 1 range (OpenGl) to 0 to 1 for DirectX
             glm::mat4x4 scale = glm::scale(glm::mat4x4(), glm::vec3(1.0f, 1.0f, 0.5f));
