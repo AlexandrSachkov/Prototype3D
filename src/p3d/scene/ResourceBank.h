@@ -30,7 +30,8 @@ namespace p3d {
         }
 
         const Res* getResource(H handle) const {
-            if (handle.getUUID() != _handles[handle.getBuffPosition()].getUUID()) {
+            if (handle.getBuffPosition() >= _handles.size() ||
+                handle.getUUID() != _handles[handle.getBuffPosition()].getUUID()) {
                 return false;
             }
 
@@ -38,7 +39,8 @@ namespace p3d {
         }
 
         const Desc* getDesc(H handle) const {
-            if (handle.getUUID() != _handles[handle.getBuffPosition()].getUUID()) {
+            if (handle.getBuffPosition() >= _handles.size() ||
+                handle.getUUID() != _handles[handle.getBuffPosition()].getUUID()) {
                 return false;
             }
 
@@ -50,7 +52,8 @@ namespace p3d {
         }
 
         bool update(H handle, std::unique_ptr<Res>& res, const Desc& desc) {
-            if (handle.getUUID() != _handles[handle.getBuffPosition()].getUUID()) {
+            if (handle.getBuffPosition() >= _handles.size() ||
+                handle.getUUID() != _handles[handle.getBuffPosition()].getUUID()) {
                 return false;
             }
 
@@ -60,7 +63,8 @@ namespace p3d {
         }
 
         bool remove(H handle) {
-            if (handle.getUUID() != _handles[handle.getBuffPosition()].getUUID()) {
+            if (handle.getBuffPosition() >= _handles.size() ||
+                handle.getUUID() != _handles[handle.getBuffPosition()].getUUID()) {
                 return false;
             }
 
