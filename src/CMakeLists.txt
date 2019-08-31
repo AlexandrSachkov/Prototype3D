@@ -62,6 +62,7 @@ SET(HEADERS
     p3d/util/util_GlfwWindowManager.h
     p3d/util/util_DefaultSampleRunner.h
     p3d/util/util_DDSTextureLoader.h
+    p3d/util/util_CameraControllerI.h
     p3d/util/util_SceneImporter.h
     p3d/util/util_SceneGraphI.h
     p3d/util/util_SceneGraph.h

@@ -93,6 +93,14 @@ namespace p3d {
             return glfwGetWin32Window(_window);
         }
 
+        int GlfwWindowManager::getKeyState(int key) {
+            return glfwGetKey(_window, key);
+        }
+
+        void GlfwWindowManager::getCursorPosition(double& posX, double& posY) {
+            glfwGetCursorPos(_window, &posX, &posY);
+        }
+
         void GlfwWindowManager::glfwErrorCallback(int error, const char* description) {
             printf("%s\n", description);
             switch (error) {

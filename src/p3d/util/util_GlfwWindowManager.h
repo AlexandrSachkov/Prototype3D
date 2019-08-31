@@ -29,6 +29,8 @@ namespace p3d {
 
             void getClientSize(unsigned int clientDim[2]);
             HWND getWindowHandle();
+            int getKeyState(int key);
+            void getCursorPosition(double& posX, double& posY);
 
             void enableCursor(bool enable);
             void pollEvents();

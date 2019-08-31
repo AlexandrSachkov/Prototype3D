@@ -33,14 +33,7 @@ namespace p3d {
 
 	void PerspectiveCamera::rotate(float pitchRad, float yawRad) {
 		_pitch += pitchRad;
-		_yaw += yawRad;
-
-        if (_pitch > 89.0f) {
-            _pitch = 89.0f;
-        }
-        if (_yaw > 89.0f) {
-            _yaw = 89.0f;
-        }
+        _yaw += yawRad;
 
 		update();
 	}

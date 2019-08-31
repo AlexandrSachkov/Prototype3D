@@ -1,6 +1,7 @@
 #pragma once
 
 #include "util_GlfwWindowManager.h"
+#include "util_CameraControllerI.h"
 #include <functional>
 
 namespace p3d {
@@ -20,12 +21,22 @@ namespace p3d {
             );
 
             void setRunProcedure(std::function<void()> procedure);
+            void setCameraController(CameraControllerI* cameraController, float moveStepSize, float rotationMultiplier);
             void start();
             void stop();
 
         private:
+            void updateCameraController();
             bool _running;
             std::function<void()> _runProcedure;
+
+            CameraControllerI* _cameraController = nullptr;
+            float _camMoveStepSize = 0.0f;
+            float _camRotationMultiplier = 0.0f;
+
+            double _lastCursorX = 0;
+            double _lastCursorY = 0;
+            bool _firstCameraUpdate = true;
         };
     }
 }

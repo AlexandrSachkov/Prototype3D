@@ -822,10 +822,17 @@ namespace p3d {
 
             auto& models = scene->getVisibleModels();
             for (HModel hmodel : models) {
-                const ModelDesc* modelDesc = scene->getDesc(hmodel);
+                const ModelDesc* modelDesc = scene->getDesc(hmodel); 
+                if (!modelDesc) {
+                    continue;
+                }
+
                 const MeshDesc* meshDesc = scene->getDesc(modelDesc->mesh);
-                const MaterialDesc* materialDesc = scene->getDesc(modelDesc->material);
                 const d3d11::Mesh* mesh = static_cast<const d3d11::Mesh*>(scene->get(modelDesc->mesh));
+                const MaterialDesc* materialDesc = scene->getDesc(modelDesc->material);
+                if (!meshDesc || !mesh || !materialDesc) {
+                    continue;
+                }
 
                 // apply transformation
                 glm::mat4x4 wvp = viewProjection * modelDesc->transform;

@@ -1,11 +1,12 @@
 #pragma once
 #include "CameraI.h"
+#include "../util/util_CameraControllerI.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
 namespace p3d {
-	class PerspectiveCamera : public CameraI {
+	class PerspectiveCamera : public CameraI, public util::CameraControllerI {
 	public:
         PerspectiveCamera(glm::vec3 pos, float fovy, float aspectRatio, float zNear, float zFar);
 		~PerspectiveCamera();
@@ -14,8 +15,8 @@ namespace p3d {
         glm::mat4x4 getProjection() const override;
 		glm::vec3 getEye() const override;
 
-		void move(float fwd, float right);
-		void rotate(float pitchRad, float yawRad);
+		void move(float fwd, float right) override;
+		void rotate(float pitchRad, float yawRad) override;
 
 	private:
 		void update();

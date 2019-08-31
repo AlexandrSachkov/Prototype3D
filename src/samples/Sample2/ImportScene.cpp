@@ -55,37 +55,7 @@ bool run() {
     sampleRunner.setRunProcedure([&]() {
         renderer->renderFrame(cubeScene.get(), camera.get());
     });
-
-    float moveStepSize = 0.05f;
-    sampleRunner.addKeyEvCbk([&](int key, int scancode, int action, int mod) {
-        if (key == GLFW_KEY_W && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-            camera->move(moveStepSize, 0.0f);
-        } else if (key == GLFW_KEY_S && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-            camera->move(-moveStepSize, 0.0f);
-        } else if (key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-            camera->move(0.0f, -moveStepSize);
-        } else if (key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-            camera->move(0.0f, moveStepSize);
-        }
-    });
-
-    double lastCursorX = 0;
-    double lastCursorY = 0;
-    bool firstCameraUpdate = true;
-    sampleRunner.addCursorPosEvCbk([&](double xPos, double yPos) {
-        if (firstCameraUpdate) {
-            lastCursorX = xPos;
-            lastCursorY = yPos;
-            firstCameraUpdate = false;
-        }
-
-        double yaw = xPos - lastCursorX;
-        double pitch = yPos - lastCursorY;
-        lastCursorX = xPos;
-        lastCursorY = yPos;
-
-        camera->rotate((float)(pitch * 0.001f), (float)(yaw * 0.001f));
-    });
+    sampleRunner.setCameraController(camera.get(), 0.001f, 0.001f);
     sampleRunner.start();
 
     return true;
