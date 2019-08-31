@@ -814,6 +814,8 @@ namespace p3d {
                 return;
             }
 
+            glm::mat4x4 viewProjection = _dxClipTransform * camera->getProjection() * camera->getView();
+
             float backgroundColor[] = { 0.0f, 0.0f, 255.0f };
             _deviceContext->ClearRenderTargetView(_renderTargetBuff.getRenderTargetView().Get(), backgroundColor);
             _deviceContext->ClearDepthStencilView(_depthStencilBuff.getDepthStencilView().Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -826,11 +828,7 @@ namespace p3d {
                 const d3d11::Mesh* mesh = static_cast<const d3d11::Mesh*>(scene->get(modelDesc->mesh));
 
                 // apply transformation
-                glm::mat4x4 projection = glm::perspective(90.0f, (float)800 / (float)600, 0.05f, 1000.f);
-                glm::mat4x4 world = modelDesc->transform;
-                //glm::mat4x4 world = glm::translate(glm::mat4x4(), glm::vec3(0, 0, -2));
-                glm::mat4x4 wvp = _dxClipTransform * projection * world;
-
+                glm::mat4x4 wvp = viewProjection * modelDesc->transform;
                 Utility::updateConstBuffer(_deviceContext, _perObjBuff, &wvp, sizeof(dx::TransformData));
 
                 // apply mesh

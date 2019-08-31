@@ -9,6 +9,7 @@ namespace p3d {
         virtual ~CameraI() {}
 
         virtual glm::mat4x4 getView() const = 0;
+        virtual glm::mat4x4 getProjection() const = 0;
         virtual glm::vec3 getEye() const = 0;
     };
 }

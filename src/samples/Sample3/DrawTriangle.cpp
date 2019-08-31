@@ -12,7 +12,7 @@
 #include "p3d/scene/Scene.h"
 #include "p3d/scene/NullSpacePartitioner.h"
 #include "p3d/util/util_SceneImporter.h"
-#include "p3d/scene/Camera.h"
+#include "p3d/scene/PerspectiveCamera.h"
 
 #include "glm/vec3.hpp"
 
@@ -44,7 +44,9 @@ bool run() {
         renderer.get()
     ));
 
-    std::unique_ptr<p3d::CameraI> camera(new p3d::Camera({ 0,0,0 }));
+    std::unique_ptr<p3d::CameraI> camera(
+        new p3d::PerspectiveCamera({ 0,0,-2 }, 90.0f, (float)windowDim[0] / windowDim[1], 0.05f, 1000.0f)
+    );
 
     p3d::MeshDesc meshDesc;
     std::vector<glm::vec3> vertices = { {0,0.5f,0}, {-0.5f,0,0}, {0,0,0.0f} };

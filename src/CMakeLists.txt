@@ -23,7 +23,8 @@ ENDIF(MSVC)
 # =====================================================================================
 
 SET(HEADERS    
-    p3d/common/Uuid.h   
+    p3d/common/Uuid.h
+    p3d/common/Utils.h
 
     p3d/renderer/d3d11/d3d11_ConstConvert.h
     p3d/renderer/d3d11/d3d11_Mesh.h
@@ -38,6 +39,7 @@ SET(HEADERS
     
     p3d/renderer/dx/dx_ComPtr.h
     p3d/renderer/dx/dx_ConstConvert.h
+    p3d/renderer/dx/dx_BufferDescriptions.h
     
     p3d/renderer/GPUResourceProviderI.h
     p3d/renderer/MaterialI.h
@@ -50,6 +52,8 @@ SET(HEADERS
     p3d/renderer/VertexShaderI.h
 
     p3d/scene/NullSpacePartitioner.h
+    p3d/scene/CameraI.h
+    p3d/scene/PerspectiveCamera.h
     p3d/scene/SpacePartitionerI.h
     p3d/scene/ResourceBank.h
     p3d/scene/SceneI.h
@@ -69,7 +73,10 @@ SET(HEADERS
     )
 
 SET(SOURCES 
+    p3d/common/Utils.cpp
+
     p3d/renderer/d3d11/d3d11_ConstConvert.cpp
+    p3d/renderer/d3d11/d3d11_Mesh.cpp
     p3d/renderer/d3d11/d3d11_PixelShader.cpp
     p3d/renderer/d3d11/d3d11_Renderer.cpp
     p3d/renderer/d3d11/d3d11_Texture1dArray.cpp
@@ -81,6 +88,7 @@ SET(SOURCES
     p3d/renderer/dx/dx_ConstConvert.cpp
 
     p3d/scene/Scene.cpp
+    p3d/scene/PerspectiveCamera.cpp
 
     p3d/util/util_GlfwWindowManager.cpp
     p3d/util/util_DefaultSampleRunner.cpp

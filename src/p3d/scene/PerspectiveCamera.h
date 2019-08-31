@@ -5,12 +5,13 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 namespace p3d {
-	class Camera : public CameraI {
+	class PerspectiveCamera : public CameraI {
 	public:
-		Camera(glm::vec3 pos);
-		~Camera();
+        PerspectiveCamera(glm::vec3 pos, float fovy, float aspectRatio, float zNear, float zFar);
+		~PerspectiveCamera();
 
 		glm::mat4x4 getView() const override;
+        glm::mat4x4 getProjection() const override;
 		glm::vec3 getEye() const override;
 
 		void move(float fwd, float right);
@@ -24,5 +25,6 @@ namespace p3d {
 		float _yaw;
 
 		glm::mat4x4 _view;
+        glm::mat4x4 _projection;
 	};
 }

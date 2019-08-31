@@ -12,7 +12,7 @@
 #include "p3d/scene/Scene.h"
 #include "p3d/scene/NullSpacePartitioner.h"
 #include "p3d/util/util_SceneImporter.h"
-#include "p3d/scene/Camera.h"
+#include "p3d/scene/PerspectiveCamera.h"
 
 #include "glm/vec3.hpp"
 
@@ -48,7 +48,9 @@ bool run() {
         p3d::util::SceneImporter::import("D:/Repositories/Prototype3D/resources/cube/cube.obj", "", cubeScene.get(), nullptr),
         "Failed to import landlord.dae");
 
-    std::unique_ptr<p3d::CameraI> camera(new p3d::Camera({ 0,0,0 }));
+    std::unique_ptr<p3d::CameraI> camera(
+        new p3d::PerspectiveCamera({ 0,0,-2 }, 90.0f, (float)windowDim[0] / windowDim[1], 0.05f, 1000.0f)
+    );
 
     sampleRunner.setRunProcedure([&]() {
         renderer->renderFrame(cubeScene.get(), camera.get());
