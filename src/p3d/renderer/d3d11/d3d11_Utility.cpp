@@ -125,10 +125,20 @@ namespace p3d {
 
         bool Utility::createDepthStencilView(
             const ComPtr<ID3D11Device> device,
-            const ComPtr<ID3D11Resource> resource,
+            const ComPtr<ID3D11Texture2D> resource,
             ComPtr<ID3D11DepthStencilView>& depthStencilView
         ) {
-            P3D_ASSERT_R_DX11(device->CreateDepthStencilView(resource.Get(), nullptr, &depthStencilView));
+            D3D11_TEXTURE2D_DESC texDesc;
+            resource->GetDesc(&texDesc);
+
+            D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
+            ZeroMemory(&descDSV, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
+
+            descDSV.Format = texDesc.Format;
+            descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+            descDSV.Texture2D.MipSlice = 0;
+
+            P3D_ASSERT_R_DX11(device->CreateDepthStencilView(resource.Get(), &descDSV, &depthStencilView));
             return true;
         }
 

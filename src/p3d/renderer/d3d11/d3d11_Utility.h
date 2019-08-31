@@ -62,7 +62,7 @@ namespace p3d {
 
             static bool createDepthStencilView(
                 const ComPtr<ID3D11Device> device,
-                const ComPtr<ID3D11Resource> resource,
+                const ComPtr<ID3D11Texture2D> resource,
                 ComPtr<ID3D11DepthStencilView>& depthStencilView
             );
 

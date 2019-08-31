@@ -117,6 +117,7 @@ namespace p3d {
 
             Texture2dArray _renderTargetBuff;
             Texture2dArray _depthStencilBuff;
+            ComPtr<ID3D11DepthStencilState> _defaultDepthStencilState = nullptr;
 
             unsigned int _msaaLevel = 0;
             unsigned int _msaaQualityLevel = 0;

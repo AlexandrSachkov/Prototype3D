@@ -20,7 +20,7 @@
 #include <string>
 
 bool run() {
-    const bool fullscreen = true;
+    const bool fullscreen = false;
     const unsigned int windowDim[] = { 1920, 1080 };
     const std::string winTitle = "Prototype3D sample 1: Create window";
 
@@ -48,8 +48,10 @@ bool run() {
         p3d::util::SceneImporter::import("D:/Repositories/Prototype3D/resources/sponza/sponza.obj", "", sponzaScene.get(), nullptr),
         "Failed to import cube.obj");
 
+    //Field of view should be 45 degrees. Otherwise, it will cause artifacts (need to look into perspective distortion)
+    //Keep near/far planes closer together to avoid floating precision issues
     std::unique_ptr<p3d::PerspectiveCamera> camera(
-        new p3d::PerspectiveCamera({ 0,0,-2 }, 45.0f, (float)windowDim[0] / windowDim[1], 0.05f, 100000.0f)
+        new p3d::PerspectiveCamera({ 0,0,-2 }, 45.0f, (float)windowDim[0] / windowDim[1], 1.0f, 10000.0f)
     );
 
     sampleRunner.setRunProcedure([&]() {

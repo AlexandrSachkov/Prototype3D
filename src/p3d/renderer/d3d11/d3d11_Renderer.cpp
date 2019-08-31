@@ -95,7 +95,7 @@ namespace p3d {
                 false,
                 msaaLevel,
                 msaaQualityLevel,
-                DXGI_FORMAT_D24_UNORM_S8_UINT,
+                DXGI_FORMAT_D32_FLOAT_S8X24_UINT,
                 D3D11_USAGE_DEFAULT,
                 0,
                 D3D11_BIND_DEPTH_STENCIL,
@@ -118,6 +118,35 @@ namespace p3d {
                 nullptr,
                 {} //TODO: add a description
             );
+
+            D3D11_DEPTH_STENCIL_DESC dsDesc;
+            ZeroMemory(&dsDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
+
+            // Depth test parameters
+            dsDesc.DepthEnable = true;
+            dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+            dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+
+            // Stencil test parameters
+            dsDesc.StencilEnable = true;
+            dsDesc.StencilReadMask = 0xFF;
+            dsDesc.StencilWriteMask = 0xFF;
+
+            // Stencil operations if pixel is front-facing
+            dsDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+            dsDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+            dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+            dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+            // Stencil operations if pixel is back-facing
+            dsDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+            dsDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+            dsDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+            dsDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+            // Create depth stencil state
+            P3D_ASSERT_R_DX11(_device->CreateDepthStencilState(&dsDesc, &_defaultDepthStencilState));
+            _deviceContext->OMSetDepthStencilState(_defaultDepthStencilState.Get(), 1);
 
             P3D_ASSERT_R(initializeRendering(screenDim), "Failed to initialize rendering");
 
@@ -780,10 +809,6 @@ namespace p3d {
         ) {
             for (auto bindFlag : bindFlags) {
                 switch (bindFlag) {
-                case P3D_BIND_DEPTH_STENCIL:
-                    P3D_ASSERT_R(Utility::createDepthStencilView(_device, resource, depthStencilView), 
-                        "Failed to create depth stencil view");
-                    break;
                 case P3D_BIND_RENDER_TARGET:
                     P3D_ASSERT_R(Utility::createRenderTargetView(_device, resource, renderTargetView),
                         "Failed to create render target view");
@@ -797,7 +822,7 @@ namespace p3d {
                         "Failed to create unordered access view");
                     break;
                 default:
-                    //do nothing
+                    return false;
                     break;
                 }
             }
