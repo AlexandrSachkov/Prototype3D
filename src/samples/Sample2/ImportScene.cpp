@@ -20,12 +20,12 @@
 #include <string>
 
 bool run() {
-    const bool fullscreen = false;
-    const unsigned int windowDim[] = { 800, 600 };
+    const bool fullscreen = true;
+    const unsigned int windowDim[] = { 1920, 1080 };
     const std::string winTitle = "Prototype3D sample 1: Create window";
 
     auto sampleRunner = p3d::util::DefaultSampleRunner();
-    P3D_ASSERT_R(sampleRunner.initialize(winTitle, windowDim, fullscreen, true, false, true),
+    P3D_ASSERT_R(sampleRunner.initialize(winTitle, windowDim, fullscreen, true, false, false),
         "Failed to initialize window manager");
 
     std::unique_ptr <p3d::d3d11::Renderer> d3d11Renderer(new p3d::d3d11::Renderer());
@@ -67,6 +67,24 @@ bool run() {
         } else if (key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
             camera->move(0.0f, moveStepSize);
         }
+    });
+
+    double lastCursorX = 0;
+    double lastCursorY = 0;
+    bool firstCameraUpdate = true;
+    sampleRunner.addCursorPosEvCbk([&](double xPos, double yPos) {
+        if (firstCameraUpdate) {
+            lastCursorX = xPos;
+            lastCursorY = yPos;
+            firstCameraUpdate = false;
+        }
+
+        double yaw = xPos - lastCursorX;
+        double pitch = yPos - lastCursorY;
+        lastCursorX = xPos;
+        lastCursorY = yPos;
+
+        camera->rotate((float)(pitch * 0.001f), (float)(yaw * 0.001f));
     });
     sampleRunner.start();
 

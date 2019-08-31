@@ -34,6 +34,14 @@ namespace p3d {
 	void PerspectiveCamera::rotate(float pitchRad, float yawRad) {
 		_pitch += pitchRad;
 		_yaw += yawRad;
+
+        if (_pitch > 89.0f) {
+            _pitch = 89.0f;
+        }
+        if (_yaw > 89.0f) {
+            _yaw = 89.0f;
+        }
+
 		update();
 	}
 
@@ -46,6 +54,6 @@ namespace p3d {
 		glm::mat4 rotate = glm::mat4_cast(orientation);
 
 		glm::mat4 translate = glm::translate(glm::mat4(1.0f), _pos);
-		_view = translate * rotate;
+		_view = rotate * translate;
 	}
 }
