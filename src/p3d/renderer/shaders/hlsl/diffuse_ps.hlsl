@@ -9,5 +9,6 @@ SamplerState diffuseSamplerState : register(s0);
 
 float4 main(PS_INPUT input) : SV_TARGET
 {
-	return diffuse.Sample(diffuseSamplerState, input.uv);
+    float2 flippedUV = float2(input.uv.x, input.uv.y * -1.0f); //flip from OpenGL standard
+	return diffuse.Sample(diffuseSamplerState, flippedUV);
 }
