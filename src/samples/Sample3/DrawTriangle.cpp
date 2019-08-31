@@ -45,7 +45,7 @@ bool run() {
     ));
 
     std::unique_ptr<p3d::CameraI> camera(
-        new p3d::PerspectiveCamera({ 0,0,-2 }, 90.0f, (float)windowDim[0] / windowDim[1], 0.05f, 1000.0f)
+        new p3d::PerspectiveCamera({ 0,0,-2 }, 45.0f, (float)windowDim[0] / windowDim[1], 0.05f, 1000.0f)
     );
 
     p3d::MeshDesc meshDesc;

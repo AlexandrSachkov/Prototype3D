@@ -48,12 +48,25 @@ bool run() {
         p3d::util::SceneImporter::import("D:/Repositories/Prototype3D/resources/cube/cube.obj", "", cubeScene.get(), nullptr),
         "Failed to import landlord.dae");
 
-    std::unique_ptr<p3d::CameraI> camera(
-        new p3d::PerspectiveCamera({ 0,0,-2 }, 90.0f, (float)windowDim[0] / windowDim[1], 0.05f, 1000.0f)
+    std::unique_ptr<p3d::PerspectiveCamera> camera(
+        new p3d::PerspectiveCamera({ 0,0,-2 }, 45.0f, (float)windowDim[0] / windowDim[1], 0.05f, 1000.0f)
     );
 
     sampleRunner.setRunProcedure([&]() {
         renderer->renderFrame(cubeScene.get(), camera.get());
+    });
+
+    float moveStepSize = 0.05f;
+    sampleRunner.addKeyEvCbk([&](int key, int scancode, int action, int mod) {
+        if (key == GLFW_KEY_W && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+            camera->move(moveStepSize, 0.0f);
+        } else if (key == GLFW_KEY_S && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+            camera->move(-moveStepSize, 0.0f);
+        } else if (key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+            camera->move(0.0f, -moveStepSize);
+        } else if (key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+            camera->move(0.0f, moveStepSize);
+        }
     });
     sampleRunner.start();
 

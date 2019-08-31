@@ -43,7 +43,7 @@ bool run() {
     ));
 
     sampleRunner.setRunProcedure([&]() {
-        renderer->renderFrame();
+        renderer->renderFrame(scene.get(), nullptr);
     });
     sampleRunner.start();
 

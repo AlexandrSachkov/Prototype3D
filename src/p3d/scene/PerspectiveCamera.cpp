@@ -26,7 +26,7 @@ namespace p3d {
 	void PerspectiveCamera::move(float fwdDist, float rightDist) {
 		glm::vec3 forward(_view[0][2], _view[1][2], _view[2][2]);
 		glm::vec3 strafe(_view[0][0], _view[1][0], _view[2][0]);
-		_pos += fwdDist * forward + rightDist * strafe;
+		_pos += fwdDist * forward - rightDist * strafe;
 
 		update();
 	}

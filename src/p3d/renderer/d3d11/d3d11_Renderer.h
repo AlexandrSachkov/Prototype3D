@@ -34,7 +34,6 @@ namespace p3d {
                 bool fullscreen
             );
 
-            void renderFrame() override;
             void renderFrame(const SceneI* scene, const CameraI* camera) override;
 
             std::unique_ptr<p3d::MeshI> createMesh(
@@ -67,6 +66,7 @@ namespace p3d {
         
         private:
             bool initializeRendering(const unsigned int screenDim[2]);
+            void drawScene(const SceneI* scene, const CameraI* camera);
 
             p3d::Texture2dArrayI& getRenderTargetBuff();
             p3d::Texture2dArrayI& getDepthStencilBuff();

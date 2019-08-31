@@ -15,7 +15,6 @@
 namespace p3d {
     class RendererI : public GPUResourceProviderI {
     public:
-        virtual void renderFrame() = 0;
         virtual void renderFrame(const SceneI* scene, const CameraI* camera) = 0;
     };
 }

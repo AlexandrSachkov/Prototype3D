@@ -16,7 +16,6 @@
 
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-//#include "DDSTextureLoader.h"
 
 #include <Windows.h>
 #include "DirectXMath.h"
@@ -298,10 +297,6 @@ namespace p3d {
 
         void Renderer::draw(unsigned int vertexCount, unsigned int vertexStartLocation) {
             _deviceContext->Draw(vertexCount, vertexStartLocation);
-        }
-
-        void Renderer::renderFrame() {
-            _swapChain->Present(0, 0);
         }
 
         std::unique_ptr<p3d::MeshI> Renderer::createMesh(
@@ -810,6 +805,11 @@ namespace p3d {
         }
 
         void Renderer::renderFrame(const SceneI* scene, const CameraI* camera) {
+            drawScene(scene, camera);
+            _swapChain->Present(0, 0);
+        }
+
+        void Renderer::drawScene(const SceneI* scene, const CameraI* camera) {
             if (scene == nullptr || camera == nullptr) {
                 return;
             }
@@ -895,8 +895,6 @@ namespace p3d {
                     _deviceContext->Draw(meshDesc->verticesSize, 0);
                 }
             }
-
-            _swapChain->Present(0, 0);
         }
     }
 }
