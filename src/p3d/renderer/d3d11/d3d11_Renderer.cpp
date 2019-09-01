@@ -200,29 +200,19 @@ namespace p3d {
             //TODO load state per material type
             // loading material-specific stuff
 
-            /*VertexShaderDesc vsDesc;
-            vsDesc.shaderEntryPoint = "main";
-            vsDesc.inputDesc = { {"POSITION", P3D_VECTOR_FORMAT::P3D_FORMAT_R32G32B32_FLOAT, 0 } };
-            P3D_ASSERT_R(util::readFile("D:/Repositories/Prototype3D/src/p3d/renderer/shaders/hlsl/pos_vs.hlsl", vsDesc.hlslSource),
-                "Failed to read vertex shader source");
-            
-            PixelShaderDesc psSource;
-            psSource.shaderEntryPoint = "main";
-            P3D_ASSERT_R(util::readFile("D:/Repositories/Prototype3D/src/p3d/renderer/shaders/hlsl/pos_ps.hlsl", psSource.hlslSource),
-                "Failed to read pixel shader source");*/
-
             VertexShaderDesc vsDesc;
             vsDesc.shaderEntryPoint = "main";
             vsDesc.inputDesc = { 
-                {"POSITION", P3D_VECTOR_FORMAT::P3D_FORMAT_R32G32B32_FLOAT, 0 },
-                {"TEXCOORD", P3D_VECTOR_FORMAT::P3D_FORMAT_R32G32_FLOAT, 1 } 
+                {"POSITION", P3D_VECTOR_FORMAT::P3D_FORMAT_R32G32B32_FLOAT, P3D_VB_VERTEX_CHANNEL },
+                {"NORMAL", P3D_VECTOR_FORMAT::P3D_FORMAT_R32G32B32_FLOAT, P3D_VB_NORMAL_CHANNEL },
+                {"TEXCOORD", P3D_VECTOR_FORMAT::P3D_FORMAT_R32G32_FLOAT, P3D_VB_TEXCOORD_CHANNEL }
             };
-            P3D_ASSERT_R(util::readFile("D:/Repositories/Prototype3D/src/p3d/renderer/shaders/hlsl/diffuse_vs.hlsl", vsDesc.hlslSource),
+            P3D_ASSERT_R(util::readFile("D:/Repositories/Prototype3D/src/p3d/renderer/shaders/hlsl/uber_vs.hlsl", vsDesc.hlslSource),
                 "Failed to read vertex shader source");
 
             PixelShaderDesc psSource;
             psSource.shaderEntryPoint = "main";
-            P3D_ASSERT_R(util::readFile("D:/Repositories/Prototype3D/src/p3d/renderer/shaders/hlsl/diffuse_ps.hlsl", psSource.hlslSource),
+            P3D_ASSERT_R(util::readFile("D:/Repositories/Prototype3D/src/p3d/renderer/shaders/hlsl/uber_ps.hlsl", psSource.hlslSource),
                 "Failed to read pixel shader source");
             
             _vertexShader = createVertexShader(vsDesc);
@@ -289,10 +279,6 @@ namespace p3d {
             return true;
         }*/
 
-        void Renderer::RSSetViewport(const float topLeft[2], const float dimensions[2], const float minMaxDepth[2]) {
-            Utility::setViewPort(_deviceContext, topLeft, dimensions, minMaxDepth);
-        }
-
         /*bool RenderingDevice::IASetVertexBuffer(
             const p3d::BufferI* vBuff,
             unsigned int offset,
@@ -320,14 +306,6 @@ namespace p3d {
             );
             return true;
         }*/
-
-        void Renderer::drawIndexed(unsigned int numIndices, unsigned int startIndex, unsigned int startVertex) {
-            _deviceContext->DrawIndexed(numIndices, startIndex, startVertex);
-        }
-
-        void Renderer::draw(unsigned int vertexCount, unsigned int vertexStartLocation) {
-            _deviceContext->Draw(vertexCount, vertexStartLocation);
-        }
 
         std::unique_ptr<p3d::MeshI> Renderer::createMesh(
             const MeshDesc& desc
@@ -861,14 +839,17 @@ namespace p3d {
                 }
 
                 // apply transformation
-                glm::mat4x4 wvp = viewProjection * modelDesc->transform;
-                Utility::updateConstBuffer(_deviceContext, _perObjBuff, &wvp, sizeof(dx::TransformData));
+                dx::TransformData transforms;
+                transforms.world = modelDesc->transform;
+                transforms.worldInvTrans = glm::transpose(glm::inverse(modelDesc->transform));
+                transforms.wvp = viewProjection * modelDesc->transform;
+                Utility::updateConstBuffer(_deviceContext, _perObjBuff, &transforms, sizeof(dx::TransformData));
 
                 // apply mesh
                 auto* vertexBuff = mesh->getVertexBuffer().Get();
                 unsigned int stride = sizeof(glm::vec3);
                 unsigned int offset = 0;
-                _deviceContext->IASetVertexBuffers(0, 1, &vertexBuff, &stride, &offset);
+                _deviceContext->IASetVertexBuffers(P3D_VB_VERTEX_CHANNEL, 1, &vertexBuff, &stride, &offset);
                 _deviceContext->IASetPrimitiveTopology(convertPrimitiveTopology(meshDesc->topology));
 
                 auto* indexBuff = mesh->getIndexBuffer().Get();
@@ -880,35 +861,28 @@ namespace p3d {
                 if (texCoordBuff) {
                     stride = sizeof(glm::vec2);
                     offset = 0;
-                    _deviceContext->IASetVertexBuffers(1, 1, &texCoordBuff, &stride, &offset);
+                    _deviceContext->IASetVertexBuffers(P3D_VB_TEXCOORD_CHANNEL, 1, &texCoordBuff, &stride, &offset);
                 }
 
                 auto* normalBuff = mesh->getNormalBuffer().Get();
                 if (normalBuff) {
                     stride = sizeof(glm::vec3);
                     offset = 0;
-                    _deviceContext->IASetVertexBuffers(2, 1, &normalBuff, &stride, &offset);
+                    _deviceContext->IASetVertexBuffers(P3D_VB_NORMAL_CHANNEL, 1, &normalBuff, &stride, &offset);
                 }
 
                 auto* tangentBuff = mesh->getTangentBuffer().Get();
                 if (tangentBuff) {
                     stride = sizeof(glm::vec3);
                     offset = 0;
-                    _deviceContext->IASetVertexBuffers(3, 1, &tangentBuff, &stride, &offset);
+                    _deviceContext->IASetVertexBuffers(P3D_VB_TANGENT_CHANNEL, 1, &tangentBuff, &stride, &offset);
                 }
 
                 auto* bitangentBuff = mesh->getBitangentBuffer().Get();
                 if (bitangentBuff) {
                     stride = sizeof(glm::vec3);
                     offset = 0;
-                    _deviceContext->IASetVertexBuffers(4, 1, &bitangentBuff, &stride, &offset);
-                }
-
-                auto* colorBuff = mesh->getColorBuffer().Get();
-                if (colorBuff) {
-                    stride = sizeof(glm::vec4);
-                    offset = 0;
-                    _deviceContext->IASetVertexBuffers(5, 1, &colorBuff, &stride, &offset);
+                    _deviceContext->IASetVertexBuffers(P3D_VB_BITANGENT_CHANNEL, 1, &bitangentBuff, &stride, &offset);
                 }
 
                 //apply material

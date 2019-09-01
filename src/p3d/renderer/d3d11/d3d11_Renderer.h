@@ -79,14 +79,6 @@ namespace p3d {
             bool IASetPrimitiveTopology(P3D_PRIMITIVE_TOPOLOGY tp);
             bool VSSetShader(const p3d::VertexShaderI* vs);
             bool PSSetShader(const p3d::PixelShaderI* ps); 
-            void RSSetViewport(
-                const float topLeft[2], 
-                const float dimensions[2], 
-                const float minMaxDepth[2]
-            );
-
-            void drawIndexed(unsigned int numIndices, unsigned int startIndex, unsigned int startVertex);
-            void draw(unsigned int vertexCount, unsigned int vertexStartLocation);
 
             Renderer(Renderer const&) = delete;
             Renderer(Renderer&&) = delete;
@@ -110,6 +102,32 @@ namespace p3d {
                 ComPtr<ID3D11ShaderResourceView>& shaderResourceView,
                 ComPtr<ID3D11UnorderedAccessView>& unorderedAccessView
             );
+
+            //member variable
+            enum P3D_VERTEX_BUFFER_CHANNEL {
+                P3D_VB_VERTEX_CHANNEL,
+                P3D_VB_NORMAL_CHANNEL,
+                P3D_VB_TEXCOORD_CHANNEL,
+                P3D_VB_TANGENT_CHANNEL,
+                P3D_VB_BITANGENT_CHANNEL
+            };
+
+            enum P3D_TEX_CHANNEL {
+                P3D_TEX_AMBIENT_CHANNEL,
+                P3D_TEX_DIFFUSE_CHANNEL,
+                P3D_TEX_EMISSION_CHANNEL,
+                P3D_TEX_LIGHTMAP_CHANNEL,
+                P3D_TEX_NORMAL_CHANNEL,
+                P3D_TEX_OPACITY_CHANNEL,
+                P3D_TEX_REFLECTION_CHANNEL,
+                P3D_TEX_SHININESS_CHANNEL,
+                P3D_TEX_SPECULAR_CHANNEL
+            };
+
+            enum P3D_CONSTANT_BUFF_CHANNEL {
+                P3D_CB_TRANSFORM_CHANNEL,
+                P3D_CB_MATERIAL_CHANNEL
+            };
 
             ComPtr<ID3D11Device> _device = nullptr;
             ComPtr<ID3D11DeviceContext> _deviceContext = nullptr;
