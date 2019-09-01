@@ -208,27 +208,34 @@ namespace p3d {
                 if (material->Get(AI_MATKEY_COLOR_SPECULAR, val) == AI_SUCCESS) {
                     out.specularColor = { val.r, val.g, val.b };
                 }
-                /*if (material->Get(AI_MATKEY_COLOR_TRANSPARENT, val) == AI_SUCCESS) {
-                    out.transparencyColor = { val.r, val.g, val.b };
-                }*/
-
-                // TODO load emission and other params
-                /*if (material->Get(AI_MATKEY_COLOR_EMISSIVE, val) == AI_SUCCESS) {
+                if (material->Get(AI_MATKEY_COLOR_EMISSIVE, val) == AI_SUCCESS) {
                     out.emissionColor = { val.r, val.g, val.b };
-                }*/
+                }
+                if (material->Get(AI_MATKEY_COLOR_REFLECTIVE, val) == AI_SUCCESS) {
+                    out.reflectionColor = { val.r, val.g, val.b };
+                }
+                if (material->Get(AI_MATKEY_COLOR_TRANSPARENT, val) == AI_SUCCESS) {
+                    out.transparencyColor = { val.r, val.g, val.b };
+                }
             }
 
             {
-            float val;
-            if (material->Get(AI_MATKEY_SHININESS, val) == AI_SUCCESS) {
-                out.shininess = val;
-            }
-            if (material->Get(AI_MATKEY_SHININESS_STRENGTH, val) == AI_SUCCESS) {
-                out.shininessStrength = val;
-            }
-            /*if (material->Get(AI_MATKEY_OPACITY, val) == AI_SUCCESS) {
-                out.opacity = val;
-            }*/
+                float val;
+                if (material->Get(AI_MATKEY_SHININESS, val) == AI_SUCCESS) {
+                    out.shininess = val;
+                }
+                if (material->Get(AI_MATKEY_SHININESS_STRENGTH, val) == AI_SUCCESS) {
+                    out.shininessStrength = val;
+                }
+                if (material->Get(AI_MATKEY_OPACITY, val) == AI_SUCCESS) {
+                    out.opacity = val;
+                }
+                if (material->Get(AI_MATKEY_REFLECTIVITY, val) == AI_SUCCESS) {
+                    out.reflectivity = val;
+                }
+                if (material->Get(AI_MATKEY_REFRACTI, val) == AI_SUCCESS) {
+                    out.refracti = val;
+                }
             }
 
             {
@@ -256,31 +263,55 @@ namespace p3d {
 
             if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
                 P3D_WARNING(!loadTexture2D(material, aiTextureType_DIFFUSE, texMap, scene, scenePath, userTexDir, out.diffuseTex, out.diffuseMapMode),
-                    "Failed to load diffuse texture of " + std::string(name.C_Str()));
+                    "Failed to load diffuse texture");
             }
 
             if (material->GetTextureCount(aiTextureType_NORMALS) > 0) {
                 P3D_WARNING(!loadTexture2D(material, aiTextureType_NORMALS, texMap, scene, scenePath, userTexDir, out.normalTex, out.normalMapMode),
-                    "Failed to load normal texture of " + std::string(name.C_Str()));
+                    "Failed to load normal texture");
             } else if ((material->GetTextureCount(aiTextureType_HEIGHT) > 0)) {
                 P3D_WARNING(!loadTexture2D(material, aiTextureType_HEIGHT, texMap, scene, scenePath, userTexDir, out.normalTex, out.normalMapMode),
-                    "Failed to load normal texture of " + std::string(name.C_Str()));
+                    "Failed to load normal texture");
             }
 
-            //TODO load other textures
-            /*if (!loadTexture2D(material, aiTextureType_AMBIENT, scenePath, out.hasAmbientTex, out.ambientTex))
-                return false;
-            if (!loadTexture2D(material, aiTextureType_SPECULAR, scenePath, out.hasSpecularTex, out.specularTex))
-                return false;
-            if (!loadTexture2D(material, aiTextureType_NORMALS, scenePath, out.hasNormalTex, out.normalTex))
-                return false;
-            if (!loadTexture2D(material, aiTextureType_SHININESS, scenePath, out.hasShininessTex, out.shininessTex))
-                return false;
-            if (!loadTexture2D(material, aiTextureType_OPACITY, scenePath, out.hasOpacityTex, out.opacityTex))
-                return false;
-            if (!loadTexture2D(material, aiTextureType_EMISSIVE, scenePath, out.hasEmissionTex, out.emissionTex))
-                return false;
-                */
+            if (material->GetTextureCount(aiTextureType_OPACITY) > 0) {
+                P3D_WARNING(!loadTexture2D(material, aiTextureType_OPACITY, texMap, scene, scenePath, userTexDir, out.opacityTex, out.opacityMapMode),
+                    "Failed to load opacity texture");
+            }
+
+            if (material->GetTextureCount(aiTextureType_AMBIENT) > 0) {
+                P3D_WARNING(!loadTexture2D(material, aiTextureType_AMBIENT, texMap, scene, scenePath, userTexDir, out.ambientTex, out.ambientMapMode),
+                    "Failed to load ambient texture");
+            }
+
+            if (material->GetTextureCount(aiTextureType_SPECULAR) > 0) {
+                P3D_WARNING(!loadTexture2D(material, aiTextureType_SPECULAR, texMap, scene, scenePath, userTexDir, out.specularTex, out.specularMapMode),
+                    "Failed to load specular texture");
+            }
+
+            if (material->GetTextureCount(aiTextureType_SHININESS) > 0) {
+                P3D_WARNING(!loadTexture2D(material, aiTextureType_SHININESS, texMap, scene, scenePath, userTexDir, out.shininessTex, out.shininessMapMode),
+                    "Failed to load shininess texture");
+            }
+
+            if (material->GetTextureCount(aiTextureType_LIGHTMAP) > 0) {
+                P3D_WARNING(!loadTexture2D(material, aiTextureType_LIGHTMAP, texMap, scene, scenePath, userTexDir, out.lightmapTex, out.lightmapMapMode),
+                    "Failed to load lightmap texture");
+            }
+
+            if (material->GetTextureCount(aiTextureType_REFLECTION) > 0) {
+                P3D_WARNING(!loadTexture2D(material, aiTextureType_REFLECTION, texMap, scene, scenePath, userTexDir, out.reflectionTex, out.reflectionMapMode),
+                    "Failed to load reflection texture");
+            }
+
+            if (material->GetTextureCount(aiTextureType_EMISSIVE) > 0) {
+                P3D_WARNING(!loadTexture2D(material, aiTextureType_EMISSIVE, texMap, scene, scenePath, userTexDir, out.emissionTex, out.emissionMapMode),
+                    "Failed to load emission texture");
+            }
+
+            P3D_WARNING(material->GetTextureCount(aiTextureType_UNKNOWN) > 0, 
+                "Unknown texture is present");
+
             return true;
         }
 
@@ -300,6 +331,9 @@ namespace p3d {
 
             P3D_ASSERT_R(material->GetTexture(type, 0, &texPathStr, &mapping, nullptr, nullptr, nullptr, mapMode) == AI_SUCCESS,
                 "Unable to retrieve texture info");
+
+            std::string texName = std::experimental::filesystem::path(texPathStr.C_Str()).filename().string();
+            P3D_ERROR_PRINT("Loading texture: " + texName);
 
             P3D_WARNING(material->GetTextureCount(type) > 1,
                 "Multiple texture of same type detected. Able to load only the first one");
