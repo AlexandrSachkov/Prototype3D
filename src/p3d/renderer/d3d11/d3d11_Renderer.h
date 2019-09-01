@@ -11,6 +11,7 @@
 #include "../PixelShaderI.h"
 #include "../dx/dx_ComPtr.h"
 #include "d3d11_Texture2dArray.h"
+#include "../dx/dx_BufferDescriptions.h"
 
 #include "glm/mat4x4.hpp"
 #include <d3d11.h>
@@ -103,6 +104,8 @@ namespace p3d {
                 ComPtr<ID3D11UnorderedAccessView>& unorderedAccessView
             );
 
+            void fillMaterialData(const MaterialDesc& desc, dx::MaterialData& dataOut);
+
             //member variable
             enum P3D_VERTEX_BUFFER_CHANNEL {
                 P3D_VB_VERTEX_CHANNEL,
@@ -124,11 +127,6 @@ namespace p3d {
                 P3D_TEX_SPECULAR_CHANNEL
             };
 
-            enum P3D_CONSTANT_BUFF_CHANNEL {
-                P3D_CB_TRANSFORM_CHANNEL,
-                P3D_CB_MATERIAL_CHANNEL
-            };
-
             ComPtr<ID3D11Device> _device = nullptr;
             ComPtr<ID3D11DeviceContext> _deviceContext = nullptr;
             ComPtr<IDXGISwapChain> _swapChain = nullptr;
@@ -147,7 +145,8 @@ namespace p3d {
             ComPtr<ID3D11RasterizerState> _frontFaceCull = nullptr;
             ComPtr<ID3D11RasterizerState> _wireframeMode = nullptr;
             std::array<ComPtr<ID3D11SamplerState>, P3D_TEX_MAP_MODE_SIZE> _samplerStates;
-            ComPtr<ID3D11Buffer> _perObjBuff = nullptr;
+            ComPtr<ID3D11Buffer> _transformBuff = nullptr;
+            ComPtr<ID3D11Buffer> _materialBuff = nullptr;
 
 
             std::unique_ptr<VertexShaderI> _vertexShader = nullptr;

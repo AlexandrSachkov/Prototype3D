@@ -2,7 +2,6 @@
 #include "../../assert.h"
 #include "../../common/Utils.h"
 #include "../dx/dx_ConstConvert.h"
-#include "../dx/dx_BufferDescriptions.h"
 #include "d3d11_ConstConvert.h"
 #include "d3d11_Utility.h"
 
@@ -186,16 +185,27 @@ namespace p3d {
                     1, _samplerStates[i]), "Failed to create texture sampler");
             }
 
-            dx::TransformData transform;
+            dx::TransformData transformData;
             P3D_ASSERT_R(Utility::createBuffer(
                 _device.Get(),
                 D3D11_BIND_CONSTANT_BUFFER,
                 D3D11_USAGE_DYNAMIC,
                 D3D11_CPU_ACCESS_WRITE,
-                &transform,
+                &transformData,
                 sizeof(dx::TransformData),
-                _perObjBuff
-            ),"Failed to create per object buffer");
+                _transformBuff
+            ),"Failed to create transformation buffer");
+
+            dx::MaterialData materialData;
+            P3D_ASSERT_R(Utility::createBuffer(
+                _device.Get(),
+                D3D11_BIND_CONSTANT_BUFFER,
+                D3D11_USAGE_DYNAMIC,
+                D3D11_CPU_ACCESS_WRITE,
+                &materialData,
+                sizeof(dx::TransformData),
+                _materialBuff
+            ), "Failed to create material buffer");
 
             //TODO load state per material type
             // loading material-specific stuff
@@ -228,8 +238,11 @@ namespace p3d {
             float blendFactor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
             _deviceContext->OMSetBlendState(_noBlendState.Get(), blendFactor, 0xffffffff);
 
-            auto* perObjBuff = _perObjBuff.Get();
-            _deviceContext->VSSetConstantBuffers(0, 1, &perObjBuff);
+            auto* transformBuff = _transformBuff.Get();
+            _deviceContext->VSSetConstantBuffers(0, 1, &transformBuff);
+            auto* materialBuff = _materialBuff.Get();
+            _deviceContext->PSSetConstantBuffers(0, 1, &materialBuff);
+
             return true;
         }
 
@@ -808,6 +821,31 @@ namespace p3d {
             return true;
         }
 
+        void Renderer::fillMaterialData(const MaterialDesc& desc, dx::MaterialData& dataOut) {
+            dataOut.ambientColor = desc.ambientColor;
+            dataOut.diffuseColor = desc.diffuseColor;
+            dataOut.emissionColor = desc.emissionColor;
+            dataOut.reflectionColor = desc.reflectionColor;
+            dataOut.specularColor = desc.specularColor;
+            dataOut.transparencyColor = desc.transparencyColor;
+
+            dataOut.opacity = desc.opacity;
+            dataOut.reflectivity = desc.reflectivity;
+            dataOut.refracti = desc.refracti;
+            dataOut.shininess = desc.shininess;
+            dataOut.shininessStrength = desc.shininessStrength;
+
+            dataOut.hasAmbientTex = desc.ambientTex.isValid();
+            dataOut.hasDiffuteTex = desc.diffuseTex.isValid();
+            dataOut.hasEmissionTex = desc.emissionTex.isValid();
+            dataOut.hasLightmapTex = desc.lightmapTex.isValid();
+            dataOut.hasNormalTex = desc.normalTex.isValid();
+            dataOut.hasOpacityTex = desc.opacityTex.isValid();
+            dataOut.hasReflectionTex = desc.reflectionTex.isValid();
+            dataOut.hasShininessTex = desc.shininessTex.isValid();
+            dataOut.hasSpecularTex = desc.specularTex.isValid();
+        }
+
         void Renderer::renderFrame(const SceneI* scene, const CameraI* camera) {
             drawScene(scene, camera);
             _swapChain->Present(0, 0);
@@ -843,7 +881,7 @@ namespace p3d {
                 transforms.world = modelDesc->transform;
                 transforms.worldInvTrans = glm::transpose(glm::inverse(modelDesc->transform));
                 transforms.wvp = viewProjection * modelDesc->transform;
-                Utility::updateConstBuffer(_deviceContext, _perObjBuff, &transforms, sizeof(dx::TransformData));
+                Utility::updateConstBuffer(_deviceContext, _transformBuff, &transforms, sizeof(dx::TransformData));
 
                 // apply mesh
                 auto* vertexBuff = mesh->getVertexBuffer().Get();
@@ -886,13 +924,65 @@ namespace p3d {
                 }
 
                 //apply material
+                dx::MaterialData materialData;
+                fillMaterialData(*materialDesc, materialData);
+                Utility::updateConstBuffer(_deviceContext, _materialBuff, &materialData, sizeof(dx::MaterialData));
+
+                if (materialDesc->ambientTex.isValid()) {
+                    auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->ambientTex));
+                    auto* textureView = p3dTexture2d->getShaderResourceView().Get();
+                    _deviceContext->PSSetShaderResources(P3D_TEX_AMBIENT_CHANNEL, 1, &textureView);
+                }
+
                 if (materialDesc->diffuseTex.isValid()) {
                     auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->diffuseTex));
                     auto* textureView = p3dTexture2d->getShaderResourceView().Get();
-                    _deviceContext->PSSetShaderResources(0, 1, &textureView);
+                    _deviceContext->PSSetShaderResources(P3D_TEX_DIFFUSE_CHANNEL, 1, &textureView);
 
                     auto* sampler = _samplerStates[materialDesc->diffuseMapMode].Get();
                     _deviceContext->PSSetSamplers(0, 1, &sampler);
+                }
+
+                if (materialDesc->emissionTex.isValid()) {
+                    auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->emissionTex));
+                    auto* textureView = p3dTexture2d->getShaderResourceView().Get();
+                    _deviceContext->PSSetShaderResources(P3D_TEX_EMISSION_CHANNEL, 1, &textureView);
+                }
+
+                if (materialDesc->lightmapTex.isValid()) {
+                    auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->lightmapTex));
+                    auto* textureView = p3dTexture2d->getShaderResourceView().Get();
+                    _deviceContext->PSSetShaderResources(P3D_TEX_LIGHTMAP_CHANNEL, 1, &textureView);
+                }
+
+                if (materialDesc->normalTex.isValid()) {
+                    auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->normalTex));
+                    auto* textureView = p3dTexture2d->getShaderResourceView().Get();
+                    _deviceContext->PSSetShaderResources(P3D_TEX_NORMAL_CHANNEL, 1, &textureView);
+                }
+
+                if (materialDesc->opacityTex.isValid()) {
+                    auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->opacityTex));
+                    auto* textureView = p3dTexture2d->getShaderResourceView().Get();
+                    _deviceContext->PSSetShaderResources(P3D_TEX_OPACITY_CHANNEL, 1, &textureView);
+                }
+
+                if (materialDesc->reflectionTex.isValid()) {
+                    auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->reflectionTex));
+                    auto* textureView = p3dTexture2d->getShaderResourceView().Get();
+                    _deviceContext->PSSetShaderResources(P3D_TEX_REFLECTION_CHANNEL, 1, &textureView);
+                }
+
+                if (materialDesc->shininessTex.isValid()) {
+                    auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->shininessTex));
+                    auto* textureView = p3dTexture2d->getShaderResourceView().Get();
+                    _deviceContext->PSSetShaderResources(P3D_TEX_SHININESS_CHANNEL, 1, &textureView);
+                }
+
+                if (materialDesc->specularTex.isValid()) {
+                    auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->specularTex));
+                    auto* textureView = p3dTexture2d->getShaderResourceView().Get();
+                    _deviceContext->PSSetShaderResources(P3D_TEX_SPECULAR_CHANNEL, 1, &textureView);
                 }
 
                 //draw

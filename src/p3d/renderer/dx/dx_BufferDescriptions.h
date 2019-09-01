@@ -25,6 +25,7 @@ namespace p3d {
             glm::vec3 reflectionColor = { 0.0f,0.0f,0.0f };
             float refracti = 1.0f;
             glm::vec3 emissionColor = { 0.0f,0.0f,0.0f };
+
             bool hasAmbientTex = false;
             bool hasDiffuteTex = false;
             bool hasEmissionTex = false;

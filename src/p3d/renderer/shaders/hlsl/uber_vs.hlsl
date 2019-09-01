@@ -7,13 +7,13 @@ struct VS_INPUT
 
 struct VS_OUTPUT
 {
-	float4 pos : SV_POSITION;
     float3 posW : POSITION;
     float3 normalW : NORMAL;
 	float2 uv : TEXCOORD;
+    float4 pos : SV_POSITION;
 };
 
-cbuffer cbPerObject : register(b0)
+cbuffer Transforms : register(b0)
 {
     float4x4 world;
     float4x4 worldInvTrans;

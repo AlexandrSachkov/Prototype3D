@@ -1,16 +1,48 @@
 struct PS_INPUT
 {
-    float4 pos : SV_POSITION;
     float3 posW : POSITION;
-    float4 normalW : NORMAL;
+    float3 normalW : NORMAL;
     float2 uv : TEXCOORD;
 };
 
-Texture2D<float4> diffuse : register(t0);
-SamplerState diffuseSamplerState : register(s0);
+cbuffer Material : register(b0)
+{
+    float3 ambientColor;
+    float opacity;
+    float3 diffuseColor;
+    float shininess;
+    float3 specularColor;
+    float shininessStrength;
+    float3 transparencyColor;
+    float reflectivity;
+    float3 reflectionColor;
+    float refracti;
+    float3 emissionColor;
+
+    bool hasAmbientTex = false;
+    bool hasDiffuteTex = false;
+    bool hasEmissionTex = false;
+    bool hasLightmapTex = false;
+    bool hasNormalTex = false;
+    bool hasOpacityTex = false;
+    bool hasReflectionTex = false;
+    bool hasShininessTex = false;
+    bool hasSpecularTex = false;
+};
+
+Texture2D<float4> ambientTex : register(t0);
+Texture2D<float4> diffuseTex : register(t1);
+Texture2D<float4> emissionTex : register(t2);
+Texture2D<float4> lightmapTex : register(t3);
+Texture2D<float4> normalTex : register(t4);
+Texture2D<float4> opacityTex : register(t5);
+Texture2D<float4> reflectionTex : register(t6);
+Texture2D<float4> shininessTex : register(t7);
+Texture2D<float4> specularTex : register(t8);
+
+SamplerState samplerState : register(s0);
 
 float4 main(PS_INPUT input) : SV_TARGET
 {
-    float2 flippedUV = float2(input.uv.x, input.uv.y * -1.0f); //flip from OpenGL standard
-	return diffuse.Sample(diffuseSamplerState, flippedUV);
+	return diffuseTex.Sample(samplerState, float2(input.uv.x, -input.uv.y));//flip from OpenGL standard
 }
