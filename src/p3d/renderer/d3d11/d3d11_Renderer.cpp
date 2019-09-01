@@ -49,7 +49,8 @@ namespace p3d {
             unsigned int msaaQualityLevel = 0;
             if (msaaLevel > 1) {
                 unsigned int maxMsaaQualityLvl;
-                P3D_ASSERT_R(Utility::getMSAAQualityLevel(_device, msaaLevel, maxMsaaQualityLvl), "Failed to retrieve MSAA quality level");
+                P3D_ASSERT_R(Utility::getMSAAQualityLevel(_device, DXGI_FORMAT_R8G8B8A8_UNORM, msaaLevel, maxMsaaQualityLvl), 
+                    "Failed to retrieve MSAA quality level");
                 msaaQualityLevel = maxMsaaQualityLvl - 1;
             }
 
@@ -533,8 +534,8 @@ namespace p3d {
                 (unsigned int)desc.surfaceMatrix.size(),
                 (unsigned int)desc.surfaceMatrix[0].size(),
                 desc.generateMipMaps,
-                _msaaLevel,
-                _msaaQualityLevel,
+                1,
+                0,
                 format,
                 usageDesc.usage,
                 usageDesc.cpuAccessFlag,

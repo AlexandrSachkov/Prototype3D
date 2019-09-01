@@ -28,6 +28,7 @@ namespace p3d {
 
             static bool Utility::getMSAAQualityLevel(
                 const ComPtr<ID3D11Device> device,
+                DXGI_FORMAT format,
                 unsigned int msaaLvl,
                 unsigned int& qualityLvl
             );
