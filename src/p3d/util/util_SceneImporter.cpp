@@ -216,43 +216,43 @@ namespace p3d {
                 /*if (material->Get(AI_MATKEY_COLOR_EMISSIVE, val) == AI_SUCCESS) {
                     out.emissionColor = { val.r, val.g, val.b };
                 }*/
-			}
+            }
 
-			{
-				float val;
-                if (material->Get(AI_MATKEY_SHININESS, val) == AI_SUCCESS) {
-                    out.shininess = val;
-                }
-                if (material->Get(AI_MATKEY_SHININESS_STRENGTH, val) == AI_SUCCESS) {
-                    out.shininessStrength = val;
-                }
-                /*if (material->Get(AI_MATKEY_OPACITY, val) == AI_SUCCESS) {
-                    out.opacity = val;
-                }*/
-			}
+            {
+            float val;
+            if (material->Get(AI_MATKEY_SHININESS, val) == AI_SUCCESS) {
+                out.shininess = val;
+            }
+            if (material->Get(AI_MATKEY_SHININESS_STRENGTH, val) == AI_SUCCESS) {
+                out.shininessStrength = val;
+            }
+            /*if (material->Get(AI_MATKEY_OPACITY, val) == AI_SUCCESS) {
+                out.opacity = val;
+            }*/
+            }
 
-			{
-				int val;
+            {
+                int val;
                 if (material->Get(AI_MATKEY_ENABLE_WIREFRAME, val) == AI_SUCCESS) {
                     out.wireframe = val == 0 ? false : true;
                 }
 
                 //TODO do we need blend mode?
-				/*if (material->Get(AI_MATKEY_BLEND_FUNC, val) == AI_SUCCESS) {
-					switch (val) {
-					case aiBlendMode_Default:
-						out.blendMode = BLEND_MODE_DEFAULT;
-						break;
-					case aiBlendMode_Additive:
-						out.blendMode = BLEND_MODE_ADDITIVE;
-						break;
-					default:
-						return false;
-					}
-				} else {
-					out.blendMode = BLEND_MODE_NONE;
-				}*/
-			}
+                /*if (material->Get(AI_MATKEY_BLEND_FUNC, val) == AI_SUCCESS) {
+                    switch (val) {
+                    case aiBlendMode_Default:
+                        out.blendMode = BLEND_MODE_DEFAULT;
+                        break;
+                    case aiBlendMode_Additive:
+                        out.blendMode = BLEND_MODE_ADDITIVE;
+                        break;
+                    default:
+                        return false;
+                    }
+                } else {
+                    out.blendMode = BLEND_MODE_NONE;
+                }*/
+            }
 
             if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
                 P3D_WARNING(!loadTexture2D(material, aiTextureType_DIFFUSE, texMap, scene, scenePath, userTexDir, out.diffuseTex, out.diffuseMapMode),
@@ -266,25 +266,25 @@ namespace p3d {
                 P3D_WARNING(!loadTexture2D(material, aiTextureType_HEIGHT, texMap, scene, scenePath, userTexDir, out.normalTex, out.normalMapMode),
                     "Failed to load normal texture of " + std::string(name.C_Str()));
             }
-                    
-            //TODO load other textures
-			/*if (!loadTexture2D(material, aiTextureType_AMBIENT, scenePath, out.hasAmbientTex, out.ambientTex))
-				return false;
-			if (!loadTexture2D(material, aiTextureType_SPECULAR, scenePath, out.hasSpecularTex, out.specularTex))
-				return false;
-			if (!loadTexture2D(material, aiTextureType_NORMALS, scenePath, out.hasNormalTex, out.normalTex))
-				return false;
-			if (!loadTexture2D(material, aiTextureType_SHININESS, scenePath, out.hasShininessTex, out.shininessTex))
-				return false;
-			if (!loadTexture2D(material, aiTextureType_OPACITY, scenePath, out.hasOpacityTex, out.opacityTex))
-				return false;
-			if (!loadTexture2D(material, aiTextureType_EMISSIVE, scenePath, out.hasEmissionTex, out.emissionTex))
-				return false;
-                */
-			return true;
-		}
 
-		bool SceneImporter::loadTexture2D(
+            //TODO load other textures
+            /*if (!loadTexture2D(material, aiTextureType_AMBIENT, scenePath, out.hasAmbientTex, out.ambientTex))
+                return false;
+            if (!loadTexture2D(material, aiTextureType_SPECULAR, scenePath, out.hasSpecularTex, out.specularTex))
+                return false;
+            if (!loadTexture2D(material, aiTextureType_NORMALS, scenePath, out.hasNormalTex, out.normalTex))
+                return false;
+            if (!loadTexture2D(material, aiTextureType_SHININESS, scenePath, out.hasShininessTex, out.shininessTex))
+                return false;
+            if (!loadTexture2D(material, aiTextureType_OPACITY, scenePath, out.hasOpacityTex, out.opacityTex))
+                return false;
+            if (!loadTexture2D(material, aiTextureType_EMISSIVE, scenePath, out.hasEmissionTex, out.emissionTex))
+                return false;
+                */
+            return true;
+        }
+
+        bool SceneImporter::loadTexture2D(
             aiMaterial* material,
             aiTextureType type,
             std::unordered_map<std::string, HTexture2dArr>& texMap,
@@ -307,9 +307,12 @@ namespace p3d {
             std::string texFinalPath;
             P3D_ASSERT_R(findTexturePath(scenePath, userTexDir, texPathStr.C_Str(), texFinalPath), "Unable to find texture");
 
-            P3D_ASSERT_R(mapMode[0] == mapMode[1], "Different map modes per UV channels not supported");
-
-            P3D_WARNING(!loadTextureMapMode(mapMode[0], mapModeOut), "Failed to load texture mode. Using default");
+            //if map mode is invalid, don't bother comparing modes per channel
+            if (!loadTextureMapMode(mapMode[0], mapModeOut), "Failed to load texture mode. Using default"){
+                P3D_ERROR_PRINT("Failed to load texture mode. Using default");
+            } else {
+                P3D_ASSERT_R(mapMode[0] == mapMode[1], "Different map modes per UV channels not supported");
+            }
 
             auto texIt = texMap.find(texFinalPath);
             if (texIt != texMap.end()) {
