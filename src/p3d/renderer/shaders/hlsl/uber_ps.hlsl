@@ -5,10 +5,13 @@ struct PS_INPUT
     float2 uv : TEXCOORD;
 };
 
-cbuffer Material : register(b0)
+cbuffer SceneConstants : register(b0) 
 {
-    float3 ambientColor;
-    float opacity;
+    float3 ambientLight;
+};
+
+cbuffer Material : register(b1)
+{
     float3 diffuseColor;
     float shininess;
     float3 specularColor;
@@ -18,31 +21,49 @@ cbuffer Material : register(b0)
     float3 reflectionColor;
     float refracti;
     float3 emissionColor;
+    float opacity;
 
-    bool hasAmbientTex = false;
-    bool hasDiffuteTex = false;
-    bool hasEmissionTex = false;
-    bool hasLightmapTex = false;
-    bool hasNormalTex = false;
-    bool hasOpacityTex = false;
-    bool hasReflectionTex = false;
-    bool hasShininessTex = false;
-    bool hasSpecularTex = false;
+    int hasDiffuteTex;
+    int hasEmissionTex;
+    int hasLightmapTex;
+    int hasNormalTex;
+    int hasOpacityTex;
+    int hasReflectionTex;
+    int hasShininessTex;
+    int hasSpecularTex;
 };
 
-Texture2D<float4> ambientTex : register(t0);
-Texture2D<float4> diffuseTex : register(t1);
-Texture2D<float4> emissionTex : register(t2);
-Texture2D<float4> lightmapTex : register(t3);
-Texture2D<float4> normalTex : register(t4);
-Texture2D<float4> opacityTex : register(t5);
-Texture2D<float4> reflectionTex : register(t6);
-Texture2D<float4> shininessTex : register(t7);
-Texture2D<float4> specularTex : register(t8);
+Texture2D<float4> diffuseTex : register(t0);
+Texture2D<float4> emissionTex : register(t1);
+Texture2D<float4> lightmapTex : register(t2);
+Texture2D<float4> normalTex : register(t3);
+Texture2D<float4> opacityTex : register(t4);
+Texture2D<float4> reflectionTex : register(t5);
+Texture2D<float4> shininessTex : register(t6);
+Texture2D<float4> specularTex : register(t7);
 
 SamplerState samplerState : register(s0);
 
 float4 main(PS_INPUT input) : SV_TARGET
 {
-	return diffuseTex.Sample(samplerState, float2(input.uv.x, -input.uv.y));//flip from OpenGL standard
+    float2 uvFlipped = float2(input.uv.x, -input.uv.y);//flip from OpenGL standard
+
+    float4 diffuseColorTex = float4(diffuseColor, 1.0f);
+    if (hasDiffuteTex) {
+        diffuseColorTex = diffuseTex.Sample(samplerState, uvFlipped);
+    }
+
+    float4 specularColorTex = float4(specularColor, 1.0f);
+    if (hasSpecularTex) {
+        specularColorTex = specularTex.Sample(samplerState, uvFlipped);
+    }
+
+    float ambientIntensity = 0.5f;
+    float4 totalLightIntensity = float4(0.0f, 0.0f, 0.0f, 0.0f);//TODO calculate light contribution
+
+    float4 litColor = 
+        float4(ambientLight, 1.0f) * diffuseColorTex +
+        totalLightIntensity * diffuseColorTex + 
+        totalLightIntensity * specularColorTex;
+    return litColor;
 }

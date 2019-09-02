@@ -90,10 +90,6 @@ namespace p3d {
         HTexture2dArr normalTex;
         P3D_TEX_MAP_MODE normalMapMode = P3D_TEX_MAP_WRAP;
 
-        glm::vec3 ambientColor = { 0.0f,0.0f,0.0f };
-        HTexture2dArr ambientTex;
-        P3D_TEX_MAP_MODE ambientMapMode = P3D_TEX_MAP_WRAP;
-
         glm::vec3 specularColor = { 0.0f,0.0f,0.0f };
         HTexture2dArr specularTex;
         P3D_TEX_MAP_MODE specularMapMode = P3D_TEX_MAP_WRAP;
@@ -124,5 +120,9 @@ namespace p3d {
         bool wireframe = false;
 
         //P3D_BLEND_MODE blendMode; since only 1 texture of each type is allowed, we might not need it
+    };
+
+    struct SceneProperties {
+        glm::vec3 ambientLight = { 1.0f,1.0f,1.0f };
     };
 }

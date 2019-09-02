@@ -48,6 +48,10 @@ bool run() {
         p3d::util::SceneImporter::import("D:/Repositories/Prototype3D/resources/sponza/sponza.obj", "", sponzaScene.get(), nullptr),
         "Failed to import cube.obj");
 
+    p3d::SceneProperties sceneProperties = sponzaScene->getProperties();
+    sceneProperties.ambientLight = { 0.9f,0.9f,0.9f };
+    sponzaScene->setProperties(sceneProperties);
+
     //Field of view should be 45 degrees. Otherwise, it will cause artifacts (need to look into perspective distortion)
     //Keep near/far planes closer together to avoid floating precision issues
     std::unique_ptr<p3d::PerspectiveCamera> camera(

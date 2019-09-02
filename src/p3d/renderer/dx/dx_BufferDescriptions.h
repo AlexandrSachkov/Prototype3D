@@ -14,8 +14,6 @@ namespace p3d {
 
         __declspec(align(16))
             struct MaterialData {
-            glm::vec3 ambientColor = { 0.0f,0.0f,0.0f };
-            float opacity = 1.0f;
             glm::vec3 diffuseColor = { 0.0f,0.0f,0.0f };
             float shininess = 0.0f;
             glm::vec3 specularColor = { 0.0f,0.0f,0.0f };
@@ -25,16 +23,21 @@ namespace p3d {
             glm::vec3 reflectionColor = { 0.0f,0.0f,0.0f };
             float refracti = 1.0f;
             glm::vec3 emissionColor = { 0.0f,0.0f,0.0f };
+            float opacity = 1.0f;
 
-            bool hasAmbientTex = false;
-            bool hasDiffuteTex = false;
-            bool hasEmissionTex = false;
-            bool hasLightmapTex = false;
-            bool hasNormalTex = false;
-            bool hasOpacityTex = false;
-            bool hasReflectionTex = false;
-            bool hasShininessTex = false;
-            bool hasSpecularTex = false;
+            int hasDiffuteTex = 0;
+            int hasEmissionTex = 0;
+            int hasLightmapTex = 0;
+            int hasNormalTex = 0;
+            int hasOpacityTex = 0;
+            int hasReflectionTex = 0;
+            int hasShininessTex = 0;
+            int hasSpecularTex = 0;
+        };
+
+        __declspec(align(16))
+            struct SceneConstants {
+            glm::vec3 ambientLight = { 0.0f,0.0f,0.0f };
         };
     }
 }

@@ -56,5 +56,8 @@ namespace p3d {
         virtual bool remove(HTexture2dArr handle) = 0;
         virtual bool remove(HVertexShader handle) = 0;
         virtual bool remove(HPixelShader handle) = 0;
+
+        virtual const SceneProperties& getProperties() const = 0;
+        virtual void setProperties(const SceneProperties& properties) = 0;
     };
 }

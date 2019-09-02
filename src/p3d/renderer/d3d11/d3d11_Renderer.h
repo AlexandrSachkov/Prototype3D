@@ -116,7 +116,6 @@ namespace p3d {
             };
 
             enum P3D_TEX_CHANNEL {
-                P3D_TEX_AMBIENT_CHANNEL,
                 P3D_TEX_DIFFUSE_CHANNEL,
                 P3D_TEX_EMISSION_CHANNEL,
                 P3D_TEX_LIGHTMAP_CHANNEL,
@@ -125,6 +124,15 @@ namespace p3d {
                 P3D_TEX_REFLECTION_CHANNEL,
                 P3D_TEX_SHININESS_CHANNEL,
                 P3D_TEX_SPECULAR_CHANNEL
+            };
+
+            enum P3D_VS_CBUFFER_CHANNEL {
+                P3D_VS_CB_TRANSFORM_CHANNEL
+            };
+
+            enum P3D_PS_CBUFFER_CHANNEL {
+                P3D_PS_CB_SCENE_CONSTANTS_CHANNEL,
+                P3D_PS_CB_MATERIAL_CHANNEL
             };
 
             ComPtr<ID3D11Device> _device = nullptr;
@@ -147,6 +155,7 @@ namespace p3d {
             std::array<ComPtr<ID3D11SamplerState>, P3D_TEX_MAP_MODE_SIZE> _samplerStates;
             ComPtr<ID3D11Buffer> _transformBuff = nullptr;
             ComPtr<ID3D11Buffer> _materialBuff = nullptr;
+            ComPtr<ID3D11Buffer> _sceneConstantsBuff = nullptr;
 
 
             std::unique_ptr<VertexShaderI> _vertexShader = nullptr;

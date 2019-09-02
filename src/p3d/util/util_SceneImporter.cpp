@@ -202,9 +202,6 @@ namespace p3d {
                 if (material->Get(AI_MATKEY_COLOR_DIFFUSE, val) == AI_SUCCESS) {
                     out.diffuseColor = { val.r, val.g, val.b };
                 }
-                if (material->Get(AI_MATKEY_COLOR_AMBIENT, val) == AI_SUCCESS) {
-                    out.ambientColor = { val.r, val.g, val.b };
-                }
                 if (material->Get(AI_MATKEY_COLOR_SPECULAR, val) == AI_SUCCESS) {
                     out.specularColor = { val.r, val.g, val.b };
                 }
@@ -277,11 +274,6 @@ namespace p3d {
             if (material->GetTextureCount(aiTextureType_OPACITY) > 0) {
                 P3D_WARNING(!loadTexture2D(material, aiTextureType_OPACITY, texMap, scene, scenePath, userTexDir, out.opacityTex, out.opacityMapMode),
                     "Failed to load opacity texture");
-            }
-
-            if (material->GetTextureCount(aiTextureType_AMBIENT) > 0) {
-                P3D_WARNING(!loadTexture2D(material, aiTextureType_AMBIENT, texMap, scene, scenePath, userTexDir, out.ambientTex, out.ambientMapMode),
-                    "Failed to load ambient texture");
             }
 
             if (material->GetTextureCount(aiTextureType_SPECULAR) > 0) {

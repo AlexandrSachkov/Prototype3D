@@ -203,9 +203,20 @@ namespace p3d {
                 D3D11_USAGE_DYNAMIC,
                 D3D11_CPU_ACCESS_WRITE,
                 &materialData,
-                sizeof(dx::TransformData),
+                sizeof(dx::MaterialData),
                 _materialBuff
             ), "Failed to create material buffer");
+
+            dx::SceneConstants sceneConstants;
+            P3D_ASSERT_R(Utility::createBuffer(
+                _device.Get(),
+                D3D11_BIND_CONSTANT_BUFFER,
+                D3D11_USAGE_DYNAMIC,
+                D3D11_CPU_ACCESS_WRITE,
+                &sceneConstants,
+                sizeof(dx::SceneConstants),
+                _sceneConstantsBuff
+            ), "Failed to create scene constants buffer");
 
             //TODO load state per material type
             // loading material-specific stuff
@@ -239,9 +250,11 @@ namespace p3d {
             _deviceContext->OMSetBlendState(_noBlendState.Get(), blendFactor, 0xffffffff);
 
             auto* transformBuff = _transformBuff.Get();
-            _deviceContext->VSSetConstantBuffers(0, 1, &transformBuff);
+            _deviceContext->VSSetConstantBuffers(P3D_VS_CB_TRANSFORM_CHANNEL, 1, &transformBuff);
+            auto* sceneConstantsBuff = _sceneConstantsBuff.Get();
+            _deviceContext->PSSetConstantBuffers(P3D_PS_CB_SCENE_CONSTANTS_CHANNEL, 1, &sceneConstantsBuff);
             auto* materialBuff = _materialBuff.Get();
-            _deviceContext->PSSetConstantBuffers(0, 1, &materialBuff);
+            _deviceContext->PSSetConstantBuffers(P3D_PS_CB_MATERIAL_CHANNEL, 1, &materialBuff);
 
             return true;
         }
@@ -822,7 +835,6 @@ namespace p3d {
         }
 
         void Renderer::fillMaterialData(const MaterialDesc& desc, dx::MaterialData& dataOut) {
-            dataOut.ambientColor = desc.ambientColor;
             dataOut.diffuseColor = desc.diffuseColor;
             dataOut.emissionColor = desc.emissionColor;
             dataOut.reflectionColor = desc.reflectionColor;
@@ -835,7 +847,6 @@ namespace p3d {
             dataOut.shininess = desc.shininess;
             dataOut.shininessStrength = desc.shininessStrength;
 
-            dataOut.hasAmbientTex = desc.ambientTex.isValid();
             dataOut.hasDiffuteTex = desc.diffuseTex.isValid();
             dataOut.hasEmissionTex = desc.emissionTex.isValid();
             dataOut.hasLightmapTex = desc.lightmapTex.isValid();
@@ -856,9 +867,13 @@ namespace p3d {
                 return;
             }
 
+            dx::SceneConstants sceneConstants;
+            sceneConstants.ambientLight = scene->getProperties().ambientLight;
+            Utility::updateConstBuffer(_deviceContext, _sceneConstantsBuff, &sceneConstants, sizeof(dx::SceneConstants));
+
             glm::mat4x4 viewProjection = _dxClipTransform * camera->getProjection() * camera->getView();
 
-            float backgroundColor[] = { 0.0f, 0.0f, 255.0f };
+            float backgroundColor[] = { 0.0f, 0.0f, 0.0f };
             _deviceContext->ClearRenderTargetView(_renderTargetBuff.getRenderTargetView().Get(), backgroundColor);
             _deviceContext->ClearDepthStencilView(_depthStencilBuff.getDepthStencilView().Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
@@ -928,19 +943,13 @@ namespace p3d {
                 fillMaterialData(*materialDesc, materialData);
                 Utility::updateConstBuffer(_deviceContext, _materialBuff, &materialData, sizeof(dx::MaterialData));
 
-                if (materialDesc->ambientTex.isValid()) {
-                    auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->ambientTex));
-                    auto* textureView = p3dTexture2d->getShaderResourceView().Get();
-                    _deviceContext->PSSetShaderResources(P3D_TEX_AMBIENT_CHANNEL, 1, &textureView);
-                }
+                auto* sampler = _samplerStates[P3D_TEX_MAP_WRAP].Get();
+                _deviceContext->PSSetSamplers(0, 1, &sampler);
 
                 if (materialDesc->diffuseTex.isValid()) {
                     auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->diffuseTex));
                     auto* textureView = p3dTexture2d->getShaderResourceView().Get();
                     _deviceContext->PSSetShaderResources(P3D_TEX_DIFFUSE_CHANNEL, 1, &textureView);
-
-                    auto* sampler = _samplerStates[materialDesc->diffuseMapMode].Get();
-                    _deviceContext->PSSetSamplers(0, 1, &sampler);
                 }
 
                 if (materialDesc->emissionTex.isValid()) {

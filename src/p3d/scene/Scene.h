@@ -57,9 +57,13 @@ namespace p3d {
         bool remove(HVertexShader handle) override;
         bool remove(HPixelShader handle) override;
 
+        const SceneProperties& getProperties() const;
+        void setProperties(const SceneProperties& properties);
     private:
         GPUResourceProviderI* _resProvider;
         std::unique_ptr<SpacePartitionerI> _spacePartitioner;
+
+        SceneProperties _properties;
 
         ResourceBank<void*, ModelDesc, HModel> _models;
         ResourceBank<p3d::MeshI, MeshDesc, HMesh> _meshes;

@@ -13,6 +13,14 @@ namespace p3d {
 
     }
 
+    const SceneProperties& Scene::getProperties() const {
+        return _properties;
+    }
+
+    void Scene::setProperties(const SceneProperties& properties) {
+        _properties = properties;
+    }
+
     HModel Scene::create(const ModelDesc& desc) {
         return _models.insert(std::unique_ptr<void*>(), desc, genUUID());
     }
