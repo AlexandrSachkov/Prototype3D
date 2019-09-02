@@ -84,39 +84,27 @@ namespace p3d {
 
     struct MaterialDesc {
         glm::vec3 diffuseColor = {0.0f,0.0f,0.0f};
-        HTexture2dArr diffuseTex;
-        P3D_TEX_MAP_MODE diffuseMapMode = P3D_TEX_MAP_WRAP;
-
-        HTexture2dArr normalTex;
-        P3D_TEX_MAP_MODE normalMapMode = P3D_TEX_MAP_WRAP;
-
         glm::vec3 specularColor = { 0.0f,0.0f,0.0f };
+        glm::vec3 transparencyColor = { 0.0f,0.0f,0.0f };
+        glm::vec3 reflectionColor = { 0.0f,0.0f,0.0f };
+        glm::vec3 emissionColor = { 0.0f,0.0f,0.0f };
+
+        HTexture2dArr diffuseTex;
+        HTexture2dArr normalTex;
         HTexture2dArr specularTex;
-        P3D_TEX_MAP_MODE specularMapMode = P3D_TEX_MAP_WRAP;
+        HTexture2dArr shininessTex;
+        HTexture2dArr opacityTex;
+        HTexture2dArr lightmapTex;
+        HTexture2dArr reflectionTex;
+        HTexture2dArr emissionTex;
 
         float shininess = 0.0f;
         float shininessStrength = 1.0f;
-        HTexture2dArr shininessTex;
-        P3D_TEX_MAP_MODE shininessMapMode = P3D_TEX_MAP_WRAP;
-
-        glm::vec3 transparencyColor = { 0.0f,0.0f,0.0f };
         float opacity = 1.0f;
-        HTexture2dArr opacityTex;
-        P3D_TEX_MAP_MODE opacityMapMode = P3D_TEX_MAP_WRAP;
-
-        HTexture2dArr lightmapTex;
-        P3D_TEX_MAP_MODE lightmapMapMode = P3D_TEX_MAP_WRAP;
-
-        glm::vec3 reflectionColor = { 0.0f,0.0f,0.0f };
         float reflectivity = 0.0f;
         float refracti = 1.0f;
-        HTexture2dArr reflectionTex;
-        P3D_TEX_MAP_MODE reflectionMapMode = P3D_TEX_MAP_WRAP;
-
-        glm::vec3 emissionColor = { 0.0f,0.0f,0.0f };
-        HTexture2dArr emissionTex;
-        P3D_TEX_MAP_MODE emissionMapMode = P3D_TEX_MAP_WRAP;
         
+        P3D_TEX_MAP_MODE texMapMode = P3D_TEX_MAP_WRAP;
         bool wireframe = false;
 
         //P3D_BLEND_MODE blendMode; since only 1 texture of each type is allowed, we might not need it

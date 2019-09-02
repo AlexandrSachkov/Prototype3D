@@ -259,45 +259,45 @@ namespace p3d {
             }
 
             if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-                P3D_WARNING(!loadTexture2D(material, aiTextureType_DIFFUSE, texMap, scene, scenePath, userTexDir, out.diffuseTex, out.diffuseMapMode),
+                P3D_WARNING(!loadTexture2D(material, aiTextureType_DIFFUSE, texMap, scene, scenePath, userTexDir, out.diffuseTex, out.texMapMode),
                     "Failed to load diffuse texture");
             }
 
             if (material->GetTextureCount(aiTextureType_NORMALS) > 0) {
-                P3D_WARNING(!loadTexture2D(material, aiTextureType_NORMALS, texMap, scene, scenePath, userTexDir, out.normalTex, out.normalMapMode),
+                P3D_WARNING(!loadTexture2D(material, aiTextureType_NORMALS, texMap, scene, scenePath, userTexDir, out.normalTex, out.texMapMode),
                     "Failed to load normal texture");
             } else if ((material->GetTextureCount(aiTextureType_HEIGHT) > 0)) {
-                P3D_WARNING(!loadTexture2D(material, aiTextureType_HEIGHT, texMap, scene, scenePath, userTexDir, out.normalTex, out.normalMapMode),
+                P3D_WARNING(!loadTexture2D(material, aiTextureType_HEIGHT, texMap, scene, scenePath, userTexDir, out.normalTex, out.texMapMode),
                     "Failed to load normal texture");
             }
 
             if (material->GetTextureCount(aiTextureType_OPACITY) > 0) {
-                P3D_WARNING(!loadTexture2D(material, aiTextureType_OPACITY, texMap, scene, scenePath, userTexDir, out.opacityTex, out.opacityMapMode),
+                P3D_WARNING(!loadTexture2D(material, aiTextureType_OPACITY, texMap, scene, scenePath, userTexDir, out.opacityTex, out.texMapMode),
                     "Failed to load opacity texture");
             }
 
             if (material->GetTextureCount(aiTextureType_SPECULAR) > 0) {
-                P3D_WARNING(!loadTexture2D(material, aiTextureType_SPECULAR, texMap, scene, scenePath, userTexDir, out.specularTex, out.specularMapMode),
+                P3D_WARNING(!loadTexture2D(material, aiTextureType_SPECULAR, texMap, scene, scenePath, userTexDir, out.specularTex, out.texMapMode),
                     "Failed to load specular texture");
             }
 
             if (material->GetTextureCount(aiTextureType_SHININESS) > 0) {
-                P3D_WARNING(!loadTexture2D(material, aiTextureType_SHININESS, texMap, scene, scenePath, userTexDir, out.shininessTex, out.shininessMapMode),
+                P3D_WARNING(!loadTexture2D(material, aiTextureType_SHININESS, texMap, scene, scenePath, userTexDir, out.shininessTex, out.texMapMode),
                     "Failed to load shininess texture");
             }
 
             if (material->GetTextureCount(aiTextureType_LIGHTMAP) > 0) {
-                P3D_WARNING(!loadTexture2D(material, aiTextureType_LIGHTMAP, texMap, scene, scenePath, userTexDir, out.lightmapTex, out.lightmapMapMode),
+                P3D_WARNING(!loadTexture2D(material, aiTextureType_LIGHTMAP, texMap, scene, scenePath, userTexDir, out.lightmapTex, out.texMapMode),
                     "Failed to load lightmap texture");
             }
 
             if (material->GetTextureCount(aiTextureType_REFLECTION) > 0) {
-                P3D_WARNING(!loadTexture2D(material, aiTextureType_REFLECTION, texMap, scene, scenePath, userTexDir, out.reflectionTex, out.reflectionMapMode),
+                P3D_WARNING(!loadTexture2D(material, aiTextureType_REFLECTION, texMap, scene, scenePath, userTexDir, out.reflectionTex, out.texMapMode),
                     "Failed to load reflection texture");
             }
 
             if (material->GetTextureCount(aiTextureType_EMISSIVE) > 0) {
-                P3D_WARNING(!loadTexture2D(material, aiTextureType_EMISSIVE, texMap, scene, scenePath, userTexDir, out.emissionTex, out.emissionMapMode),
+                P3D_WARNING(!loadTexture2D(material, aiTextureType_EMISSIVE, texMap, scene, scenePath, userTexDir, out.emissionTex, out.texMapMode),
                     "Failed to load emission texture");
             }
 

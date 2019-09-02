@@ -943,7 +943,7 @@ namespace p3d {
                 fillMaterialData(*materialDesc, materialData);
                 Utility::updateConstBuffer(_deviceContext, _materialBuff, &materialData, sizeof(dx::MaterialData));
 
-                auto* sampler = _samplerStates[P3D_TEX_MAP_WRAP].Get();
+                auto* sampler = _samplerStates[materialDesc->texMapMode].Get();
                 _deviceContext->PSSetSamplers(0, 1, &sampler);
 
                 if (materialDesc->diffuseTex.isValid()) {
