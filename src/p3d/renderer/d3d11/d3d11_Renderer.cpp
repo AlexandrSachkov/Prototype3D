@@ -794,7 +794,7 @@ namespace p3d {
                         "Data array out of bounds");
 
                     subresData.push_back({
-                            desc.data + dataOffset,
+                            desc.data.get() + dataOffset,
                             surface.rowSizeBytes,
                             surface.slice2DSizeBytes
                         });

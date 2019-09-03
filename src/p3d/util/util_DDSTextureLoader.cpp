@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <algorithm>
+#include <memory>
 
 namespace p3d {
     namespace util {
@@ -13,7 +14,7 @@ namespace p3d {
             DDSHeader ddsHeader;
             DDSHeaderDxt10 ddsHeaderDxt10;
             bool dxt10 = false;
-            void* data = nullptr;
+            std::shared_ptr<char> data = nullptr;
             unsigned int dataSize = 0;
 
             std::memset(&ddsHeader, 0, sizeof(DDSHeader));
@@ -21,7 +22,6 @@ namespace p3d {
 
             P3D_ASSERT_R(readDDSFile(path, ddsHeader, ddsHeaderDxt10, dxt10, data, dataSize), "Failed to read DDS file");
             if (!loadDDSData(ddsHeader, ddsHeaderDxt10, dxt10, data, dataSize, texDesc)) {
-                delete data;
                 P3D_ASSERT_R(false, "Failed to load DDS data");
             }
             return true;
@@ -32,7 +32,7 @@ namespace p3d {
             DDSHeader& ddsHeader,
             DDSHeaderDxt10& ddsHeaderDxt10,
             bool& dxt10,
-            void*& data,
+            std::shared_ptr<char>& data,
             unsigned int& dataSize) {
 
             std::ifstream ifs(path, std::ifstream::in | std::ifstream::binary);
@@ -59,8 +59,8 @@ namespace p3d {
                 dataSize = fileSizeBytes - DX10_HEADER_SIZE_BYTES;
             }
 
-            data = new char[dataSize];
-            ifs.read(reinterpret_cast<char*>(data), dataSize);
+            data.reset(new char[dataSize]);
+            ifs.read(data.get(), dataSize);
 
             return true;
         }
@@ -69,7 +69,7 @@ namespace p3d {
             const DDSHeader& ddsHeader,
             const DDSHeaderDxt10& dx10Header,
             bool dtx10,
-            const void* data,
+            std::shared_ptr<char> data,
             unsigned int dataSize,
             TextureDesc& texDesc
         ) {
@@ -106,7 +106,7 @@ namespace p3d {
 
             TextureDesc desc;
             desc.format = format;
-            desc.data = reinterpret_cast<char*>((void*)data);
+            desc.data = data;
             desc.dataSize = dataSize;
 
             unsigned int dataOffset = 0;

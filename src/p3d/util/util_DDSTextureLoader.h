@@ -252,7 +252,7 @@ namespace p3d {
                 DDSHeader& ddsHeader,
                 DDSHeaderDxt10& dx10Header,
                 bool& dxt10,
-                void*& data,
+                std::shared_ptr<char>& data,
                 unsigned int& dataSize
             );
 
@@ -260,7 +260,7 @@ namespace p3d {
                 const DDSHeader& ddsHeader,
                 const DDSHeaderDxt10& ddsHeaderDxt10,
                 bool dtx10,
-                const void* data,
+                std::shared_ptr<char> data,
                 unsigned int dataSize,
                 TextureDesc& texDesc
             );

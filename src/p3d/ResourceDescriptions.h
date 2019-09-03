@@ -20,7 +20,7 @@ namespace p3d {
         };
 
         std::vector<std::vector<SurfaceDesc>> surfaceMatrix; // Texture[MipMap[]]
-        char* data;
+        std::shared_ptr<char> data;
         unsigned int dataSize;
         Format format;
         P3D_USAGE usageFlag;
