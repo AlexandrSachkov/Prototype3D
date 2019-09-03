@@ -1,5 +1,6 @@
 #include "util_SceneImporter.h"
 #include "../assert.h"
+#include "../common/AABB.h"
 #include "util_DDSTextureLoader.h"
 
 #include <assimp/Importer.hpp>      // C++ importer interface
@@ -68,6 +69,12 @@ namespace p3d {
                 desc.mesh = meshes[srcMeshIndex];
                 desc.material = materials[srcMeshes[srcMeshIndex]->mMaterialIndex];
 				
+                if (desc.mesh.isValid()) {
+                    auto* meshDesc = scene->getDesc(desc.mesh);
+                    AABB aabb = AABB::build(meshDesc->vertices.get(), meshDesc->verticesSize, desc.transform);
+                    desc.boundingVolume.reset(new AABB(aabb));
+                }
+                
                 HModel hmodel = scene->create(desc);
                 P3D_WARNING(!hmodel.isValid(), "Failed to create scene model");
 			}

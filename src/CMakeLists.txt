@@ -22,7 +22,9 @@ ENDIF(MSVC)
 
 # =====================================================================================
 
-SET(HEADERS    
+SET(HEADERS  
+    p3d/common/AABB.h
+    p3d/common/BoundingVolumeI.h
     p3d/common/Uuid.h
     p3d/common/Utils.h
 
@@ -74,6 +76,7 @@ SET(HEADERS
     )
 
 SET(SOURCES 
+    p3d/common/AABB.cpp
     p3d/common/Utils.cpp
 
     p3d/renderer/d3d11/d3d11_ConstConvert.cpp

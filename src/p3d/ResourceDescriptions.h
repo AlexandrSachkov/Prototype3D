@@ -2,6 +2,7 @@
 
 #include "Constants.h"
 #include "ResourceHandles.h"
+#include "common/BoundingVolumeI.h"
 
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
@@ -20,7 +21,7 @@ namespace p3d {
         };
 
         std::vector<std::vector<SurfaceDesc>> surfaceMatrix; // Texture[MipMap[]]
-        std::shared_ptr<char> data;
+        std::shared_ptr<char> data = nullptr;
         unsigned int dataSize;
         Format format;
         P3D_USAGE usageFlag;
@@ -65,6 +66,7 @@ namespace p3d {
         HMesh mesh;
         HMaterial material;
         glm::mat4x4 transform;
+        std::shared_ptr<BoundingVolumeI> boundingVolume = nullptr;
     };
 
     struct MeshDesc {
