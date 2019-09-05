@@ -416,18 +416,6 @@ namespace p3d {
                 ), "Failed to create bitangent buffer");
             }
 
-            if (desc.colors) {
-                P3D_ASSERT_R(Utility::createBuffer(
-                    _device,
-                    D3D11_BIND_VERTEX_BUFFER,
-                    D3D11_USAGE_IMMUTABLE,
-                    (D3D11_CPU_ACCESS_FLAG)0,
-                    desc.colors.get(),
-                    desc.verticesSize * sizeof(glm::vec4),
-                    bitangentBuff
-                ), "Failed to create color buffer");
-            }
-
             return std::unique_ptr<MeshI>(new Mesh(
                 vertexBuff,
                 indexBuff,

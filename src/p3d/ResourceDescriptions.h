@@ -90,7 +90,6 @@ namespace p3d {
         std::shared_ptr<glm::vec3> normals = nullptr;
         std::shared_ptr<glm::vec3> tangents = nullptr;
         std::shared_ptr<glm::vec3> bitangents = nullptr;
-        std::shared_ptr<glm::vec4> colors = nullptr;
     };
 
     struct MaterialDesc {
@@ -123,5 +122,6 @@ namespace p3d {
 
     struct SceneProperties {
         glm::vec3 ambientLight = { 1.0f,1.0f,1.0f };
+        bool drawBoundingVolumes = false;
     };
 }

@@ -150,11 +150,6 @@ namespace p3d {
             P3D_WARNING(mesh->GetNumColorChannels() > 1,
                 "Mesh contains " + std::to_string(mesh->GetNumColorChannels()) + " color channels. Only the first channel will be loaded");
 
-            if (mesh->HasVertexColors(0)) {
-                meshOut.colors.reset(new glm::vec4[mesh->mNumVertices]);
-                memcpy(meshOut.colors.get(), mesh->mColors[0], sizeof(glm::vec4) * mesh->mNumVertices);
-            }
-
             if (mesh->HasTangentsAndBitangents()) {
                 meshOut.tangents.reset(new glm::vec3[mesh->mNumVertices]);
                 memcpy(meshOut.tangents.get(), mesh->mTangents, sizeof(glm::vec3) * mesh->mNumVertices);
