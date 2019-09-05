@@ -7,37 +7,53 @@ namespace p3d {
 
     }
 
-    bool AABB::intersects(const BoundingVolumeI* other) const {
-        return false;
+    float AABB::getMinX() {
+        return _minX;
     }
 
-    float AABB::getShortestDistance() const {
-        return 0.0f;
+    float AABB::getMaxX() {
+        return _maxX;
     }
 
-    AABB AABB::build(const glm::vec3* vertices, unsigned int numVertices, const glm::mat4x4& transform) {
+    float AABB::getMinY() {
+        return _minY;
+    }
+
+    float AABB::getMaxY() {
+        return _maxY;
+    }
+
+    float AABB::getMinZ() {
+        return _minZ;
+    }
+
+    float AABB::getMaxZ() {
+        return _maxZ;
+    }
+
+    AABB AABB::build(const glm::vec3* vertices, unsigned int numVertices, const glm::mat4x4& worldTransform) {
         float minX, minY, minZ, maxX, maxY, maxZ;
         minX = minY = minZ = FLT_MAX;
         maxX = maxY = maxZ = FLT_MIN;
 
         glm::vec4 vertexFinal;
         for (unsigned int i = 0; i < numVertices; i++) {
-            vertexFinal = transform * glm::vec4(vertices[i], 1.0f);
-            if (vertexFinal.x < minX) {
+            vertexFinal = worldTransform * glm::vec4(vertices[i], 1.0f);
+            if (vertexFinal.x <= minX) {
                 minX = vertexFinal.x;
-            } else if (vertexFinal.x > maxX) {
+            } else if (vertexFinal.x >= maxX) {
                 maxX = vertexFinal.x;
             }
 
-            if (vertexFinal.y < minY) {
+            if (vertexFinal.y <= minY) {
                 minY = vertexFinal.y;
-            } else if (vertexFinal.y > maxY) {
+            } else if (vertexFinal.y >= maxY) {
                 maxY = vertexFinal.y;
             }
 
-            if (vertexFinal.z < minZ) {
+            if (vertexFinal.z <= minZ) {
                 minZ = vertexFinal.z;
-            } else if (vertexFinal.z > maxZ) {
+            } else if (vertexFinal.z >= maxZ) {
                 maxZ = vertexFinal.z;
             }
         }

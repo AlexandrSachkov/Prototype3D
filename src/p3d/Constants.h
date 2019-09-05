@@ -193,6 +193,11 @@ namespace p3d {
         P3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ
     };
 
+    enum class P3D_BOUNDING_VOLUME_TYPE {
+        P3D_BOUNDING_VOLUME_NONE,
+        P3D_BOUNDING_VOLUME_AABB
+    };
+
     unsigned int getVecFormatSizeBits(P3D_VECTOR_FORMAT format);
     unsigned int getBlockCompressionFormatSizeBytes(P3D_BLOCK_COMPRESSION_FORMAT format);
 }

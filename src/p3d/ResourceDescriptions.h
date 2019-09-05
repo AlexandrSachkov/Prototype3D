@@ -2,7 +2,7 @@
 
 #include "Constants.h"
 #include "ResourceHandles.h"
-#include "common/BoundingVolumeI.h"
+#include "common/AABB.h"
 
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
@@ -12,6 +12,15 @@
 #include <string>
 
 namespace p3d {
+    struct BoundingVolume {
+        P3D_BOUNDING_VOLUME_TYPE type = P3D_BOUNDING_VOLUME_TYPE::P3D_BOUNDING_VOLUME_NONE;
+        union Volume {
+            Volume() {}
+
+            AABB aabb;
+        } volume;
+    };
+
     struct TextureDesc {
         struct SurfaceDesc {
             unsigned int surfaceDim[3];     // width/height/depth
@@ -66,7 +75,7 @@ namespace p3d {
         HMesh mesh;
         HMaterial material;
         glm::mat4x4 transform;
-        std::shared_ptr<BoundingVolumeI> boundingVolume = nullptr;
+        BoundingVolume boundingVolume;
     };
 
     struct MeshDesc {
