@@ -873,121 +873,135 @@ namespace p3d {
                 }
 
                 const MeshDesc* meshDesc = scene->getDesc(modelDesc->mesh);
-                const d3d11::Mesh* mesh = static_cast<const d3d11::Mesh*>(scene->get(modelDesc->mesh));
                 const MaterialDesc* materialDesc = scene->getDesc(modelDesc->material);
-                if (!meshDesc || !mesh || !materialDesc) {
+                if (!meshDesc || !materialDesc) {
                     continue;
                 }
 
-                // apply transformation
-                dx::TransformData transforms;
-                transforms.world = modelDesc->transform;
-                transforms.worldInvTrans = glm::transpose(glm::inverse(modelDesc->transform));
-                transforms.wvp = viewProjection * modelDesc->transform;
-                Utility::updateConstBuffer(_deviceContext, _transformBuff, &transforms, sizeof(dx::TransformData));
+                drawModel(scene, viewProjection, modelDesc, meshDesc, materialDesc);
+            }
+        }
 
-                // apply mesh
-                auto* vertexBuff = mesh->getVertexBuffer().Get();
-                unsigned int stride = sizeof(glm::vec3);
-                unsigned int offset = 0;
-                _deviceContext->IASetVertexBuffers(P3D_VB_VERTEX_CHANNEL, 1, &vertexBuff, &stride, &offset);
-                _deviceContext->IASetPrimitiveTopology(convertPrimitiveTopology(meshDesc->topology));
+        void Renderer::drawModel(
+            const SceneI* scene,
+            const glm::mat4x4& viewProjection,
+            const ModelDesc* modelDesc,
+            const MeshDesc* meshDesc,
+            const MaterialDesc* materialDesc
+        ) {
+            const d3d11::Mesh* mesh = static_cast<const d3d11::Mesh*>(scene->get(modelDesc->mesh));
+            if (!mesh) {
+                return;
+            }
 
-                auto* indexBuff = mesh->getIndexBuffer().Get();
-                if (indexBuff) {
-                    _deviceContext->IASetIndexBuffer(indexBuff, DXGI_FORMAT_R32_UINT, 0);
-                }
+            // apply transformation
+            dx::TransformData transforms;
+            transforms.world = modelDesc->transform;
+            transforms.worldInvTrans = glm::transpose(glm::inverse(modelDesc->transform));
+            transforms.wvp = viewProjection * modelDesc->transform;
+            Utility::updateConstBuffer(_deviceContext, _transformBuff, &transforms, sizeof(dx::TransformData));
 
-                auto* texCoordBuff = mesh->getTextCoordBuffer().Get();
-                if (texCoordBuff) {
-                    stride = sizeof(glm::vec2);
-                    offset = 0;
-                    _deviceContext->IASetVertexBuffers(P3D_VB_TEXCOORD_CHANNEL, 1, &texCoordBuff, &stride, &offset);
-                }
+            // apply mesh
+            auto* vertexBuff = mesh->getVertexBuffer().Get();
+            unsigned int stride = sizeof(glm::vec3);
+            unsigned int offset = 0;
+            _deviceContext->IASetVertexBuffers(P3D_VB_VERTEX_CHANNEL, 1, &vertexBuff, &stride, &offset);
+            _deviceContext->IASetPrimitiveTopology(convertPrimitiveTopology(meshDesc->topology));
 
-                auto* normalBuff = mesh->getNormalBuffer().Get();
-                if (normalBuff) {
-                    stride = sizeof(glm::vec3);
-                    offset = 0;
-                    _deviceContext->IASetVertexBuffers(P3D_VB_NORMAL_CHANNEL, 1, &normalBuff, &stride, &offset);
-                }
+            auto* indexBuff = mesh->getIndexBuffer().Get();
+            if (indexBuff) {
+                _deviceContext->IASetIndexBuffer(indexBuff, DXGI_FORMAT_R32_UINT, 0);
+            }
 
-                auto* tangentBuff = mesh->getTangentBuffer().Get();
-                if (tangentBuff) {
-                    stride = sizeof(glm::vec3);
-                    offset = 0;
-                    _deviceContext->IASetVertexBuffers(P3D_VB_TANGENT_CHANNEL, 1, &tangentBuff, &stride, &offset);
-                }
+            auto* texCoordBuff = mesh->getTextCoordBuffer().Get();
+            if (texCoordBuff) {
+                stride = sizeof(glm::vec2);
+                offset = 0;
+                _deviceContext->IASetVertexBuffers(P3D_VB_TEXCOORD_CHANNEL, 1, &texCoordBuff, &stride, &offset);
+            }
 
-                auto* bitangentBuff = mesh->getBitangentBuffer().Get();
-                if (bitangentBuff) {
-                    stride = sizeof(glm::vec3);
-                    offset = 0;
-                    _deviceContext->IASetVertexBuffers(P3D_VB_BITANGENT_CHANNEL, 1, &bitangentBuff, &stride, &offset);
-                }
+            auto* normalBuff = mesh->getNormalBuffer().Get();
+            if (normalBuff) {
+                stride = sizeof(glm::vec3);
+                offset = 0;
+                _deviceContext->IASetVertexBuffers(P3D_VB_NORMAL_CHANNEL, 1, &normalBuff, &stride, &offset);
+            }
 
-                //apply material
-                dx::MaterialData materialData;
-                fillMaterialData(*materialDesc, materialData);
-                Utility::updateConstBuffer(_deviceContext, _materialBuff, &materialData, sizeof(dx::MaterialData));
+            auto* tangentBuff = mesh->getTangentBuffer().Get();
+            if (tangentBuff) {
+                stride = sizeof(glm::vec3);
+                offset = 0;
+                _deviceContext->IASetVertexBuffers(P3D_VB_TANGENT_CHANNEL, 1, &tangentBuff, &stride, &offset);
+            }
 
-                auto* sampler = _samplerStates[materialDesc->texMapMode].Get();
-                _deviceContext->PSSetSamplers(0, 1, &sampler);
+            auto* bitangentBuff = mesh->getBitangentBuffer().Get();
+            if (bitangentBuff) {
+                stride = sizeof(glm::vec3);
+                offset = 0;
+                _deviceContext->IASetVertexBuffers(P3D_VB_BITANGENT_CHANNEL, 1, &bitangentBuff, &stride, &offset);
+            }
 
-                if (materialDesc->diffuseTex.isValid()) {
-                    auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->diffuseTex));
-                    auto* textureView = p3dTexture2d->getShaderResourceView().Get();
-                    _deviceContext->PSSetShaderResources(P3D_TEX_DIFFUSE_CHANNEL, 1, &textureView);
-                }
+            //apply material
+            dx::MaterialData materialData;
+            fillMaterialData(*materialDesc, materialData);
+            Utility::updateConstBuffer(_deviceContext, _materialBuff, &materialData, sizeof(dx::MaterialData));
 
-                if (materialDesc->emissionTex.isValid()) {
-                    auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->emissionTex));
-                    auto* textureView = p3dTexture2d->getShaderResourceView().Get();
-                    _deviceContext->PSSetShaderResources(P3D_TEX_EMISSION_CHANNEL, 1, &textureView);
-                }
+            auto* sampler = _samplerStates[materialDesc->texMapMode].Get();
+            _deviceContext->PSSetSamplers(0, 1, &sampler);
 
-                if (materialDesc->lightmapTex.isValid()) {
-                    auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->lightmapTex));
-                    auto* textureView = p3dTexture2d->getShaderResourceView().Get();
-                    _deviceContext->PSSetShaderResources(P3D_TEX_LIGHTMAP_CHANNEL, 1, &textureView);
-                }
+            if (materialDesc->diffuseTex.isValid()) {
+                auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->diffuseTex));
+                auto* textureView = p3dTexture2d->getShaderResourceView().Get();
+                _deviceContext->PSSetShaderResources(P3D_TEX_DIFFUSE_CHANNEL, 1, &textureView);
+            }
 
-                if (materialDesc->normalTex.isValid()) {
-                    auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->normalTex));
-                    auto* textureView = p3dTexture2d->getShaderResourceView().Get();
-                    _deviceContext->PSSetShaderResources(P3D_TEX_NORMAL_CHANNEL, 1, &textureView);
-                }
+            if (materialDesc->emissionTex.isValid()) {
+                auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->emissionTex));
+                auto* textureView = p3dTexture2d->getShaderResourceView().Get();
+                _deviceContext->PSSetShaderResources(P3D_TEX_EMISSION_CHANNEL, 1, &textureView);
+            }
 
-                if (materialDesc->opacityTex.isValid()) {
-                    auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->opacityTex));
-                    auto* textureView = p3dTexture2d->getShaderResourceView().Get();
-                    _deviceContext->PSSetShaderResources(P3D_TEX_OPACITY_CHANNEL, 1, &textureView);
-                }
+            if (materialDesc->lightmapTex.isValid()) {
+                auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->lightmapTex));
+                auto* textureView = p3dTexture2d->getShaderResourceView().Get();
+                _deviceContext->PSSetShaderResources(P3D_TEX_LIGHTMAP_CHANNEL, 1, &textureView);
+            }
 
-                if (materialDesc->reflectionTex.isValid()) {
-                    auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->reflectionTex));
-                    auto* textureView = p3dTexture2d->getShaderResourceView().Get();
-                    _deviceContext->PSSetShaderResources(P3D_TEX_REFLECTION_CHANNEL, 1, &textureView);
-                }
+            if (materialDesc->normalTex.isValid()) {
+                auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->normalTex));
+                auto* textureView = p3dTexture2d->getShaderResourceView().Get();
+                _deviceContext->PSSetShaderResources(P3D_TEX_NORMAL_CHANNEL, 1, &textureView);
+            }
 
-                if (materialDesc->shininessTex.isValid()) {
-                    auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->shininessTex));
-                    auto* textureView = p3dTexture2d->getShaderResourceView().Get();
-                    _deviceContext->PSSetShaderResources(P3D_TEX_SHININESS_CHANNEL, 1, &textureView);
-                }
+            if (materialDesc->opacityTex.isValid()) {
+                auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->opacityTex));
+                auto* textureView = p3dTexture2d->getShaderResourceView().Get();
+                _deviceContext->PSSetShaderResources(P3D_TEX_OPACITY_CHANNEL, 1, &textureView);
+            }
 
-                if (materialDesc->specularTex.isValid()) {
-                    auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->specularTex));
-                    auto* textureView = p3dTexture2d->getShaderResourceView().Get();
-                    _deviceContext->PSSetShaderResources(P3D_TEX_SPECULAR_CHANNEL, 1, &textureView);
-                }
+            if (materialDesc->reflectionTex.isValid()) {
+                auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->reflectionTex));
+                auto* textureView = p3dTexture2d->getShaderResourceView().Get();
+                _deviceContext->PSSetShaderResources(P3D_TEX_REFLECTION_CHANNEL, 1, &textureView);
+            }
 
-                //draw
-                if (indexBuff) {
-                    _deviceContext->DrawIndexed(meshDesc->indicesSize, 0, 0);
-                } else {
-                    _deviceContext->Draw(meshDesc->verticesSize, 0);
-                }
+            if (materialDesc->shininessTex.isValid()) {
+                auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->shininessTex));
+                auto* textureView = p3dTexture2d->getShaderResourceView().Get();
+                _deviceContext->PSSetShaderResources(P3D_TEX_SHININESS_CHANNEL, 1, &textureView);
+            }
+
+            if (materialDesc->specularTex.isValid()) {
+                auto* p3dTexture2d = static_cast<const d3d11::Texture2dArray*>(scene->get(materialDesc->specularTex));
+                auto* textureView = p3dTexture2d->getShaderResourceView().Get();
+                _deviceContext->PSSetShaderResources(P3D_TEX_SPECULAR_CHANNEL, 1, &textureView);
+            }
+
+            //draw
+            if (indexBuff) {
+                _deviceContext->DrawIndexed(meshDesc->indicesSize, 0, 0);
+            } else {
+                _deviceContext->Draw(meshDesc->verticesSize, 0);
             }
         }
     }

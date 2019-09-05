@@ -68,6 +68,13 @@ namespace p3d {
         private:
             bool initializeRendering(const unsigned int screenDim[2]);
             void drawScene(const SceneI* scene, const CameraI* camera);
+            void drawModel(
+                const SceneI* scene, 
+                const glm::mat4x4& viewProjection,
+                const ModelDesc* modelDesc, 
+                const MeshDesc* meshDesc, 
+                const MaterialDesc* materialDesc
+            );
 
             p3d::Texture2dArrayI& getRenderTargetBuff();
             p3d::Texture2dArrayI& getDepthStencilBuff();
