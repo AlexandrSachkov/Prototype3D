@@ -1,6 +1,7 @@
 #include "d3d11_Renderer.h"
 #include "../../assert.h"
 #include "../../common/Utils.h"
+#include "../../common/StandardShapes.h"
 #include "../dx/dx_ConstConvert.h"
 #include "d3d11_ConstConvert.h"
 #include "d3d11_Utility.h"
@@ -149,6 +150,7 @@ namespace p3d {
             _deviceContext->OMSetDepthStencilState(_defaultDepthStencilState.Get(), 1);
 
             P3D_ASSERT_R(initializeRendering(screenDim), "Failed to initialize rendering");
+            P3D_ASSERT_R(initializeStandardShapes(), "Failed to initialize standard shapes");
 
             return true;
         }
@@ -259,6 +261,13 @@ namespace p3d {
             return true;
         }
 
+        bool Renderer::initializeStandardShapes() {
+            //cube
+            _cubeMeshDesc = shapes::createCube();
+            P3D_ASSERT_R(createMesh(_cubeMeshDesc), "Failed to create cube mesh");
+            return true;
+        }
+
         p3d::Texture2dArrayI& Renderer::getRenderTargetBuff() {
             return _renderTargetBuff;
         }
@@ -344,7 +353,6 @@ namespace p3d {
             ComPtr<ID3D11Buffer> normalBuff = nullptr;
             ComPtr<ID3D11Buffer> tangentBuff = nullptr;
             ComPtr<ID3D11Buffer> bitangentBuff = nullptr;
-            ComPtr<ID3D11Buffer> colorBuff = nullptr;
 
             P3D_ASSERT_R(Utility::createBuffer(
                 _device,
@@ -423,7 +431,9 @@ namespace p3d {
                 normalBuff,
                 tangentBuff,
                 bitangentBuff,
-                colorBuff
+                desc.verticesSize,
+                desc.indicesSize,
+                convertPrimitiveTopology(desc.topology)
             ));
         }
 
@@ -873,12 +883,16 @@ namespace p3d {
                 }
 
                 const MeshDesc* meshDesc = scene->getDesc(modelDesc->mesh);
+                const d3d11::Mesh* mesh = static_cast<const d3d11::Mesh*>(scene->get(modelDesc->mesh));
                 const MaterialDesc* materialDesc = scene->getDesc(modelDesc->material);
-                if (!meshDesc || !materialDesc) {
+                if (!meshDesc || !mesh || !materialDesc) {
                     continue;
                 }
 
-                drawModel(scene, viewProjection, modelDesc, meshDesc, materialDesc);
+                drawModel(scene, viewProjection, modelDesc, mesh, materialDesc);
+                if (scene->getProperties().drawBoundingVolumes || modelDesc->drawBoundingVolume) {
+                    drawBoundingVolume(scene, viewProjection, modelDesc, mesh, materialDesc);
+                }
             }
         }
 
@@ -886,14 +900,9 @@ namespace p3d {
             const SceneI* scene,
             const glm::mat4x4& viewProjection,
             const ModelDesc* modelDesc,
-            const MeshDesc* meshDesc,
+            const d3d11::Mesh* mesh,
             const MaterialDesc* materialDesc
         ) {
-            const d3d11::Mesh* mesh = static_cast<const d3d11::Mesh*>(scene->get(modelDesc->mesh));
-            if (!mesh) {
-                return;
-            }
-
             // apply transformation
             dx::TransformData transforms;
             transforms.world = modelDesc->transform;
@@ -906,7 +915,7 @@ namespace p3d {
             unsigned int stride = sizeof(glm::vec3);
             unsigned int offset = 0;
             _deviceContext->IASetVertexBuffers(P3D_VB_VERTEX_CHANNEL, 1, &vertexBuff, &stride, &offset);
-            _deviceContext->IASetPrimitiveTopology(convertPrimitiveTopology(meshDesc->topology));
+            _deviceContext->IASetPrimitiveTopology(mesh->getPrimitiveTopology());
 
             auto* indexBuff = mesh->getIndexBuffer().Get();
             if (indexBuff) {
@@ -999,9 +1008,21 @@ namespace p3d {
 
             //draw
             if (indexBuff) {
-                _deviceContext->DrawIndexed(meshDesc->indicesSize, 0, 0);
+                _deviceContext->DrawIndexed(mesh->getNumIndexes(), 0, 0);
             } else {
-                _deviceContext->Draw(meshDesc->verticesSize, 0);
+                _deviceContext->Draw(mesh->getNumIndexes(), 0);
+            }
+        }
+
+        void Renderer::drawBoundingVolume(
+            const SceneI* scene,
+            const glm::mat4x4& viewProjection,
+            const ModelDesc* modelDesc,
+            const d3d11::Mesh* mesh,
+            const MaterialDesc* materialDesc
+        ) {
+            if (modelDesc->boundingVolume.type == P3D_BOUNDING_VOLUME_TYPE::P3D_BOUNDING_VOLUME_AABB) {
+
             }
         }
     }

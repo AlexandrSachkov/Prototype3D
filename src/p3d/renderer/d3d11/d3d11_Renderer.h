@@ -10,6 +10,7 @@
 #include "../VertexShaderI.h"
 #include "../PixelShaderI.h"
 #include "../dx/dx_ComPtr.h"
+#include "d3d11_Mesh.h"
 #include "d3d11_Texture2dArray.h"
 #include "../dx/dx_BufferDescriptions.h"
 
@@ -67,12 +68,20 @@ namespace p3d {
         
         private:
             bool initializeRendering(const unsigned int screenDim[2]);
+            bool initializeStandardShapes();
             void drawScene(const SceneI* scene, const CameraI* camera);
             void drawModel(
                 const SceneI* scene, 
                 const glm::mat4x4& viewProjection,
                 const ModelDesc* modelDesc, 
-                const MeshDesc* meshDesc, 
+                const d3d11::Mesh* mesh,
+                const MaterialDesc* materialDesc
+            );
+            void drawBoundingVolume(
+                const SceneI* scene,
+                const glm::mat4x4& viewProjection,
+                const ModelDesc* modelDesc,
+                const d3d11::Mesh* mesh,
                 const MaterialDesc* materialDesc
             );
 
@@ -167,6 +176,12 @@ namespace p3d {
 
             std::unique_ptr<VertexShaderI> _vertexShader = nullptr;
             std::unique_ptr<PixelShaderI> _pixelShader = nullptr;
+
+
+            //this should be in some other file
+            //AABB data
+            MeshDesc _cubeMeshDesc;
+            std::unique_ptr<d3d11::Mesh> _cubeMesh;
         };
     }
 }

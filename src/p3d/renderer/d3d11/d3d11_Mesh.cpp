@@ -9,7 +9,9 @@ namespace p3d {
             ComPtr<ID3D11Buffer> normalBuff,
             ComPtr<ID3D11Buffer> tangentBuff,
             ComPtr<ID3D11Buffer> bitangentBuff,
-            ComPtr<ID3D11Buffer> colorBuff
+            unsigned int numVertices,
+            unsigned int numIndexes,
+            D3D11_PRIMITIVE_TOPOLOGY primitiveTopology
         ) : 
             _vertexBuff(vertexBuff), 
             _indexBuff(indexBuff), 
@@ -17,7 +19,9 @@ namespace p3d {
             _normalBuff(normalBuff),
             _tangentBuff(tangentBuff),
             _bitangentBuff(bitangentBuff),
-            _colorBuff(colorBuff)
+            _numVertices(numVertices),
+            _numIndexes(numIndexes),
+            _primitiveTopology(primitiveTopology)
         {}
 
         const ComPtr<ID3D11Buffer> Mesh::getVertexBuffer() const {
@@ -44,8 +48,16 @@ namespace p3d {
             return _bitangentBuff;
         }
 
-        const ComPtr<ID3D11Buffer> Mesh::getColorBuffer() const {
-            return _colorBuff;
+        unsigned int Mesh::getNumVertices() const {
+            return _numVertices;
+        }
+
+        unsigned int Mesh::getNumIndexes() const {
+            return _numIndexes;
+        }
+
+        D3D11_PRIMITIVE_TOPOLOGY Mesh::getPrimitiveTopology() const {
+            return _primitiveTopology;
         }
     }
 }
