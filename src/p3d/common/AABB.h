@@ -11,12 +11,12 @@ namespace p3d {
         AABB() = default;
         AABB(float minX, float maxX, float minY, float maxY, float minZ, float maxZ);
 
-        float getMinX();
-        float getMaxX();
-        float getMinY();
-        float getMaxY();
-        float getMinZ();
-        float getMaxZ();
+        float getMinX() const;
+        float getMaxX() const;
+        float getMinY() const;
+        float getMaxY() const;
+        float getMinZ() const;
+        float getMaxZ() const;
 
     private:
         float _minX = 0;

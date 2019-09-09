@@ -13,6 +13,7 @@
 #include "p3d/scene/NullSpacePartitioner.h"
 #include "p3d/scene/PerspectiveCamera.h"
 #include "p3d/common/StandardShapes.h"
+#include "p3d/common/AABB.h"
 
 #include "glm/vec3.hpp"
 
@@ -28,10 +29,13 @@ bool run() {
     P3D_ASSERT_R(sampleRunner.initialize(winTitle, windowDim, fullscreen, true, false, false),
         "Failed to initialize window manager");
 
+    unsigned int clientDim[2];
+    sampleRunner.getClientSize(clientDim);
+
     std::unique_ptr <p3d::d3d11::Renderer> d3d11Renderer(new p3d::d3d11::Renderer());
     P3D_ASSERT_R(d3d11Renderer->initialize(
         sampleRunner.getWindowHandle(),
-        windowDim,
+        clientDim,
         60, // refresh rate
         1,  // multi-sampling
         1,  // number of back buffers (1 for double buffering, 2 for tripple)
@@ -47,17 +51,23 @@ bool run() {
     p3d::ModelDesc modelDesc;
     p3d::MeshDesc meshDesc = p3d::shapes::createCube();
     modelDesc.mesh = cubeScene->create(meshDesc);
+    modelDesc.transform = glm::rotate(modelDesc.transform, glm::radians(45.0f), { 0,1,0 });
+    modelDesc.transform = glm::translate(modelDesc.transform, { -1,2,-3 });
     P3D_ASSERT_R(modelDesc.mesh.isValid(), "Failed to create mesh");
+    modelDesc.boundingVolume.type = p3d::P3D_BOUNDING_VOLUME_TYPE::P3D_BOUNDING_VOLUME_AABB;
+    modelDesc.boundingVolume.volume.aabb = p3d::AABB::build(meshDesc.vertices.get(), meshDesc.verticesSize, modelDesc.transform);
+    modelDesc.drawBoundingVolume = true;
 
     p3d::MaterialDesc materialDesc;
-    materialDesc.diffuseColor = { 1.0f,0.0f,1.0f };
+    materialDesc.diffuseColor = { 1.0f,0.0f,0.0f };
+    materialDesc.wireframe = false;
     modelDesc.material = cubeScene->create(materialDesc);
     P3D_ASSERT_R(modelDesc.material.isValid(), "Failed to create material");
 
     P3D_ASSERT_R(cubeScene->create(modelDesc).isValid(), "Failed to create model");
 
     std::unique_ptr<p3d::PerspectiveCamera> camera(
-        new p3d::PerspectiveCamera({ 0,0,-2 }, 45.0f, (float)windowDim[0] / windowDim[1], 0.05f, 1000.0f)
+        new p3d::PerspectiveCamera({ 0,0,-2 }, 45.0f, (float)clientDim[0] / clientDim[1], 0.05f, 1000.0f)
     );
 
     sampleRunner.setRunProcedure([&]() {

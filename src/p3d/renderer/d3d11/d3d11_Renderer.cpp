@@ -246,7 +246,6 @@ namespace p3d {
             //This should not be done here but for every object material type during rendering
             P3D_ASSERT_R(VSSetShader(_vertexShader.get()), "Failed to set vertex shader");
             P3D_ASSERT_R(PSSetShader(_pixelShader.get()), "Failed to set pixel shader");
-            _deviceContext->RSSetState(_backFaceCull.Get());
 
             float blendFactor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
             _deviceContext->OMSetBlendState(_noBlendState.Get(), blendFactor, 0xffffffff);
@@ -264,7 +263,10 @@ namespace p3d {
         bool Renderer::initializeStandardShapes() {
             //cube
             _cubeMeshDesc = shapes::createCube();
-            P3D_ASSERT_R(createMesh(_cubeMeshDesc), "Failed to create cube mesh");
+            auto mesh = createMesh(_cubeMeshDesc);
+            P3D_ASSERT_R(mesh, "Failed to create cube mesh");
+            _cubeMesh.reset(static_cast<d3d11::Mesh*>(mesh.release()));
+            
             return true;
         }
 
@@ -889,7 +891,7 @@ namespace p3d {
                     continue;
                 }
 
-                drawModel(scene, viewProjection, modelDesc, mesh, materialDesc);
+                drawModel(scene, viewProjection, modelDesc->transform, mesh, materialDesc);
                 if (scene->getProperties().drawBoundingVolumes || modelDesc->drawBoundingVolume) {
                     drawBoundingVolume(scene, viewProjection, modelDesc, mesh, materialDesc);
                 }
@@ -899,15 +901,15 @@ namespace p3d {
         void Renderer::drawModel(
             const SceneI* scene,
             const glm::mat4x4& viewProjection,
-            const ModelDesc* modelDesc,
+            const glm::mat4x4& modelTransform,
             const d3d11::Mesh* mesh,
             const MaterialDesc* materialDesc
         ) {
             // apply transformation
             dx::TransformData transforms;
-            transforms.world = modelDesc->transform;
-            transforms.worldInvTrans = glm::transpose(glm::inverse(modelDesc->transform));
-            transforms.wvp = viewProjection * modelDesc->transform;
+            transforms.world = modelTransform;
+            transforms.worldInvTrans = glm::transpose(glm::inverse(modelTransform));
+            transforms.wvp = viewProjection * modelTransform;
             Utility::updateConstBuffer(_deviceContext, _transformBuff, &transforms, sizeof(dx::TransformData));
 
             // apply mesh
@@ -1006,6 +1008,12 @@ namespace p3d {
                 _deviceContext->PSSetShaderResources(P3D_TEX_SPECULAR_CHANNEL, 1, &textureView);
             }
 
+            if (materialDesc->wireframe) {
+                _deviceContext->RSSetState(_wireframeMode.Get());
+            } else {
+                _deviceContext->RSSetState(_backFaceCull.Get());
+            }
+
             //draw
             if (indexBuff) {
                 _deviceContext->DrawIndexed(mesh->getNumIndexes(), 0, 0);
@@ -1022,7 +1030,20 @@ namespace p3d {
             const MaterialDesc* materialDesc
         ) {
             if (modelDesc->boundingVolume.type == P3D_BOUNDING_VOLUME_TYPE::P3D_BOUNDING_VOLUME_AABB) {
+                const AABB& aabb = modelDesc->boundingVolume.volume.aabb;
 
+                float xScale = glm::abs(aabb.getMaxX() - aabb.getMinX());
+                float yScale = glm::abs(aabb.getMaxY() - aabb.getMinY());
+                float zScale = glm::abs(aabb.getMaxZ() - aabb.getMinZ());
+                glm::mat4x4 scale = glm::scale(glm::mat4x4(), { xScale, yScale, zScale });
+
+                glm::mat4x4 translate = glm::translate(glm::mat4x4(), 
+                    { modelDesc->transform[3][0], modelDesc->transform[3][1], modelDesc->transform[3][2]});
+
+                MaterialDesc materialDesc;
+                materialDesc.diffuseColor = { 1.0f,0.0f,1.0f };
+                materialDesc.wireframe = true;
+                drawModel(scene, viewProjection, translate * scale, _cubeMesh.get(), &materialDesc);
             }
         }
     }

@@ -28,10 +28,13 @@ bool run() {
     P3D_ASSERT_R(sampleRunner.initialize(winTitle, windowDim, fullscreen, true, false, false),
         "Failed to initialize window manager");
 
+    unsigned int clientDim[2];
+    sampleRunner.getClientSize(clientDim);
+
     std::unique_ptr <p3d::d3d11::Renderer> d3d11Renderer(new p3d::d3d11::Renderer());
     P3D_ASSERT_R(d3d11Renderer->initialize(
         sampleRunner.getWindowHandle(),
-        windowDim,
+        clientDim,
         60, // refresh rate
         1,  // multi-sampling
         1,  // number of back buffers (1 for double buffering, 2 for tripple)
@@ -50,12 +53,13 @@ bool run() {
 
     p3d::SceneProperties sceneProperties = sponzaScene->getProperties();
     sceneProperties.ambientLight = { 0.9f,0.9f,0.9f };
+    sceneProperties.drawBoundingVolumes = true;
     sponzaScene->setProperties(sceneProperties);
 
     //Field of view should be 45 degrees. Otherwise, it will cause artifacts (need to look into perspective distortion)
     //Keep near/far planes closer together to avoid floating precision issues
     std::unique_ptr<p3d::PerspectiveCamera> camera(
-        new p3d::PerspectiveCamera({ 0,0,-2 }, 45.0f, (float)windowDim[0] / windowDim[1], 1.0f, 10000.0f)
+        new p3d::PerspectiveCamera({ 0,0,-2 }, 45.0f, (float)clientDim[0] / clientDim[1], 1.0f, 10000.0f)
     );
 
     sampleRunner.setRunProcedure([&]() {

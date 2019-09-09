@@ -73,7 +73,7 @@ namespace p3d {
             void drawModel(
                 const SceneI* scene, 
                 const glm::mat4x4& viewProjection,
-                const ModelDesc* modelDesc, 
+                const glm::mat4x4& modelTransform,
                 const d3d11::Mesh* mesh,
                 const MaterialDesc* materialDesc
             );
