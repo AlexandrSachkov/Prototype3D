@@ -77,6 +77,7 @@ namespace p3d {
         glm::mat4x4 transform;
         BoundingVolume boundingVolume;
         bool drawBoundingVolume = false;
+        bool draw = true;
     };
 
     struct MeshDesc {

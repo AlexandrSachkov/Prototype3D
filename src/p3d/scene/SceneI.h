@@ -43,9 +43,10 @@ namespace p3d {
 
         virtual const std::vector<HModel>& getVisibleModels() const = 0;
 
-        /*virtual bool update(HModel handle, const ModelDesc& desc) = 0;
-        virtual bool update(HMesh handle, const MeshDesc& desc) = 0;
+        virtual bool update(HModel handle, const ModelDesc& desc) = 0;
         virtual bool update(HMaterial handle, const MaterialDesc& desc) = 0;
+        
+        /*virtual bool update(HMesh handle, const MeshDesc& desc) = 0;
         virtual bool update(HTexture2dArr handle, const TextureDesc& desc) = 0;
         virtual bool update(HVertexShader handle, const VertexShaderDesc& desc) = 0;
         virtual bool update(HPixelShader handle, const PixelShaderDesc& desc) = 0;*/

@@ -880,7 +880,7 @@ namespace p3d {
             auto& models = scene->getVisibleModels();
             for (HModel hmodel : models) {
                 const ModelDesc* modelDesc = scene->getDesc(hmodel); 
-                if (!modelDesc) {
+                if (!modelDesc || !modelDesc->draw) {
                     continue;
                 }
 

@@ -43,9 +43,10 @@ namespace p3d {
 
         const std::vector<HModel>& getVisibleModels() const override;
 
-        /*bool update(HModel handle, const ModelDesc& desc) override;
-        bool update(HMesh handle, const MeshDesc& desc) override;
+        bool update(HModel handle, const ModelDesc& desc) override;
         bool update(HMaterial handle, const MaterialDesc& desc) override;
+
+        /*bool update(HMesh handle, const MeshDesc& desc) override;
         bool update(HTexture2dArr handle, const TextureDesc& desc) override;
         bool update(HVertexShader handle, const VertexShaderDesc& desc) override;
         bool update(HPixelShader handle, const PixelShaderDesc& desc) override;*/

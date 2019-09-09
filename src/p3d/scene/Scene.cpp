@@ -35,12 +35,13 @@ namespace p3d {
     }
 
     HMaterial Scene::create(const MaterialDesc& desc) {
-        auto material = _resProvider->createMaterial(desc);
+        //TODO do we even need to create gpu data per material?
+        /*auto material = _resProvider->createMaterial(desc);
         if (nullptr == material) {
             return HMaterial();
-        }
+        }*/
 
-        return _materials.insert(material, desc, genUUID());
+        return _materials.insert(std::unique_ptr<MaterialI>(), desc, genUUID());
     }
 
     HTexture2dArr Scene::create(const TextureDesc& desc) {
@@ -142,18 +143,18 @@ namespace p3d {
         //TODO reimplement using space partitioner
         return _models.getAllHandles();
     }
-    /*bool Scene::update(HModel handle, const ModelDesc& desc) {
-        return false;
-    }
 
-    bool Scene::update(HMesh handle, const MeshDesc& desc) {
-        return false;
+    bool Scene::update(HModel handle, const ModelDesc& desc) {
+        return _models.update(handle, std::unique_ptr<void*>(), desc);
     }
 
     bool Scene::update(HMaterial handle, const MaterialDesc& desc) {
-        return false;
+        return _materials.update(handle, std::unique_ptr<MaterialI>(), desc);
     }
 
+    /*bool Scene::update(HMesh handle, const MeshDesc& desc) {
+        return false;
+    }
     bool Scene::update(HTexture2dArr handle, const TextureDesc& desc) {
         return false;
     }
