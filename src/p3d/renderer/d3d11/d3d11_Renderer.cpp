@@ -1032,13 +1032,16 @@ namespace p3d {
             if (modelDesc->boundingVolume.type == P3D_BOUNDING_VOLUME_TYPE::P3D_BOUNDING_VOLUME_AABB) {
                 const AABB& aabb = modelDesc->boundingVolume.volume.aabb;
 
-                float xScale = glm::abs(aabb.getMaxX() - aabb.getMinX());
-                float yScale = glm::abs(aabb.getMaxY() - aabb.getMinY());
-                float zScale = glm::abs(aabb.getMaxZ() - aabb.getMinZ());
-                glm::mat4x4 scale = glm::scale(glm::mat4x4(), { xScale, yScale, zScale });
+                float deltaX = glm::abs(aabb.getMaxX() - aabb.getMinX());
+                float deltaY = glm::abs(aabb.getMaxY() - aabb.getMinY());
+                float deltaZ = glm::abs(aabb.getMaxZ() - aabb.getMinZ());
 
-                glm::mat4x4 translate = glm::translate(glm::mat4x4(), 
-                    { modelDesc->transform[3][0], modelDesc->transform[3][1], modelDesc->transform[3][2]});
+                glm::mat4x4 scale = glm::scale(glm::mat4x4(), { deltaX, deltaY, deltaZ });
+                glm::mat4x4 translate = glm::translate(glm::mat4x4(), { 
+                    aabb.getMinX() + deltaX / 2,
+                    aabb.getMinY() + deltaY / 2,
+                    aabb.getMinZ() + deltaZ / 2
+                });
 
                 MaterialDesc materialDesc;
                 materialDesc.diffuseColor = { 1.0f,0.0f,1.0f };
