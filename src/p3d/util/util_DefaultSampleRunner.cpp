@@ -25,6 +25,7 @@ namespace p3d {
                 enableCursor
             ), "Failed to initialize window manager");
 
+            //close window controls
             addWindowCloseEvCbk([&]() {
                 stop();
             });
@@ -33,7 +34,71 @@ namespace p3d {
                     stop();
                 }    
             });
+
+            //scene debugging controls
+            addKeyEvCbk([&](int key, int scancode, int action, int mod) {
+                if (key == GLFW_KEY_HOME && action == GLFW_PRESS && _scene) {
+                    if (_scene->getAllModels().size() == 0) {
+                        return;
+                    }
+
+                    _currentModel = 0;
+                    enableModel(_currentModel);
+                }
+            });
+            addKeyEvCbk([&](int key, int scancode, int action, int mod) {
+                if (key == GLFW_KEY_END && action == GLFW_PRESS && _scene) {
+                    ModelDesc modelDesc;
+                    for (const HModel& hModel : _scene->getAllModels()) {
+                        modelDesc = *_scene->getDesc(hModel);
+                        modelDesc.draw = true;
+                        _scene->update(hModel, modelDesc);
+                    }
+                }
+            });
+            addKeyEvCbk([&](int key, int scancode, int action, int mod) {
+                if (key == GLFW_KEY_PAGE_DOWN && action == GLFW_PRESS && _scene) {
+                    unsigned int numModels = (unsigned int)_scene->getAllModels().size();
+                    if (numModels == 0) {
+                        return;
+                    }
+
+                    _currentModel = (_currentModel + 1) % numModels;
+                    enableModel(_currentModel);
+                }
+            });
+            addKeyEvCbk([&](int key, int scancode, int action, int mod) {
+                if (key == GLFW_KEY_PAGE_UP && action == GLFW_PRESS && _scene) {
+                    unsigned int numModels = (unsigned int)_scene->getAllModels().size();
+                    if (numModels == 0) {
+                        return;
+                    }
+
+                    _currentModel = _currentModel > 0 ? _currentModel - 1 : numModels - 1;
+                    enableModel(_currentModel);
+                }
+            });
             return true;
+        }
+
+        void DefaultSampleRunner::enableModel(unsigned int modelNum) {
+            unsigned int numModels = (unsigned int)_scene->getAllModels().size();
+            if (numModels == 0 && modelNum < numModels) {
+                return;
+            }
+
+            ModelDesc modelDesc;
+            for (const HModel& hModel : _scene->getAllModels()) {
+                modelDesc = *_scene->getDesc(hModel);
+                modelDesc.draw = false;
+                _scene->update(hModel, modelDesc);
+            }
+
+            HModel hCurrModel = _scene->getAllModels()[modelNum];
+            modelDesc = *_scene->getDesc(hCurrModel);
+            modelDesc.draw = true;
+            _scene->update(hCurrModel, modelDesc);
+            P3D_ERROR_PRINT("Drawing model: " + std::to_string(modelNum));
         }
 
         void DefaultSampleRunner::setRunProcedure(std::function<void()> procedure) {
@@ -99,6 +164,10 @@ namespace p3d {
             _lastCursorY = cursorY;
 
             _cameraController->rotate((float)(pitch * _camRotationMultiplier), (float)(yaw * _camRotationMultiplier));
+        }
+
+        void DefaultSampleRunner::enableDebugging(SceneI* scene) {
+            _scene = scene;
         }
     }
 }

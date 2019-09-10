@@ -2,6 +2,7 @@
 
 #include "util_GlfwWindowManager.h"
 #include "util_CameraControllerI.h"
+#include "../scene/SceneI.h"
 #include <functional>
 
 namespace p3d {
@@ -22,11 +23,14 @@ namespace p3d {
 
             void setRunProcedure(std::function<void()> procedure);
             void setCameraController(CameraControllerI* cameraController, float moveStepSize, float rotationMultiplier);
+            void enableDebugging(SceneI* scene);
             void start();
             void stop();
 
         private:
             void updateCameraController();
+            void enableModel(unsigned int modelNum);
+
             bool _running;
             std::function<void()> _runProcedure;
 
@@ -37,6 +41,9 @@ namespace p3d {
             double _lastCursorX = 0;
             double _lastCursorY = 0;
             bool _firstCameraUpdate = true;
+
+            SceneI* _scene = nullptr;
+            unsigned int _currentModel = 0;
         };
     }
 }

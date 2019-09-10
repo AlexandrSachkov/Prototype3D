@@ -66,6 +66,7 @@ bool run() {
         renderer->renderFrame(sponzaScene.get(), camera.get());
     });
     sampleRunner.setCameraController(camera.get(), 1.0f, 0.001f);
+    sampleRunner.enableDebugging(sponzaScene.get());
     sampleRunner.start();
 
     return true;
