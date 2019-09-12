@@ -53,7 +53,7 @@ bool run() {
 
     p3d::SceneProperties sceneProperties = sponzaScene->getProperties();
     sceneProperties.ambientLight = { 0.9f,0.9f,0.9f };
-    sceneProperties.drawBoundingVolumes = true;
+    sceneProperties.drawBoundingVolumes = false;
     sponzaScene->setProperties(sceneProperties);
 
     //Field of view should be 45 degrees. Otherwise, it will cause artifacts (need to look into perspective distortion)

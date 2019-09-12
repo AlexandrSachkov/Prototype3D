@@ -18,6 +18,8 @@ namespace p3d {
         float getMinZ() const;
         float getMaxZ() const;
 
+        glm::vec3 getCenter() const;
+
     private:
         float _minX = 0;
         float _maxX = 0;

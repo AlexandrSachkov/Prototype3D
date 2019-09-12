@@ -69,6 +69,15 @@ namespace p3d {
         private:
             bool initializeRendering(const unsigned int screenDim[2]);
             bool initializeStandardShapes();
+            void sortObjects(
+                const std::vector<HModel>& src,
+                const SceneI* scene,
+                glm::vec3 cameraPosition,
+                std::vector<HModel>& opaque, 
+                std::vector<HModel>& transparent,
+                std::vector<HModel>& boundingVolumes,
+                std::vector<HModel>& wireframe
+            );
             void drawScene(const SceneI* scene, const CameraI* camera);
             void drawModel(
                 const SceneI* scene, 
@@ -80,9 +89,7 @@ namespace p3d {
             void drawBoundingVolume(
                 const SceneI* scene,
                 const glm::mat4x4& viewProjection,
-                const ModelDesc* modelDesc,
-                const d3d11::Mesh* mesh,
-                const MaterialDesc* materialDesc
+                const BoundingVolume* boundingVolume
             );
 
             p3d::Texture2dArrayI& getRenderTargetBuff();
@@ -165,6 +172,7 @@ namespace p3d {
 
             //pipeline state object components
             ComPtr<ID3D11BlendState> _noBlendState = nullptr;
+            ComPtr<ID3D11BlendState> _additiveBlendState = nullptr;
             ComPtr<ID3D11RasterizerState> _backFaceCull = nullptr;
             ComPtr<ID3D11RasterizerState> _frontFaceCull = nullptr;
             ComPtr<ID3D11RasterizerState> _wireframeMode = nullptr;
@@ -177,6 +185,10 @@ namespace p3d {
             std::unique_ptr<VertexShaderI> _vertexShader = nullptr;
             std::unique_ptr<PixelShaderI> _pixelShader = nullptr;
 
+            std::vector<HModel> _opaqueObjectBuff;
+            std::vector<HModel> _transparentObjectBuff;
+            std::vector<HModel> _boundingVolumeBuff;
+            std::vector<HModel> _wireframeObjBuff;
 
             //this should be in some other file
             //AABB data

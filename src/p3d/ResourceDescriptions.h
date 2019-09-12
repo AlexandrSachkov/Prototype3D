@@ -120,6 +120,10 @@ namespace p3d {
         bool wireframe = false;
 
         //P3D_BLEND_MODE blendMode; since only 1 texture of each type is allowed, we might not need it
+
+        bool isTransparent() const {
+            return opacity < 1.0f || opacityTex.isValid();
+        }
     };
 
     struct SceneProperties {

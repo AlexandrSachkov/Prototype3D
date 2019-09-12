@@ -42,6 +42,13 @@ namespace p3d {
             unsigned int numBackBuffers,
             bool fullscreen
         ) {
+            _opaqueObjectBuff.reserve(1000);
+            _opaqueObjectBuff.clear();
+            _transparentObjectBuff.reserve(100);
+            _transparentObjectBuff.clear();
+            _boundingVolumeBuff.clear();
+            _wireframeObjBuff.clear();
+
             P3D_ASSERT_R(Utility::createDevice(_device, _deviceContext), "d3d11 device failed to initialize");
 
             if (msaaLevel < 1) msaaLevel = 1; //anything less than 1 is considered off. So we set the sampling count to 1
@@ -171,6 +178,8 @@ namespace p3d {
 
             P3D_ASSERT_R(Utility::createBlendState(_device.Get(), false, false, _noBlendState), 
                 "Failed to create no-blend state");
+            P3D_ASSERT_R(Utility::createBlendState(_device.Get(), true, false, _additiveBlendState),
+                "Failed to create additive blend state");
 
             bool fontCCW = true; //this is to enable OpenGL compatibility
             P3D_ASSERT_R(Utility::createRasterizerState(_device.Get(), D3D11_CULL_BACK, D3D11_FILL_SOLID, fontCCW, _backFaceCull),
@@ -246,9 +255,6 @@ namespace p3d {
             //This should not be done here but for every object material type during rendering
             P3D_ASSERT_R(VSSetShader(_vertexShader.get()), "Failed to set vertex shader");
             P3D_ASSERT_R(PSSetShader(_pixelShader.get()), "Failed to set pixel shader");
-
-            float blendFactor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-            _deviceContext->OMSetBlendState(_noBlendState.Get(), blendFactor, 0xffffffff);
 
             auto* transformBuff = _transformBuff.Get();
             _deviceContext->VSSetConstantBuffers(P3D_VS_CB_TRANSFORM_CHANNEL, 1, &transformBuff);
@@ -867,6 +873,21 @@ namespace p3d {
                 return;
             }
 
+            _opaqueObjectBuff.clear();
+            _transparentObjectBuff.clear();
+            _boundingVolumeBuff.clear();
+            _wireframeObjBuff.clear();
+
+            sortObjects(
+                scene->getVisibleModels(), 
+                scene, 
+                camera->getEye(), 
+                _opaqueObjectBuff, 
+                _transparentObjectBuff, 
+                _boundingVolumeBuff,
+                _wireframeObjBuff
+            );
+
             dx::SceneConstants sceneConstants;
             sceneConstants.ambientLight = scene->getProperties().ambientLight;
             Utility::updateConstBuffer(_deviceContext, _sceneConstantsBuff, &sceneConstants, sizeof(dx::SceneConstants));
@@ -877,24 +898,49 @@ namespace p3d {
             _deviceContext->ClearRenderTargetView(_renderTargetBuff.getRenderTargetView().Get(), backgroundColor);
             _deviceContext->ClearDepthStencilView(_depthStencilBuff.getDepthStencilView().Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-            auto& models = scene->getVisibleModels();
-            for (HModel hmodel : models) {
-                const ModelDesc* modelDesc = scene->getDesc(hmodel); 
-                if (!modelDesc || !modelDesc->draw) {
-                    continue;
-                }
+            //set state for opaque rendering
+            static const float defaultBlendFactor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+            _deviceContext->OMSetBlendState(_noBlendState.Get(), defaultBlendFactor, 0xffffffff);
+            _deviceContext->RSSetState(_backFaceCull.Get());
 
+            for (HModel hmodel : _opaqueObjectBuff) {
+                const ModelDesc* modelDesc = scene->getDesc(hmodel); 
                 const MeshDesc* meshDesc = scene->getDesc(modelDesc->mesh);
                 const d3d11::Mesh* mesh = static_cast<const d3d11::Mesh*>(scene->get(modelDesc->mesh));
                 const MaterialDesc* materialDesc = scene->getDesc(modelDesc->material);
-                if (!meshDesc || !mesh || !materialDesc) {
-                    continue;
-                }
 
                 drawModel(scene, viewProjection, modelDesc->transform, mesh, materialDesc);
-                if (scene->getProperties().drawBoundingVolumes || modelDesc->drawBoundingVolume) {
-                    drawBoundingVolume(scene, viewProjection, modelDesc, mesh, materialDesc);
-                }
+            }
+
+            //set state for wireframe rendering and bounding volume
+            _deviceContext->RSSetState(_wireframeMode.Get());
+
+            for (HModel hmodel : _wireframeObjBuff) {
+                const ModelDesc* modelDesc = scene->getDesc(hmodel);
+                const MeshDesc* meshDesc = scene->getDesc(modelDesc->mesh);
+                const d3d11::Mesh* mesh = static_cast<const d3d11::Mesh*>(scene->get(modelDesc->mesh));
+                const MaterialDesc* materialDesc = scene->getDesc(modelDesc->material);
+
+                drawModel(scene, viewProjection, modelDesc->transform, mesh, materialDesc);
+            }
+
+            for (HModel hmodel : _boundingVolumeBuff) {
+                drawBoundingVolume(scene, viewProjection, &scene->getDesc(hmodel)->boundingVolume);
+            }
+
+            //set state for transparent object rendering
+            _deviceContext->OMSetBlendState(_additiveBlendState.Get(), defaultBlendFactor, 0xffffffff);
+
+            for (HModel hmodel : _transparentObjectBuff) {
+                const ModelDesc* modelDesc = scene->getDesc(hmodel);
+                const MeshDesc* meshDesc = scene->getDesc(modelDesc->mesh);
+                const d3d11::Mesh* mesh = static_cast<const d3d11::Mesh*>(scene->get(modelDesc->mesh));
+                const MaterialDesc* materialDesc = scene->getDesc(modelDesc->material);
+
+                _deviceContext->RSSetState(_frontFaceCull.Get());
+                drawModel(scene, viewProjection, modelDesc->transform, mesh, materialDesc);
+                _deviceContext->RSSetState(_backFaceCull.Get());
+                drawModel(scene, viewProjection, modelDesc->transform, mesh, materialDesc);
             }
         }
 
@@ -1008,12 +1054,6 @@ namespace p3d {
                 _deviceContext->PSSetShaderResources(P3D_TEX_SPECULAR_CHANNEL, 1, &textureView);
             }
 
-            if (materialDesc->wireframe) {
-                _deviceContext->RSSetState(_wireframeMode.Get());
-            } else {
-                _deviceContext->RSSetState(_backFaceCull.Get());
-            }
-
             //draw
             if (indexBuff) {
                 _deviceContext->DrawIndexed(mesh->getNumIndexes(), 0, 0);
@@ -1025,29 +1065,74 @@ namespace p3d {
         void Renderer::drawBoundingVolume(
             const SceneI* scene,
             const glm::mat4x4& viewProjection,
-            const ModelDesc* modelDesc,
-            const d3d11::Mesh* mesh,
-            const MaterialDesc* materialDesc
+            const BoundingVolume* boundingVolume
         ) {
-            if (modelDesc->boundingVolume.type == P3D_BOUNDING_VOLUME_TYPE::P3D_BOUNDING_VOLUME_AABB) {
-                const AABB& aabb = modelDesc->boundingVolume.volume.aabb;
+            if (boundingVolume->type == P3D_BOUNDING_VOLUME_TYPE::P3D_BOUNDING_VOLUME_AABB) {
+                const AABB& aabb = boundingVolume->volume.aabb;
 
                 float deltaX = glm::abs(aabb.getMaxX() - aabb.getMinX());
                 float deltaY = glm::abs(aabb.getMaxY() - aabb.getMinY());
                 float deltaZ = glm::abs(aabb.getMaxZ() - aabb.getMinZ());
 
                 glm::mat4x4 scale = glm::scale(glm::mat4x4(), { deltaX, deltaY, deltaZ });
-                glm::mat4x4 translate = glm::translate(glm::mat4x4(), { 
-                    aabb.getMinX() + deltaX / 2,
-                    aabb.getMinY() + deltaY / 2,
-                    aabb.getMinZ() + deltaZ / 2
-                });
+                glm::mat4x4 translate = glm::translate(glm::mat4x4(), aabb.getCenter());
 
                 MaterialDesc materialDesc;
                 materialDesc.diffuseColor = { 1.0f,0.0f,1.0f };
-                materialDesc.wireframe = true;
                 drawModel(scene, viewProjection, translate * scale, _cubeMesh.get(), &materialDesc);
             }
+        }
+
+        void Renderer::sortObjects(
+            const std::vector<HModel>& src, 
+            const SceneI* scene, 
+            glm::vec3 cameraPosition,
+            std::vector<HModel>& opaque, 
+            std::vector<HModel>& transparent,
+            std::vector<HModel>& boundingVolumes,
+            std::vector<HModel>& wireframe
+        ) {
+            for (const HModel& hModel : src) {
+                const ModelDesc* modelDesc = scene->getDesc(hModel);
+                if (!modelDesc->draw) {
+                    continue;
+                }
+
+                const MaterialDesc* materialDesc = scene->getDesc(modelDesc->material);
+                if (materialDesc->wireframe) {
+                    wireframe.emplace_back(hModel);
+                } else if (materialDesc->isTransparent()) {
+                    transparent.emplace_back(hModel);
+                } else {
+                    opaque.emplace_back(hModel);
+                }
+
+                if (scene->getProperties().drawBoundingVolumes || modelDesc->drawBoundingVolume) {
+                    boundingVolumes.emplace_back(hModel);
+                }
+            }
+
+            //sort opaque object closest-to-furthest to prevent overdraw
+            std::sort(opaque.begin(), opaque.end(), [&](HModel first, HModel second) {
+                const ModelDesc* firstModelDesc = scene->getDesc(first);
+                const ModelDesc* secondModelDesc = scene->getDesc(second);
+
+                //TODO handle other bounding volume types
+                float distFirst = glm::length(cameraPosition - firstModelDesc->boundingVolume.volume.aabb.getCenter());
+                float distSecond = glm::length(cameraPosition - secondModelDesc->boundingVolume.volume.aabb.getCenter());
+                return distFirst < distSecond;
+            });
+
+            //sort transparent object furthest-to-closest for correct blending
+            std::sort(transparent.begin(), transparent.end(), [&](HModel first, HModel second) {
+                const ModelDesc* firstModelDesc = scene->getDesc(first);
+                const ModelDesc* secondModelDesc = scene->getDesc(second);
+
+                //TODO handle other bounding volume types
+                float distFirst = glm::length(cameraPosition - firstModelDesc->boundingVolume.volume.aabb.getCenter());
+                float distSecond = glm::length(cameraPosition - secondModelDesc->boundingVolume.volume.aabb.getCenter());
+                return distFirst > distSecond;
+            });
         }
     }
 }

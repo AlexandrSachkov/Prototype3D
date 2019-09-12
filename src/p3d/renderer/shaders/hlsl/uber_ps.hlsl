@@ -58,6 +58,11 @@ float4 main(PS_INPUT input) : SV_TARGET
         specularColorTex = specularTex.Sample(samplerState, uvFlipped);
     }
 
+    diffuseColorTex.a = opacity;
+    if (hasOpacityTex) {
+        diffuseColorTex.a = opacityTex.Sample(samplerState, uvFlipped).r;
+    }
+
     float ambientIntensity = 0.5f;
     float4 totalLightIntensity = float4(0.0f, 0.0f, 0.0f, 0.0f);//TODO calculate light contribution
 
@@ -65,5 +70,6 @@ float4 main(PS_INPUT input) : SV_TARGET
         float4(ambientLight, 1.0f) * diffuseColorTex +
         totalLightIntensity * diffuseColorTex + 
         totalLightIntensity * specularColorTex;
+
     return litColor;
 }

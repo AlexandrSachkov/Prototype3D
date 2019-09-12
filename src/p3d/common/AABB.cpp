@@ -1,5 +1,6 @@
 #include "AABB.h"
 #include <limits>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace p3d {
     AABB::AABB(float minX, float maxX, float minY, float maxY, float minZ, float maxZ) 
@@ -29,6 +30,18 @@ namespace p3d {
 
     float AABB::getMaxZ() const {
         return _maxZ;
+    }
+
+    glm::vec3 AABB::getCenter() const {
+        float deltaX = glm::abs(getMaxX() - getMinX());
+        float deltaY = glm::abs(getMaxY() - getMinY());
+        float deltaZ = glm::abs(getMaxZ() - getMinZ());
+
+        return {
+            getMinX() + deltaX / 2,
+            getMinY() + deltaY / 2,
+            getMinZ() + deltaZ / 2
+        };
     }
 
     AABB AABB::build(const glm::vec3* vertices, unsigned int numVertices, const glm::mat4x4& worldTransform) {

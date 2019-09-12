@@ -22,6 +22,9 @@ namespace p3d {
     }
 
     HModel Scene::create(const ModelDesc& desc) {
+        if (!desc.mesh.isValid() || !desc.material.isValid()) {
+            return HModel();
+        }
         return _models.insert(std::unique_ptr<void*>(), desc, genUUID());
     }
 

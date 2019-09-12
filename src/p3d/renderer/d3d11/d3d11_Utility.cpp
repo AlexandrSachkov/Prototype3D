@@ -273,8 +273,8 @@ namespace p3d {
             ZeroMemory(&rtbd, sizeof(rtbd));
 
             rtbd.BlendEnable = enableBlend;
-            rtbd.SrcBlend = D3D11_BLEND_SRC_COLOR;
-            rtbd.DestBlend = D3D11_BLEND_BLEND_FACTOR;
+            rtbd.SrcBlend = D3D11_BLEND_SRC_ALPHA;
+            rtbd.DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
             rtbd.BlendOp = D3D11_BLEND_OP_ADD;
             rtbd.SrcBlendAlpha = D3D11_BLEND_ONE;
             rtbd.DestBlendAlpha = D3D11_BLEND_ZERO;
