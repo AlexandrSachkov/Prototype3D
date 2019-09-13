@@ -195,11 +195,16 @@ add_executable (Sample5
   Sample5/CreateScene.cpp
 )
 
+add_executable (Sample6
+  Sample6/Transparency.cpp
+)
+
 TARGET_LINK_LIBRARIES(Sample1 ${LIBS})
 TARGET_LINK_LIBRARIES(Sample2 ${LIBS})
 TARGET_LINK_LIBRARIES(Sample3 ${LIBS})
 TARGET_LINK_LIBRARIES(Sample4 ${LIBS})
 TARGET_LINK_LIBRARIES(Sample5 ${LIBS})
+TARGET_LINK_LIBRARIES(Sample6 ${LIBS})
 
 set_target_properties(
     Sample1
@@ -207,6 +212,7 @@ set_target_properties(
     Sample3
     Sample4
     Sample5
+    Sample6
 
     PROPERTIES DEBUG_POSTFIX _d
 )
