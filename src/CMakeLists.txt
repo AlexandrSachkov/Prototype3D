@@ -68,6 +68,7 @@ SET(HEADERS
     p3d/util/util_SceneImporter.h
     p3d/util/util_SceneGraphI.h
     p3d/util/util_SceneGraph.h
+    p3d/util/util_TextureImporter.h
     
     p3d/Constants.h
     p3d/ResourceDescriptions.h
@@ -100,6 +101,7 @@ SET(SOURCES
     p3d/util/util_DDSTextureLoader.cpp
     p3d/util/util_SceneGraph.cpp
     p3d/util/util_SceneImporter.cpp
+    p3d/util/util_TextureImporter.cpp
 
     p3d/Constants.cpp
     )
@@ -192,6 +194,50 @@ IF(P3D_CEREAL_INCLUDE_PATH STREQUAL "")
 	MESSAGE(SEND_ERROR "P3D Cereal include path must be specified")
 ENDIF(P3D_CEREAL_INCLUDE_PATH STREQUAL "")
 
+# FreeImage
+SET(P3D_FREE_IMAGE_INCLUDE_PATH
+	"" CACHE PATH "P3D FreeImage include path")
+
+IF(P3D_FREE_IMAGE_INCLUDE_PATH STREQUAL "")
+	MESSAGE(SEND_ERROR "P3D FreeImage include path must be specified")
+ENDIF(P3D_FREE_IMAGE_INCLUDE_PATH STREQUAL "")
+
+SET(P3D_FREE_IMAGE_LIBRARY_DEBUG_PATH
+	"" CACHE PATH "P3D FreeImage library debug path")
+
+IF(P3D_FREE_IMAGE_LIBRARY_DEBUG_PATH STREQUAL "")
+	MESSAGE(SEND_ERROR "P3D FreeImage library debug path must be specified")
+ENDIF(P3D_FREE_IMAGE_LIBRARY_DEBUG_PATH STREQUAL "")
+
+SET(P3D_FREE_IMAGE_LIBRARY_RELEASE_PATH
+	"" CACHE PATH "P3D FreeImage library release path")
+
+IF(P3D_FREE_IMAGE_LIBRARY_RELEASE_PATH STREQUAL "")
+	MESSAGE(SEND_ERROR "P3D FreeImage library release path must be specified")
+ENDIF(P3D_FREE_IMAGE_LIBRARY_RELEASE_PATH STREQUAL "")
+
+# Compressonator
+SET(P3D_COMPRESSONATOR_INCLUDE_PATH
+	"" CACHE PATH "P3D Compressonator include path")
+
+IF(P3D_COMPRESSONATOR_INCLUDE_PATH STREQUAL "")
+	MESSAGE(SEND_ERROR "P3D Compressonator include path must be specified")
+ENDIF(P3D_COMPRESSONATOR_INCLUDE_PATH STREQUAL "")
+
+SET(P3D_COMPRESSONATOR_LIBRARY_DEBUG_PATH
+	"" CACHE PATH "P3D Compressonator library debug path")
+
+IF(P3D_COMPRESSONATOR_LIBRARY_DEBUG_PATH STREQUAL "")
+	MESSAGE(SEND_ERROR "P3D Compressonator library debug path must be specified")
+ENDIF(P3D_COMPRESSONATOR_LIBRARY_DEBUG_PATH STREQUAL "")
+
+SET(P3D_COMPRESSONATOR_LIBRARY_RELEASE_PATH
+	"" CACHE PATH "P3D Compressonator library release path")
+
+IF(P3D_COMPRESSONATOR_LIBRARY_RELEASE_PATH STREQUAL "")
+	MESSAGE(SEND_ERROR "P3D Compressonator library release path must be specified")
+ENDIF(P3D_COMPRESSONATOR_LIBRARY_RELEASE_PATH STREQUAL "")
+
 
 SET(HEADERS
         ${HEADERS}
@@ -221,6 +267,8 @@ INCLUDE_DIRECTORIES(
     ${P3D_GLM_INCLUDE_PATH}
     ${P3D_ASSIMP_INCLUDE_PATH}
 	${P3D_CEREAL_INCLUDE_PATH}
+    ${P3D_FREE_IMAGE_INCLUDE_PATH}
+    ${P3D_COMPRESSONATOR_INCLUDE_PATH}
     )
 
 ADD_DEFINITIONS(
@@ -235,6 +283,10 @@ LINK_DIRECTORIES(
     ${P3D_D3D11_LIBRARY_RELEASE_PATH}
     ${P3D_ASSIMP_LIBRARY_DEBUG_PATH}
 	${P3D_ASSIMP_LIBRARY_RELEASE_PATH}
+    ${P3D_FREE_IMAGE_LIBRARY_DEBUG_PATH}
+	${P3D_FREE_IMAGE_LIBRARY_RELEASE_PATH}
+    ${P3D_COMPRESSONATOR_LIBRARY_DEBUG_PATH}
+	${P3D_COMPRESSONATOR_LIBRARY_RELEASE_PATH}
     )
 
 add_library (P3D STATIC
@@ -253,6 +305,12 @@ TARGET_LINK_LIBRARIES(P3D
 
     debug assimp-vc140-mt
 	optimized assimp-vc140-mt
+
+    debug FreeImage.lib
+	optimized FreeImage.lib
+
+    debug Compressonator_MDd_DLL.lib
+	optimized Compressonator_MD_DLL.lib
     )
 
 set_target_properties(P3D PROPERTIES DEBUG_POSTFIX _d)
