@@ -48,22 +48,22 @@ float4 main(PS_INPUT input) : SV_TARGET
 {
     float2 uvFlipped = float2(input.uv.x, -input.uv.y);//flip from OpenGL standard
 
-    float4 diffuseColorTex = float4(diffuseColor, 1.0f);
+    float4 diffuseColorTex = float4(diffuseColor, opacity);
     if (hasDiffuteTex) {
         diffuseColorTex = diffuseTex.Sample(samplerState, uvFlipped);
     }
+    
+    if (hasOpacityTex) {
+        diffuseColorTex.a = opacityTex.Sample(samplerState, uvFlipped).r;
+    }
+    
+    clip(diffuseColorTex.a < 0.05f ? true : false);
 
     float4 specularColorTex = float4(specularColor, 1.0f);
     if (hasSpecularTex) {
         specularColorTex = specularTex.Sample(samplerState, uvFlipped);
     }
 
-    diffuseColorTex.a = opacity;
-    if (hasOpacityTex) {
-        diffuseColorTex.a = opacityTex.Sample(samplerState, uvFlipped).r;
-    }
-
-    float ambientIntensity = 0.5f;
     float4 totalLightIntensity = float4(0.0f, 0.0f, 0.0f, 0.0f);//TODO calculate light contribution
 
     float4 litColor = 
