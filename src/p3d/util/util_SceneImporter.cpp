@@ -355,7 +355,6 @@ namespace p3d {
 
             texDesc.usageFlag = P3D_USAGE::P3D_USAGE_GPU_R;
             texDesc.bindFlags = { P3D_BIND_SHADER_RESOURCE };
-            texDesc.generateMipMaps = true;
 
             texOut = scene->create(texDesc);
             P3D_ASSERT_R(texOut.isValid(), "Scene failed to create texture");

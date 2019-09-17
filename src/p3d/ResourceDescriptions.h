@@ -35,7 +35,6 @@ namespace p3d {
         Format format;
         P3D_USAGE usageFlag;
         std::vector<P3D_BIND_FLAG> bindFlags;
-        bool generateMipMaps;
 
         std::string path; //used only as reference
     };

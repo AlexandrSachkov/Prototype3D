@@ -315,7 +315,6 @@ namespace p3d {
             const unsigned int texWidth,
             unsigned int numTextures,
             unsigned int numMipMaps,
-            bool generateMipMaps,
             DXGI_FORMAT format,
             D3D11_USAGE usage,
             unsigned int cpuAccessFlag,
@@ -326,7 +325,7 @@ namespace p3d {
             D3D11_TEXTURE1D_DESC textDesc;
             ZeroMemory(&textDesc, sizeof(textDesc));
             textDesc.Width = texWidth;
-            textDesc.MipLevels = (generateMipMaps && numMipMaps == 1) ? 0 : 1;
+            textDesc.MipLevels = numMipMaps;
             textDesc.ArraySize = numTextures;
             textDesc.Format = format;
 
@@ -348,7 +347,6 @@ namespace p3d {
             const unsigned int texDim[2],
             unsigned int numTextures,
             unsigned int numMipMaps,
-            bool generateMipMaps,
             unsigned int msaaLevel,
             unsigned int msaaQualityLevel,
             DXGI_FORMAT format,
@@ -362,7 +360,7 @@ namespace p3d {
             ZeroMemory(&textDesc, sizeof(textDesc));
             textDesc.Width = texDim[0];
             textDesc.Height = texDim[1];
-            textDesc.MipLevels = (generateMipMaps && numMipMaps == 1) ? 0 : 1;
+            textDesc.MipLevels = numMipMaps;
             textDesc.ArraySize = numTextures;
             textDesc.Format = format;
 
@@ -389,7 +387,6 @@ namespace p3d {
             const ComPtr<ID3D11Device> device,
             const unsigned int texDim[3],
             unsigned int numMipMaps,
-            bool generateMipMaps,
             DXGI_FORMAT format,
             D3D11_USAGE usage,
             unsigned int cpuAccessFlag,
@@ -402,7 +399,7 @@ namespace p3d {
             textDesc.Width = texDim[0];
             textDesc.Height = texDim[1];
             textDesc.Depth = texDim[2];
-            textDesc.MipLevels = (generateMipMaps && numMipMaps == 1) ? 0 : 1;
+            textDesc.MipLevels = numMipMaps;
             textDesc.Format = format;
 
             textDesc.Usage = usage;
