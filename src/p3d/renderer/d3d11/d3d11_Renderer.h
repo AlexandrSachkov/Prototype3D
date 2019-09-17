@@ -32,6 +32,7 @@ namespace p3d {
                 const unsigned int screenDim[2],
                 unsigned int screenRefreshRate,
                 unsigned int msaaLevel,
+                unsigned int anisotropy,
                 unsigned int numBackBuffers,
                 bool fullscreen
             );
@@ -168,6 +169,7 @@ namespace p3d {
 
             unsigned int _msaaLevel = 0;
             unsigned int _msaaQualityLevel = 0;
+            unsigned int _anisotropy = 1;
             glm::mat4x4 _dxClipTransform;
 
             //pipeline state object components

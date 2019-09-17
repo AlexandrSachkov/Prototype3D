@@ -34,6 +34,7 @@ bool run() {
         windowDim,
         60, // refresh rate
         1,  // multi-sampling
+        1,  // anisotropy
         1,  // number of back buffers (1 for double buffering, 2 for tripple)
         fullscreen
     ), "Failed to initialize D3D11 device");

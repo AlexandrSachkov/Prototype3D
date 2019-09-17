@@ -39,6 +39,7 @@ namespace p3d {
             const unsigned int screenDim[2],
             unsigned int screenRefreshRate,
             unsigned int msaaLevel,
+            unsigned int anisotropy,
             unsigned int numBackBuffers,
             bool fullscreen
         ) {
@@ -52,7 +53,6 @@ namespace p3d {
             P3D_ASSERT_R(Utility::createDevice(_device, _deviceContext), "d3d11 device failed to initialize");
 
             if (msaaLevel < 1) msaaLevel = 1; //anything less than 1 is considered off. So we set the sampling count to 1
-
             unsigned int msaaQualityLevel = 0;
             if (msaaLevel > 1) {
                 unsigned int maxMsaaQualityLvl;
@@ -63,6 +63,9 @@ namespace p3d {
 
             _msaaLevel = msaaLevel;
             _msaaQualityLevel = msaaQualityLevel;
+
+            P3D_ASSERT_R(anisotropy >= 1 && anisotropy <= 16, "Anisotropy must be between 1 and 16");
+            _anisotropy = anisotropy;
 
             P3D_ASSERT_R(Utility::createSwapChain(
                 windowHandle,
@@ -191,8 +194,8 @@ namespace p3d {
             for (unsigned int i = 0; i < P3D_TEX_MAP_MODE_SIZE; i++) {
                 D3D11_TEXTURE_ADDRESS_MODE dx11MapMode;
                 P3D_ASSERT_R(convertTextureMapMode((P3D_TEX_MAP_MODE)i, dx11MapMode), "Failed to convert texture map mode");
-                P3D_ASSERT_R(Utility::createTextureSamplerState(_device.Get(), dx11MapMode, D3D11_FILTER_MIN_MAG_MIP_LINEAR /*D3D11_FILTER_ANISOTROPIC*/,
-                    1, _samplerStates[i]), "Failed to create texture sampler");
+                P3D_ASSERT_R(Utility::createTextureSamplerState(_device.Get(), dx11MapMode, D3D11_FILTER_ANISOTROPIC,
+                    _anisotropy, _samplerStates[i]), "Failed to create texture sampler");
             }
 
             dx::TransformData transformData;
