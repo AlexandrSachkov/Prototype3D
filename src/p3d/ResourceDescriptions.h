@@ -129,4 +129,23 @@ namespace p3d {
         glm::vec3 ambientLight = { 1.0f,1.0f,1.0f };
         bool drawBoundingVolumes = false;
     };
+
+    struct LightDesc {
+        struct PointLight {
+            glm::vec3 position;
+            glm::vec3 ambientColor;
+            glm::vec3 diffuseColor;
+            glm::vec3 specularColor;
+
+            float range = 0;
+            float constAttenuation = 0;
+            float linearAttenuation = 0;
+            float quadraticAttenuation = 0;
+        };
+
+        P3D_LIGHT_TYPE type;
+        union {
+            PointLight point;
+        } desc;
+    };
 }

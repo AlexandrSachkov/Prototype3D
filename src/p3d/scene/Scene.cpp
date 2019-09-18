@@ -74,6 +74,10 @@ namespace p3d {
         return _pixelShaders.insert(ps, desc, genUUID());
     }
 
+    HLight Scene::create(const LightDesc& desc) {
+        return _lights.insert(std::unique_ptr<void*>(), desc, genUUID());
+    }
+
     const MeshI* Scene::get(HMesh handle) const {
         return _meshes.getResource(handle);
     }
@@ -118,6 +122,10 @@ namespace p3d {
         return _pixelShaders.getDesc(handle);
     }
 
+    const LightDesc* Scene::getDesc(HLight handle) const {
+        return _lights.getDesc(handle);
+    }
+
     const std::vector<HModel>& Scene::getAllModels() const {
         return _models.getAllHandles();
     }
@@ -142,6 +150,10 @@ namespace p3d {
         return _pixelShaders.getAllHandles();
     }
 
+    const std::vector<HLight>& Scene::getAllLights() const {
+        return _lights.getAllHandles();
+    }
+
     const std::vector<HModel>& Scene::getVisibleModels() const {
         //TODO reimplement using space partitioner
         return _models.getAllHandles();
@@ -153,6 +165,10 @@ namespace p3d {
 
     bool Scene::update(HMaterial handle, const MaterialDesc& desc) {
         return _materials.update(handle, std::unique_ptr<MaterialI>(), desc);
+    }
+
+    bool Scene::update(HLight handle, const LightDesc& desc) {
+        return _lights.update(handle, std::unique_ptr<void*>(), desc);
     }
 
     /*bool Scene::update(HMesh handle, const MeshDesc& desc) {
@@ -192,5 +208,9 @@ namespace p3d {
 
     bool Scene::remove(HPixelShader handle) {
         return _pixelShaders.remove(handle);
+    }
+
+    bool Scene::remove(HLight handle) {
+        return _lights.remove(handle);
     }
 }

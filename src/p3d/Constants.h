@@ -198,6 +198,10 @@ namespace p3d {
         P3D_BOUNDING_VOLUME_AABB
     };
 
+    enum class P3D_LIGHT_TYPE {
+        P3D_POINT_LIGHT
+    };
+
     unsigned int getVecFormatSizeBits(P3D_VECTOR_FORMAT format);
     unsigned int getBlockCompressionFormatSizeBytes(P3D_BLOCK_COMPRESSION_FORMAT format);
 }

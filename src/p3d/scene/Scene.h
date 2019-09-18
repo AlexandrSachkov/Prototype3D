@@ -20,6 +20,7 @@ namespace p3d {
         HTexture2dArr create(const TextureDesc& desc) override;
         HVertexShader create(const VertexShaderDesc& desc) override;
         HPixelShader create(const PixelShaderDesc& desc) override;
+        HLight create(const LightDesc& desc) override;
 
         const MeshI* get(HMesh handle) const;
         const MaterialI* get(HMaterial handle) const;
@@ -33,6 +34,7 @@ namespace p3d {
         const TextureDesc* getDesc(HTexture2dArr handle) const override;
         const VertexShaderDesc* getDesc(HVertexShader handle) const override;
         const PixelShaderDesc* getDesc(HPixelShader handle) const override;
+        const LightDesc* getDesc(HLight handle) const override;
 
         const std::vector<HModel>& getAllModels() const override;
         const std::vector<HMesh>& getAllMeshes() const override;
@@ -40,11 +42,13 @@ namespace p3d {
         const std::vector<HTexture2dArr>& getAllTexture2dArr() const override;
         const std::vector<HVertexShader>& getAllVertexShaders() const override;
         const std::vector<HPixelShader>& getAllPixelShaders() const override;
+        const std::vector<HLight>& getAllLights() const override;
 
         const std::vector<HModel>& getVisibleModels() const override;
 
         bool update(HModel handle, const ModelDesc& desc) override;
         bool update(HMaterial handle, const MaterialDesc& desc) override;
+        bool update(HLight handle, const LightDesc& desc) override;
 
         /*bool update(HMesh handle, const MeshDesc& desc) override;
         bool update(HTexture2dArr handle, const TextureDesc& desc) override;
@@ -57,6 +61,7 @@ namespace p3d {
         bool remove(HTexture2dArr handle) override;
         bool remove(HVertexShader handle) override;
         bool remove(HPixelShader handle) override;
+        bool remove(HLight handle) override;
 
         const SceneProperties& getProperties() const;
         void setProperties(const SceneProperties& properties);
@@ -72,5 +77,6 @@ namespace p3d {
         ResourceBank<p3d::Texture2dArrayI, TextureDesc, HTexture2dArr> _textures2dArr;
         ResourceBank<p3d::VertexShaderI, VertexShaderDesc, HVertexShader> _vertexShaders;
         ResourceBank<p3d::PixelShaderI, PixelShaderDesc, HPixelShader> _pixelShaders;
+        ResourceBank<void*, LightDesc, HLight> _lights;
     };
 }
