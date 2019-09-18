@@ -256,12 +256,17 @@ add_executable (Sample6
   Sample6/Transparency.cpp
 )
 
+add_executable (Sample7
+  Sample7/Lighting.cpp
+)
+
 TARGET_LINK_LIBRARIES(Sample1 ${LIBS})
 TARGET_LINK_LIBRARIES(Sample2 ${LIBS})
 TARGET_LINK_LIBRARIES(Sample3 ${LIBS})
 TARGET_LINK_LIBRARIES(Sample4 ${LIBS})
 TARGET_LINK_LIBRARIES(Sample5 ${LIBS})
 TARGET_LINK_LIBRARIES(Sample6 ${LIBS})
+TARGET_LINK_LIBRARIES(Sample7 ${LIBS})
 
 set_target_properties(
     Sample1
@@ -270,6 +275,7 @@ set_target_properties(
     Sample4
     Sample5
     Sample6
+    Sample7
 
     PROPERTIES DEBUG_POSTFIX _d
 )
