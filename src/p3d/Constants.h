@@ -202,6 +202,8 @@ namespace p3d {
         P3D_POINT_LIGHT
     };
 
+    const unsigned int MAX_LIGHTS = 64;
+
     unsigned int getVecFormatSizeBits(P3D_VECTOR_FORMAT format);
     unsigned int getBlockCompressionFormatSizeBytes(P3D_BLOCK_COMPRESSION_FORMAT format);
 }

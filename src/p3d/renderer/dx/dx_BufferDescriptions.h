@@ -39,5 +39,22 @@ namespace p3d {
             struct SceneConstants {
             glm::vec3 ambientLight = { 0.0f,0.0f,0.0f };
         };
+
+        struct PointLightData {
+            glm::vec3 position = { 0.0f,0.0f,0.0f };
+            float range = 0;
+            glm::vec3 ambientColor = { 0.0f,0.0f,0.0f };
+            float constAttenuation = 0;
+            glm::vec3 diffuseColor = { 0.0f,0.0f,0.0f };
+            float linearAttenuation = 0;
+            glm::vec3 specularColor = { 0.0f,0.0f,0.0f };
+            float quadraticAttenuation = 0;
+        };
+
+        __declspec(align(16))
+            struct LightData {
+            PointLightData pointLights[MAX_LIGHTS];
+            int numPointLights = 0;
+        };
     }
 }

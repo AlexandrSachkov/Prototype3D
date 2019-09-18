@@ -1,5 +1,6 @@
 #include "Scene.h"
 #include "../common/Uuid.h"
+#include "../assert.h"
 
 namespace p3d {
     Scene::Scene(
@@ -75,6 +76,10 @@ namespace p3d {
     }
 
     HLight Scene::create(const LightDesc& desc) {
+        if (_lights.getAllHandles().size() == MAX_LIGHTS) {
+            P3D_ERROR_PRINT("Failed to create light. Maximum number of lights reached");
+            return HLight();
+        }
         return _lights.insert(std::unique_ptr<void*>(), desc, genUUID());
     }
 

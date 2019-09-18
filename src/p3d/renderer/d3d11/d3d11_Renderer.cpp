@@ -231,6 +231,16 @@ namespace p3d {
                 _sceneConstantsBuff
             ), "Failed to create scene constants buffer");
 
+            P3D_ASSERT_R(Utility::createBuffer(
+                _device.Get(),
+                D3D11_BIND_CONSTANT_BUFFER,
+                D3D11_USAGE_DYNAMIC,
+                D3D11_CPU_ACCESS_WRITE,
+                nullptr,
+                sizeof(dx::LightData),
+                _lightBuff
+            ), "Failed to create light buffer");
+
             //TODO load state per material type
             // loading material-specific stuff
 
@@ -264,6 +274,8 @@ namespace p3d {
             _deviceContext->PSSetConstantBuffers(P3D_PS_CB_SCENE_CONSTANTS_CHANNEL, 1, &sceneConstantsBuff);
             auto* materialBuff = _materialBuff.Get();
             _deviceContext->PSSetConstantBuffers(P3D_PS_CB_MATERIAL_CHANNEL, 1, &materialBuff);
+            auto* lightBuff = _lightBuff.Get();
+            _deviceContext->PSSetConstantBuffers(P3D_PS_CB_LIGHT_CHANNEL, 1, &lightBuff);
 
             return true;
         }
@@ -887,6 +899,10 @@ namespace p3d {
                 _wireframeObjBuff
             );
 
+            dx::LightData lightData;
+            fillLightData(scene->getAllLights(), scene, lightData);
+            Utility::updateConstBuffer(_deviceContext, _lightBuff, &lightData, sizeof(dx::LightData));
+
             dx::SceneConstants sceneConstants;
             sceneConstants.ambientLight = scene->getProperties().ambientLight;
             Utility::updateConstBuffer(_deviceContext, _sceneConstantsBuff, &sceneConstants, sizeof(dx::SceneConstants));
@@ -1132,6 +1148,25 @@ namespace p3d {
                 float distSecond = glm::length(cameraPosition - secondModelDesc->boundingVolume.volume.aabb.getCenter());
                 return distFirst > distSecond;
             });
+        }
+
+        void Renderer::fillLightData(const std::vector<HLight>& lights, const SceneI* scene, dx::LightData& lightData) {
+            for (HLight hlight : lights) {
+                const LightDesc* desc = scene->getDesc(hlight);
+                if (desc->type == P3D_LIGHT_TYPE::P3D_POINT_LIGHT) {
+                    lightData.numPointLights++;
+                    dx::PointLightData& pointLightData = lightData.pointLights[lightData.numPointLights - 1];
+
+                    pointLightData.ambientColor = desc->desc.point.ambientColor;
+                    pointLightData.diffuseColor = desc->desc.point.diffuseColor;
+                    pointLightData.specularColor = desc->desc.point.specularColor;
+                    pointLightData.position = desc->desc.point.position;
+                    pointLightData.range = desc->desc.point.range;
+                    pointLightData.constAttenuation = desc->desc.point.constAttenuation;
+                    pointLightData.linearAttenuation = desc->desc.point.linearAttenuation;
+                    pointLightData.quadraticAttenuation = desc->desc.point.quadraticAttenuation;
+                }
+            }
         }
     }
 }

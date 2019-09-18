@@ -129,6 +129,7 @@ namespace p3d {
             );
 
             void fillMaterialData(const MaterialDesc& desc, dx::MaterialData& dataOut);
+            void fillLightData(const std::vector<HLight>& lights, const SceneI* scene, dx::LightData& lightData);
 
             //member variable
             enum P3D_VERTEX_BUFFER_CHANNEL {
@@ -156,7 +157,8 @@ namespace p3d {
 
             enum P3D_PS_CBUFFER_CHANNEL {
                 P3D_PS_CB_SCENE_CONSTANTS_CHANNEL,
-                P3D_PS_CB_MATERIAL_CHANNEL
+                P3D_PS_CB_MATERIAL_CHANNEL,
+                P3D_PS_CB_LIGHT_CHANNEL
             };
 
             ComPtr<ID3D11Device> _device = nullptr;
@@ -182,6 +184,7 @@ namespace p3d {
             ComPtr<ID3D11Buffer> _transformBuff = nullptr;
             ComPtr<ID3D11Buffer> _materialBuff = nullptr;
             ComPtr<ID3D11Buffer> _sceneConstantsBuff = nullptr;
+            ComPtr<ID3D11Buffer> _lightBuff = nullptr;
 
 
             std::unique_ptr<VertexShaderI> _vertexShader = nullptr;

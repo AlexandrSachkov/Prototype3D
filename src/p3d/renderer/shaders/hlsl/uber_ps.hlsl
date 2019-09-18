@@ -33,6 +33,24 @@ cbuffer Material : register(b1)
     int hasSpecularTex;
 };
 
+struct PointLight 
+{
+    float3 position;
+    float range;
+    float3 ambientColor;
+    float constAttenuation;
+    float3 diffuseColor;
+    float linearAttenuation;
+    float3 specularColor;
+    float quadraticAttenuation;
+};
+
+cbuffer Lights : register(b2) 
+{
+    PointLight pointLights[64];
+    int numPointLights;
+}
+
 Texture2D<float4> diffuseTex : register(t0);
 Texture2D<float4> emissionTex : register(t1);
 Texture2D<float4> lightmapTex : register(t2);
