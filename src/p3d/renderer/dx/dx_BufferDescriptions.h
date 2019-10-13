@@ -54,6 +54,7 @@ namespace p3d {
         __declspec(align(16))
             struct LightData {
             PointLightData pointLights[MAX_LIGHTS];
+            glm::vec3 eyePosition = { 0.0f,0.0f,0.0f };
             int numPointLights = 0;
         };
     }

@@ -1,17 +1,14 @@
-struct PS_INPUT
-{
+struct PS_INPUT {
     float3 posW : POSITION;
     float3 normalW : NORMAL;
     float2 uv : TEXCOORD;
 };
 
-cbuffer SceneConstants : register(b0) 
-{
+cbuffer SceneConstants : register(b0) {
     float3 ambientLight;
 };
 
-cbuffer Material : register(b1)
-{
+cbuffer Material : register(b1) {
     float3 diffuseColor;
     float shininess;
     float3 specularColor;
@@ -33,8 +30,7 @@ cbuffer Material : register(b1)
     int hasSpecularTex;
 };
 
-struct PointLight 
-{
+struct PointLight {
     float3 position;
     float range;
     float3 ambientColor;
@@ -45,9 +41,9 @@ struct PointLight
     float quadraticAttenuation;
 };
 
-cbuffer Lights : register(b2) 
-{
+cbuffer Lights : register(b2) {
     PointLight pointLights[64];
+    float3 eyePosition;
     int numPointLights;
 }
 
@@ -62,32 +58,88 @@ Texture2D<float4> specularTex : register(t7);
 
 SamplerState samplerState : register(s0);
 
-float4 main(PS_INPUT input) : SV_TARGET
-{
+void calculatePointLightContribution(
+    float4 matDiffuse, float4 matSpecular,
+    float3 pixelPos, float3 normal, float3 toEye,
+    out float4 diffuse, out float4 specular
+);
+
+float4 main(PS_INPUT input) : SV_TARGET {
+    input.normalW = normalize(input.normalW);
     float2 uvFlipped = float2(input.uv.x, -input.uv.y);//flip from OpenGL standard
+    float3 toEyeW = normalize(eyePosition - input.posW);
 
     float4 diffuseColorTex = float4(diffuseColor, opacity);
     if (hasDiffuteTex) {
         diffuseColorTex = diffuseTex.Sample(samplerState, uvFlipped);
     }
     
+    float opacityFinal = opacity;
     if (hasOpacityTex) {
-        diffuseColorTex.a = opacityTex.Sample(samplerState, uvFlipped).r;
+        opacityFinal = opacityTex.Sample(samplerState, uvFlipped).r;
     }
     
-    clip(diffuseColorTex.a < 0.05f ? true : false);
+    clip(opacityFinal < 0.05f ? true : false);
 
     float4 specularColorTex = float4(specularColor, 1.0f);
     if (hasSpecularTex) {
         specularColorTex = specularTex.Sample(samplerState, uvFlipped);
     }
 
-    float4 totalLightIntensity = float4(0.0f, 0.0f, 0.0f, 0.0f);//TODO calculate light contribution
+    float4 ambientTotal = float4(ambientLight, 1.0f) * diffuseColorTex;
+    float4 diffuseTotal = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    float4 specularTotal = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
-    float4 litColor = 
-        float4(ambientLight, 1.0f) * diffuseColorTex +
-        totalLightIntensity * diffuseColorTex + 
-        totalLightIntensity * specularColorTex;
+    float4 diffusePoint = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    float4 specularPoint = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
+    calculatePointLightContribution(
+        diffuseColorTex, specularColorTex,
+        input.posW, input.normalW, toEyeW,
+        diffusePoint, specularPoint
+    );
+
+    diffuseTotal += diffusePoint;
+    specularTotal += specularTotal;
+
+    float4 litColor = ambientTotal + diffuseTotal + specularTotal;
+    litColor.a = opacityFinal;
     return litColor;
+}
+
+void calculatePointLightContribution(
+    float4 matDiffuse, float4 matSpecular, 
+    float3 pixelPos, float3 normal, float3 toEye,
+    out float4 diffuse, out float4 specular
+) {
+    diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    specular = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+    for (int i = 0; i < numPointLights; i++) {
+        PointLight light = pointLights[i];
+        float3 lightVec = light.position - pixelPos;
+        float distance = length(lightVec);
+        if (distance > light.range) {
+            return;
+        }  
+
+        lightVec /= distance; //normalize
+
+        float diffuseFactor = dot(lightVec, normal);
+        if (diffuseFactor > 0.0f) {
+            float3 v = reflect(-lightVec, normal);
+            float specFactor = pow(max(dot(v, toEye), 0.0f), matSpecular.w);
+
+            diffuse = diffuseFactor * matDiffuse * float4(light.diffuseColor, 1.0f);
+            specular = specFactor * matSpecular * float4(light.specularColor, 1.0f);
+        }
+
+        float attenuation = 1.0f / dot(
+            float3(light.constAttenuation, light.linearAttenuation, light.quadraticAttenuation), 
+            float3(1.0f, distance, distance * distance)
+        );
+
+        diffuse *= attenuation;
+        specular *= attenuation;
+    }
 }

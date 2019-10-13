@@ -53,7 +53,7 @@ bool run() {
         "Failed to import cube.obj");
 
     p3d::SceneProperties sceneProperties = sponzaScene->getProperties();
-    sceneProperties.ambientLight = { 0.9f,0.9f,0.9f };
+    sceneProperties.ambientLight = { 0.2f,0.2f,0.2f };
     sceneProperties.drawBoundingVolumes = false;
     sponzaScene->setProperties(sceneProperties);
 
@@ -63,7 +63,22 @@ bool run() {
         new p3d::PerspectiveCamera({ 0,0,-2 }, 45.0f, (float)clientDim[0] / clientDim[1], 1.0f, 10000.0f)
     );
 
+    p3d::LightDesc lightDesc;
+    lightDesc.type = p3d::P3D_LIGHT_TYPE::P3D_POINT_LIGHT;
+    lightDesc.desc.point.range = 10000.0f;
+    lightDesc.desc.point.constAttenuation = 0.0f;
+    lightDesc.desc.point.linearAttenuation = 0.005f;
+    lightDesc.desc.point.quadraticAttenuation = 0.0f;
+    lightDesc.desc.point.diffuseColor = { 0.7f, 0.7f, 0.7f };
+    lightDesc.desc.point.specularColor = { 0.7f, 0.7f, 0.7f };
+    lightDesc.desc.point.position = camera->getEye();
+
+    p3d::HLight hlight = sponzaScene->create(lightDesc);
+    P3D_ASSERT_R(hlight.isValid(), "Failed to create light");
+
     sampleRunner.setRunProcedure([&]() {
+        lightDesc.desc.point.position = camera->getEye();
+        sponzaScene->update(hlight, lightDesc);
         renderer->renderFrame(sponzaScene.get(), camera.get());
     });
     sampleRunner.setCameraController(camera.get(), 0.2f, 0.001f);

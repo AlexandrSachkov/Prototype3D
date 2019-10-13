@@ -137,14 +137,16 @@ namespace p3d {
             glm::vec3 diffuseColor;
             glm::vec3 specularColor;
 
-            float range = 0;
-            float constAttenuation = 0;
-            float linearAttenuation = 0;
-            float quadraticAttenuation = 0;
+            float range = 0.0f;
+            float constAttenuation = 0.0f;
+            float linearAttenuation = 0.0f;
+            float quadraticAttenuation = 0.0f;
         };
 
         P3D_LIGHT_TYPE type;
-        union {
+        union Light {
+            Light() {}
+
             PointLight point;
         } desc;
     };

@@ -901,6 +901,7 @@ namespace p3d {
 
             dx::LightData lightData;
             fillLightData(scene->getAllLights(), scene, lightData);
+            lightData.eyePosition = camera->getEye();
             Utility::updateConstBuffer(_deviceContext, _lightBuff, &lightData, sizeof(dx::LightData));
 
             dx::SceneConstants sceneConstants;
