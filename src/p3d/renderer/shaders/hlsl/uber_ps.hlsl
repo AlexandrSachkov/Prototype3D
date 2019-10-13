@@ -100,7 +100,7 @@ float4 main(PS_INPUT input) : SV_TARGET {
     );
 
     diffuseTotal += diffusePoint;
-    specularTotal += specularTotal;
+    specularTotal += specularPoint;
 
     float4 litColor = ambientTotal + diffuseTotal + specularTotal;
     litColor.a = opacityFinal;
