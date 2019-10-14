@@ -1,6 +1,8 @@
 struct PS_INPUT {
     float3 posW : POSITION;
     float3 normalW : NORMAL;
+    float3 tangentW : TANGENT;
+    float3 bitangentW : BITANGENT;
     float2 uv : TEXCOORD;
 };
 
@@ -66,6 +68,7 @@ void calculatePointLightContribution(
 
 float4 main(PS_INPUT input) : SV_TARGET {
     input.normalW = normalize(input.normalW);
+
     float2 uvFlipped = float2(input.uv.x, -input.uv.y);//flip from OpenGL standard
     float3 toEyeW = normalize(eyePosition - input.posW);
 
@@ -86,6 +89,17 @@ float4 main(PS_INPUT input) : SV_TARGET {
         specularColorTex = specularTex.Sample(samplerState, uvFlipped);
     }
 
+    float3 normal = input.normalW;
+    if (hasNormalTex) {
+        input.tangentW = normalize(input.tangentW - dot(input.tangentW, input.normalW)*input.normalW);
+        input.bitangentW = normalize(input.bitangentW - dot(input.bitangentW, input.normalW)*input.normalW);
+
+        normal = normalTex.Sample(samplerState, uvFlipped).xyz;
+        normal = 2.0f * normal - 1.0f;
+        float3x3 TBN = float3x3(input.tangentW, input.bitangentW, input.normalW);
+        normal = mul(normal, TBN);
+    }
+
     float4 ambientTotal = float4(ambientLight, 1.0f) * diffuseColorTex;
     float4 diffuseTotal = float4(0.0f, 0.0f, 0.0f, 0.0f);
     float4 specularTotal = float4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -95,7 +109,7 @@ float4 main(PS_INPUT input) : SV_TARGET {
 
     calculatePointLightContribution(
         diffuseColorTex, specularColorTex,
-        input.posW, input.normalW, toEyeW,
+        input.posW, normal, toEyeW,
         diffusePoint, specularPoint
     );
 

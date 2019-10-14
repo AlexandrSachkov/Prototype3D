@@ -249,7 +249,9 @@ namespace p3d {
             vsDesc.inputDesc = { 
                 {"POSITION", P3D_VECTOR_FORMAT::P3D_FORMAT_R32G32B32_FLOAT, P3D_VB_VERTEX_CHANNEL },
                 {"NORMAL", P3D_VECTOR_FORMAT::P3D_FORMAT_R32G32B32_FLOAT, P3D_VB_NORMAL_CHANNEL },
-                {"TEXCOORD", P3D_VECTOR_FORMAT::P3D_FORMAT_R32G32_FLOAT, P3D_VB_TEXCOORD_CHANNEL }
+                {"TEXCOORD", P3D_VECTOR_FORMAT::P3D_FORMAT_R32G32_FLOAT, P3D_VB_TEXCOORD_CHANNEL },
+                {"TANGENT", P3D_VECTOR_FORMAT::P3D_FORMAT_R32G32B32_FLOAT, P3D_VB_TANGENT_CHANNEL },
+                {"BITANGENT", P3D_VECTOR_FORMAT::P3D_FORMAT_R32G32B32_FLOAT, P3D_VB_BITANGENT_CHANNEL }
             };
             P3D_ASSERT_R(util::readFile("D:/Repositories/Prototype3D/src/p3d/renderer/shaders/hlsl/uber_vs.hlsl", vsDesc.hlslSource),
                 "Failed to read vertex shader source");
