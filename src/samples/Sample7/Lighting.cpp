@@ -69,8 +69,8 @@ bool run() {
     lightDesc.desc.point.constAttenuation = 0.0f;
     lightDesc.desc.point.linearAttenuation = 0.005f;
     lightDesc.desc.point.quadraticAttenuation = 0.0f;
-    lightDesc.desc.point.diffuseColor = { 0.7f, 0.7f, 0.7f };
-    lightDesc.desc.point.specularColor = { 0.7f, 0.7f, 0.7f };
+    lightDesc.desc.point.diffuseColor = { 1.0f, 1.0f, 1.0f };
+    lightDesc.desc.point.specularColor = { 1.0f, 1.0f, 1.0f };
     lightDesc.desc.point.position = camera->getEye();
 
     p3d::HLight hlight = sponzaScene->create(lightDesc);

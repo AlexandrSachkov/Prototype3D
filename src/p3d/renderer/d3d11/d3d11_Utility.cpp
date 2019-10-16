@@ -158,9 +158,9 @@ namespace p3d {
             ComPtr<ID3DBlob>& blob,
             ComPtr<ID3DBlob>& errBlob
         ) {
-            UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
+            UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_WARNINGS_ARE_ERRORS;
         #if defined( P3D_DEBUG )
-            flags |= D3DCOMPILE_DEBUG;
+            flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
         #endif
 
             P3D_ASSERT_R_DX11(D3DCompile(

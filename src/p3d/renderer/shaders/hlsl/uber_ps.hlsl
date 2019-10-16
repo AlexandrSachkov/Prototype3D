@@ -115,6 +115,8 @@ float4 main(PS_INPUT input) : SV_TARGET {
 
     diffuseTotal += diffusePoint;
     specularTotal += specularPoint;
+    diffuseTotal = clamp(diffuseTotal, float4(0.0f, 0.0f, 0.0f, 0.0f), float4(1.0f, 1.0f, 1.0f, 1.0f));
+    specularTotal = clamp(specularTotal, float4(0.0f, 0.0f, 0.0f, 0.0f), float4(1.0f, 1.0f, 1.0f, 1.0f));
 
     float4 litColor = ambientTotal + diffuseTotal + specularTotal;
     litColor.a = opacityFinal;
@@ -129,6 +131,9 @@ void calculatePointLightContribution(
     diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
     specular = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
+    float4 lDiffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    float4 lSpecular = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
     for (int i = 0; i < numPointLights; i++) {
         PointLight light = pointLights[i];
         float3 lightVec = light.position - pixelPos;
@@ -142,18 +147,21 @@ void calculatePointLightContribution(
         float diffuseFactor = dot(lightVec, normal);
         if (diffuseFactor > 0.0f) {
             float3 v = reflect(-lightVec, normal);
-            float specFactor = pow(max(dot(v, toEye), 0.0f), matSpecular.w);
+            float specFactor = pow(max(dot(v, toEye), 0.0f), matSpecular.r);
 
-            diffuse = diffuseFactor * matDiffuse * float4(light.diffuseColor, 1.0f);
-            specular = specFactor * matSpecular * float4(light.specularColor, 1.0f);
+            lDiffuse = diffuseFactor * matDiffuse * float4(light.diffuseColor, 1.0f);
+            lSpecular = specFactor * matSpecular * float4(light.specularColor, 1.0f);
+
+            float attenuation = 1.0f / dot(
+                float3(light.constAttenuation, light.linearAttenuation, light.quadraticAttenuation),
+                float3(1.0f, distance, distance * distance)
+            );
+
+            lDiffuse *= attenuation;
+            lSpecular *= attenuation;
         }
 
-        float attenuation = 1.0f / dot(
-            float3(light.constAttenuation, light.linearAttenuation, light.quadraticAttenuation), 
-            float3(1.0f, distance, distance * distance)
-        );
-
-        diffuse *= attenuation;
-        specular *= attenuation;
+        diffuse += lDiffuse;
+        specular += lSpecular;
     }
 }
