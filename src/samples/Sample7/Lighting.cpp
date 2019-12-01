@@ -53,7 +53,7 @@ bool run() {
         "Failed to import cube.obj");
 
     p3d::SceneProperties sceneProperties = sponzaScene->getProperties();
-    sceneProperties.ambientLight = { 0.2f,0.2f,0.2f };
+    sceneProperties.ambientLight = { 0.0f,0.0f,0.0f };
     sceneProperties.drawBoundingVolumes = false;
     sponzaScene->setProperties(sceneProperties);
 
@@ -67,7 +67,7 @@ bool run() {
     lightDesc.type = p3d::P3D_LIGHT_TYPE::P3D_POINT_LIGHT;
     lightDesc.desc.point.range = 10000.0f;
     lightDesc.desc.point.constAttenuation = 0.0f;
-    lightDesc.desc.point.linearAttenuation = 0.005f;
+    lightDesc.desc.point.linearAttenuation = 0.002f;
     lightDesc.desc.point.quadraticAttenuation = 0.0f;
     lightDesc.desc.point.diffuseColor = { 1.0f, 1.0f, 1.0f };
     lightDesc.desc.point.specularColor = { 1.0f, 1.0f, 1.0f };
