@@ -1,6 +1,6 @@
 <h1>Prototype3D</h1>
 
-<p><b>Prototype3D is a 3D real-time rendering engine that I have been working on in my spare time as a hobby</b></p>
+<p><b>Prototype3D is a free 3D real-time rendering engine that I have been working on in my spare time as a hobby</b></p>
     
 <p><table>
     <tr>
